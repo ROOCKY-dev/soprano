@@ -39,7 +39,8 @@ public class MixinAltoClefLocalPlayer {
         if (!AltoClefBridge.isRunning()) {
             return;
         }
-        cir.setReturnValue(((Entity) (Object) this).getXRot(partialTick));
+        Entity self = (Entity) (Object) this;
+        cir.setReturnValue(net.minecraft.util.Mth.lerp(partialTick, self.xRotO, self.getXRot()));
     }
 
     @Inject(
@@ -53,6 +54,6 @@ public class MixinAltoClefLocalPlayer {
         if (!AltoClefBridge.isRunning() || self.isPassenger()) {
             return;
         }
-        cir.setReturnValue(self.getYRot(partialTick));
+        cir.setReturnValue(net.minecraft.util.Mth.lerp(partialTick, self.yRotO, self.getYRot()));
     }
 }

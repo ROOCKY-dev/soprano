@@ -151,8 +151,8 @@ public class BlockPlaceHelper {
             // back a changed stack is some other Success, and == SUCCESS missed those. no swing, no scaffold, no trace,
             // and then the off hand clicked too. same split as
             // vanilla startUseItem: success is done, fail is done, only a pass goes on to the item and the other hand
-            if (result instanceof InteractionResult.Success success) {
-                if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
+            if (result.consumesAction()) {
+                if (result.shouldSwing()) {
                     ctx.player().swing(hand);
                 }
                 if (scaffold != null) {
@@ -163,12 +163,12 @@ public class BlockPlaceHelper {
                 }
                 return;
             }
-            if (result instanceof InteractionResult.Fail) {
+            if (result == InteractionResult.FAIL) {
                 return; // something in the way. trying the off hand on the same spot just puts the wrong block there
             }
             // a bucket says success with the emptied bucket attached, which isn't == SUCCESS, so the off hand used to
             // fire right after every pour
-            if (!ctx.player().getItemInHand(hand).isEmpty() && ctx.playerController().processRightClick(ctx.player(), ctx.world(), hand) instanceof InteractionResult.Success) {
+            if (!ctx.player().getItemInHand(hand).isEmpty() && ctx.playerController().processRightClick(ctx.player(), ctx.world(), hand).consumesAction()) {
                 return;
             }
         }

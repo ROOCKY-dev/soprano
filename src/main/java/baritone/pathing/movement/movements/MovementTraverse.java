@@ -511,7 +511,7 @@ public class MovementTraverse extends Movement {
         double e = GodBridge.pastEdge(pos.x, pos.z, src.x, src.z, dx, dz);
         HitResult hit = ctx.objectMouseOver();
         boolean onFace = hit != null && hit.getType() == HitResult.Type.BLOCK && ((BlockHitResult) hit).getBlockPos().equals(src.below())
-                && ((BlockHitResult) hit).getDirection() == Direction.getNearest(dx, 0, dz, Direction.UP);
+                && ((BlockHitResult) hit).getDirection() == Direction.getNearest(dx, 0, dz);
         // a swap from the main inventory isn't done the tick we ask for it, and a click with the wrong thing in hand is a
         // click that places nothing with no sneak to catch us. so not ready until the block is really in hand
         boolean ready = ((Baritone) baritone).getInputOverrideHandler().getBlockPlaceHelper().ready()

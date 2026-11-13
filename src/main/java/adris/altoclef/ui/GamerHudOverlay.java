@@ -125,7 +125,7 @@ public class GamerHudOverlay {
     private record Sprite(ResourceLocation id, int x, int y, int w, int h) implements Op {
         @Override
         public void draw(GuiGraphics g, Font font) {
-            g.blitSprite(RenderType::guiTextured, id, x, y, w, h);
+            g.blitSprite(id, x, y, w, h);
         }
     }
 

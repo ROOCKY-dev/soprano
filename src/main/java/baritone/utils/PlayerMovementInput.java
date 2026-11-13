@@ -18,21 +18,21 @@
 package baritone.utils;
 
 import baritone.api.utils.input.Input;
-import net.minecraft.client.player.ClientInput;
+import baritone.api.utils.IInputOverrideHandler;
 
-public class PlayerMovementInput extends ClientInput {
+public class PlayerMovementInput extends net.minecraft.client.player.Input {
 
-    private final InputOverrideHandler handler;
+    private final IInputOverrideHandler handler;
 
-    PlayerMovementInput(InputOverrideHandler handler) {
+    PlayerMovementInput(IInputOverrideHandler handler) {
         this.handler = handler;
     }
 
     @Override
-    public void tick() {
+    public void tick(boolean slowDown, float slowDownFactor) {
         this.leftImpulse = 0.0F;
         this.forwardImpulse = 0.0F;
-        boolean jumping = handler.isInputForcedDown(Input.JUMP); // oppa gangnam style
+        this.jumping = handler.isInputForcedDown(Input.JUMP); // oppa gangnam style
 
         boolean up = handler.isInputForcedDown(Input.MOVE_FORWARD);
         if (up) {
@@ -55,8 +55,15 @@ public class PlayerMovementInput extends ClientInput {
         }
 
         boolean sneaking = handler.isInputForcedDown(Input.SNEAK);
-        boolean sprinting = handler.isInputForcedDown(Input.SPRINT);
 
-        this.keyPresses = new net.minecraft.world.entity.player.Input(up, down, left, right, jumping, sneaking, sprinting);
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.shiftKeyDown = sneaking;
+        if (slowDown) {
+            this.leftImpulse *= slowDownFactor;
+            this.forwardImpulse *= slowDownFactor;
+        }
     }
 }

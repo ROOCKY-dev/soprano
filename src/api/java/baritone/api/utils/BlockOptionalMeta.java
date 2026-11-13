@@ -225,8 +225,8 @@ public final class BlockOptionalMeta {
 
     private static synchronized List<Item> drops(Block b) {
         return drops.computeIfAbsent(b, block -> {
-            Optional<ResourceKey<LootTable>> optionalLootTableKey = block.getLootTable();
-            if (optionalLootTableKey.isEmpty()) {
+            ResourceKey<LootTable> lootTableKey = block.getLootTable();
+            if (lootTableKey.equals(net.minecraft.world.level.storage.loot.BuiltInLootTables.EMPTY)) {
                 return Collections.emptyList();
             } else {
                 List<Item> items = new ArrayList<>();
@@ -247,13 +247,13 @@ public final class BlockOptionalMeta {
     }
 
     private static List<ItemStack> getDrops(Block state, LootParams.Builder params) {
-        Optional<ResourceKey<LootTable>> lv = state.getLootTable();
-        if (lv.isEmpty()) {
+        ResourceKey<LootTable> lv = state.getLootTable();
+        if (lv.equals(net.minecraft.world.level.storage.loot.BuiltInLootTables.EMPTY)) {
             return Collections.emptyList();
         } else {
             LootParams lv2 = params.withParameter(LootContextParams.BLOCK_STATE, state.defaultBlockState()).create(LootContextParamSets.BLOCK);
             ServerLevelStub lv3 = (ServerLevelStub) lv2.getLevel();
-            LootTable lv4 = lv3.holder().getLootTable(lv.get());
+            LootTable lv4 = lv3.holder().getLootTable(lv);
             return((ILootTable) lv4).invokeGetRandomItems(new LootContext.Builder(lv2).withOptionalRandomSeed(1).create(null));
         }
     }
@@ -311,27 +311,19 @@ public final class BlockOptionalMeta {
                 List.of(ServerPacksSource.createVanillaPackSource())
             );
             LayeredRegistryAccess<RegistryLayer> baseLayeredRegistry = RegistryLayer.createRegistryAccess();
-            List<Registry.PendingTags<?>> pendingTags = TagLoader.loadTagsForExistingRegistries(
-                closeableResourceManager, baseLayeredRegistry.getLayer(RegistryLayer.STATIC)
-            );
-            List<HolderLookup.RegistryLookup<?>> worldGenRegistryLookupList = TagLoader.buildUpdatedLookups(
-                baseLayeredRegistry.getAccessForLoading(RegistryLayer.WORLDGEN),
-                pendingTags
-            );
             LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = baseLayeredRegistry.replaceFrom(
                 RegistryLayer.WORLDGEN,
                 RegistryDataLoader.load(
                     closeableResourceManager,
-                    worldGenRegistryLookupList,
+                    baseLayeredRegistry.getAccessForLoading(RegistryLayer.WORLDGEN),
                     RegistryDataLoader.WORLDGEN_REGISTRIES
                 )
             );
             return ReloadableServerRegistries.reload(
                 layeredRegistryAccess,
-                pendingTags,
                 closeableResourceManager,
                 ForkJoinPool.commonPool()
-            ).thenApply(r -> r.layers().compositeAccess());
+            ).thenApply(LayeredRegistryAccess::compositeAccess);
         }
     }
 }

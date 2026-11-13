@@ -73,14 +73,14 @@ public abstract class MixinLoadingOverlay {
             method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Ljava/util/function/Function;Lnet/minecraft/resources/ResourceLocation;IIFFIIIIIII)V"
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIFFIIII)V"
             ),
             require = 0
     )
-    private void soprano$logo(GuiGraphics g, Function<ResourceLocation, RenderType> type, ResourceLocation texture,
-                              int x, int y, float u, float v, int w, int h, int uw, int vh, int tw, int th, int color) {
+    private void soprano$logo(GuiGraphics g, ResourceLocation texture,
+                              int x, int y, int w, int h, float u, float v, int uw, int vh, int tw, int th) {
         if (!BootScreen.drawing()) {
-            g.blit(type, texture, x, y, u, v, w, h, uw, vh, tw, th, color);
+            g.blit(texture, x, y, w, h, u, v, uw, vh, tw, th);
         }
     }
 

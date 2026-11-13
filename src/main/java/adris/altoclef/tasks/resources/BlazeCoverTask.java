@@ -64,7 +64,7 @@ public final class BlazeCoverTask extends Task {
         Blaze target = allowShield ? shieldAt.get() : null;
         boolean hasShield = mod.getItemStorage().hasItem(Items.SHIELD) || mod.getItemStorage().hasItemInOffhand(Items.SHIELD);
         ItemStack offhand = StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT);
-        if (target == null || !hasShield || mod.getPlayer().getCooldowns().isOnCooldown(offhand)) {
+        if (target == null || !hasShield || mod.getPlayer().getCooldowns().isOnCooldown(offhand.getItem())) {
             shield.stopShielding(mod);
             setDebugState("Hiding from blazes");
             return null;

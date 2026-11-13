@@ -35,7 +35,7 @@ public class ItemDeserializer implements JsonDeserializer<Item> {
         ResourceLocation identifier = ResourceLocation.tryParse(itemKey);
         // ITEM is a defaulted registry, getValue would hand us air for a typo instead of failing
         if (identifier != null && BuiltInRegistries.ITEM.containsKey(identifier)) {
-            return BuiltInRegistries.ITEM.getValue(identifier);
+            return BuiltInRegistries.ITEM.get(identifier);
         }
         Debug.logWarning("Invalid item name:" + itemKey);
         return null;

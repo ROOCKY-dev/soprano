@@ -175,7 +175,7 @@ public final class MoveScreen extends Screen implements MoveSession.MoveScreenMa
         float inv = (float) (1.0 / Math.max(1, win.getGuiScale()));
         // the hotbar's items leave depth behind right where the bar sits, same clean start as GuiScreen
         g.flush();
-        RenderSystem.clear(256);
+        RenderSystem.clear(256, Minecraft.ON_OSX);
         g.pose().pushPose();
         g.pose().scale(inv, inv, 1f);
         boolean began = false;

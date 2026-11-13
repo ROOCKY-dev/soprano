@@ -384,7 +384,7 @@ public class PlaceStationTask extends Task {
 
     private static Direction face(int fx, int fy, int fz) {
         for (Direction d : Direction.values()) {
-            if (d.getUnitVec3i().getX() == fx && d.getUnitVec3i().getY() == fy && d.getUnitVec3i().getZ() == fz) {
+            if (d.getNormal().getX() == fx && d.getNormal().getY() == fy && d.getNormal().getZ() == fz) {
                 return d;
             }
         }

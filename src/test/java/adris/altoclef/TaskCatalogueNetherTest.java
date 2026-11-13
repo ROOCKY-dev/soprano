@@ -21,7 +21,7 @@ public class TaskCatalogueNetherTest {
     }
 
     private static Item item(String path) {
-        return BuiltInRegistries.ITEM.getValue(ResourceLocation.withDefaultNamespace(path));
+        return BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(path));
     }
 
     @Test

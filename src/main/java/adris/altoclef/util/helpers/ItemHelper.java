@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.client.Minecraft;
-import net.minecraft.world.level.block.entity.FuelValues;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -49,10 +49,10 @@ public class ItemHelper {
             Items.WAXED_OXIDIZED_CUT_COPPER};
     public static final Item[] SAPLINGS = new Item[]{Items.OAK_SAPLING, Items.SPRUCE_SAPLING, Items.BIRCH_SAPLING,
             Items.JUNGLE_SAPLING, Items.ACACIA_SAPLING, Items.DARK_OAK_SAPLING, Items.MANGROVE_PROPAGULE,
-            Items.CHERRY_SAPLING, Items.PALE_OAK_SAPLING};
+            Items.CHERRY_SAPLING};
     public static final Block[] SAPLING_SOURCES = new Block[]{Blocks.OAK_LEAVES, Blocks.SPRUCE_LEAVES,
             Blocks.BIRCH_LEAVES, Blocks.JUNGLE_LEAVES, Blocks.ACACIA_LEAVES, Blocks.DARK_OAK_LEAVES,
-            Blocks.MANGROVE_PROPAGULE, Blocks.CHERRY_LEAVES, Blocks.PALE_OAK_LEAVES};
+            Blocks.MANGROVE_PROPAGULE, Blocks.CHERRY_LEAVES};
     public static final Item[] HOSTILE_MOB_DROPS = new Item[]{Items.BLAZE_ROD, Items.FEATHER, Items.CHICKEN,
             Items.COOKED_CHICKEN, Items.ROTTEN_FLESH, Items.ZOMBIE_HEAD, Items.GUNPOWDER, Items.CREEPER_HEAD,
             Items.TOTEM_OF_UNDYING, Items.EMERALD, Items.PORKCHOP, Items.COOKED_PORKCHOP, Items.LEATHER,
@@ -64,48 +64,48 @@ public class ItemHelper {
     public static final Item[] DIRTS = new Item[]{Items.DIRT, Items.DIRT_PATH, Items.COARSE_DIRT, Items.ROOTED_DIRT};
     public static final Item[] PLANKS = new Item[]{Items.ACACIA_PLANKS, Items.BIRCH_PLANKS, Items.CRIMSON_PLANKS,
             Items.DARK_OAK_PLANKS, Items.OAK_PLANKS, Items.JUNGLE_PLANKS, Items.SPRUCE_PLANKS, Items.WARPED_PLANKS,
-            Items.MANGROVE_PLANKS, Items.CHERRY_PLANKS, Items.PALE_OAK_PLANKS, Items.BAMBOO_PLANKS};
+            Items.MANGROVE_PLANKS, Items.CHERRY_PLANKS, Items.BAMBOO_PLANKS};
     public static final Item[] LEAVES = new Item[]{Items.ACACIA_LEAVES, Items.BIRCH_LEAVES, Items.DARK_OAK_LEAVES,
-            Items.OAK_LEAVES, Items.JUNGLE_LEAVES, Items.SPRUCE_LEAVES, Items.MANGROVE_LEAVES, Items.CHERRY_LEAVES, Items.PALE_OAK_LEAVES};
+            Items.OAK_LEAVES, Items.JUNGLE_LEAVES, Items.SPRUCE_LEAVES, Items.MANGROVE_LEAVES, Items.CHERRY_LEAVES};
     public static final Item[] WOOD = new Item[]{Items.ACACIA_WOOD, Items.BIRCH_WOOD, Items.CRIMSON_HYPHAE,
             Items.DARK_OAK_WOOD, Items.OAK_WOOD, Items.JUNGLE_WOOD, Items.SPRUCE_WOOD, Items.WARPED_HYPHAE,
             Items.MANGROVE_WOOD};
     public static final Item[] WOOD_BUTTON = new Item[]{Items.ACACIA_BUTTON, Items.BIRCH_BUTTON, Items.CRIMSON_BUTTON,
             Items.DARK_OAK_BUTTON, Items.OAK_BUTTON, Items.JUNGLE_BUTTON, Items.SPRUCE_BUTTON, Items.WARPED_BUTTON,
-            Items.MANGROVE_BUTTON, Items.BAMBOO_BUTTON, Items.CHERRY_BUTTON, Items.PALE_OAK_BUTTON};
+            Items.MANGROVE_BUTTON, Items.BAMBOO_BUTTON, Items.CHERRY_BUTTON};
     public static final Item[] WOOD_SIGN = new Item[]{Items.ACACIA_SIGN, Items.BIRCH_SIGN, Items.CRIMSON_SIGN,
             Items.DARK_OAK_SIGN, Items.OAK_SIGN, Items.JUNGLE_SIGN, Items.SPRUCE_SIGN, Items.WARPED_SIGN,
-            Items.MANGROVE_SIGN, Items.BAMBOO_SIGN, Items.CHERRY_SIGN, Items.PALE_OAK_SIGN};
+            Items.MANGROVE_SIGN, Items.BAMBOO_SIGN, Items.CHERRY_SIGN};
     public static final Item[] WOOD_HANGING_SIGN = new Item[]{Items.ACACIA_HANGING_SIGN, Items.BIRCH_HANGING_SIGN,
             Items.CRIMSON_HANGING_SIGN, Items.DARK_OAK_HANGING_SIGN, Items.OAK_HANGING_SIGN, Items.JUNGLE_HANGING_SIGN,
             Items.SPRUCE_HANGING_SIGN, Items.WARPED_HANGING_SIGN, Items.MANGROVE_HANGING_SIGN, Items.BAMBOO_HANGING_SIGN,
-            Items.CHERRY_HANGING_SIGN, Items.PALE_OAK_HANGING_SIGN};
+            Items.CHERRY_HANGING_SIGN};
     public static final Item[] WOOD_PRESSURE_PLATE = new Item[]{Items.ACACIA_PRESSURE_PLATE, Items.BIRCH_PRESSURE_PLATE,
             Items.CRIMSON_PRESSURE_PLATE, Items.DARK_OAK_PRESSURE_PLATE, Items.OAK_PRESSURE_PLATE,
             Items.JUNGLE_PRESSURE_PLATE, Items.SPRUCE_PRESSURE_PLATE, Items.WARPED_PRESSURE_PLATE,
-            Items.MANGROVE_PRESSURE_PLATE, Items.BAMBOO_PRESSURE_PLATE, Items.CHERRY_PRESSURE_PLATE, Items.PALE_OAK_PRESSURE_PLATE};
+            Items.MANGROVE_PRESSURE_PLATE, Items.BAMBOO_PRESSURE_PLATE, Items.CHERRY_PRESSURE_PLATE};
     public static final Item[] WOOD_FENCE = new Item[]{Items.ACACIA_FENCE, Items.BIRCH_FENCE, Items.DARK_OAK_FENCE,
             Items.OAK_FENCE, Items.JUNGLE_FENCE, Items.SPRUCE_FENCE, Items.CRIMSON_FENCE, Items.WARPED_FENCE,
-            Items.MANGROVE_FENCE, Items.BAMBOO_FENCE, Items.CHERRY_FENCE, Items.PALE_OAK_FENCE};
+            Items.MANGROVE_FENCE, Items.BAMBOO_FENCE, Items.CHERRY_FENCE};
     public static final Item[] WOOD_FENCE_GATE = new Item[]{Items.ACACIA_FENCE_GATE, Items.BIRCH_FENCE_GATE,
             Items.DARK_OAK_FENCE_GATE, Items.OAK_FENCE_GATE, Items.JUNGLE_FENCE_GATE, Items.SPRUCE_FENCE_GATE,
             Items.CRIMSON_FENCE_GATE, Items.WARPED_FENCE_GATE, Items.MANGROVE_FENCE_GATE, Items.BAMBOO_FENCE_GATE,
-            Items.CHERRY_FENCE_GATE, Items.PALE_OAK_FENCE_GATE};
+            Items.CHERRY_FENCE_GATE};
     public static final Item[] WOOD_BOAT = new Item[]{Items.ACACIA_BOAT, Items.BIRCH_BOAT, Items.DARK_OAK_BOAT,
-            Items.OAK_BOAT, Items.JUNGLE_BOAT, Items.SPRUCE_BOAT, Items.MANGROVE_BOAT, Items.CHERRY_BOAT, Items.PALE_OAK_BOAT};
+            Items.OAK_BOAT, Items.JUNGLE_BOAT, Items.SPRUCE_BOAT, Items.MANGROVE_BOAT, Items.CHERRY_BOAT};
     public static final Item[] WOOD_DOOR = new Item[]{Items.ACACIA_DOOR, Items.BIRCH_DOOR, Items.CRIMSON_DOOR,
             Items.DARK_OAK_DOOR, Items.OAK_DOOR, Items.JUNGLE_DOOR, Items.SPRUCE_DOOR, Items.WARPED_DOOR,
-            Items.MANGROVE_DOOR, Items.BAMBOO_DOOR, Items.CHERRY_DOOR, Items.PALE_OAK_DOOR};
+            Items.MANGROVE_DOOR, Items.BAMBOO_DOOR, Items.CHERRY_DOOR};
     public static final Item[] WOOD_SLAB = new Item[]{Items.ACACIA_SLAB, Items.BIRCH_SLAB, Items.CRIMSON_SLAB,
             Items.DARK_OAK_SLAB, Items.OAK_SLAB, Items.JUNGLE_SLAB, Items.SPRUCE_SLAB, Items.WARPED_SLAB,
-            Items.MANGROVE_SLAB, Items.BAMBOO_SLAB, Items.CHERRY_SLAB, Items.PALE_OAK_SLAB};
+            Items.MANGROVE_SLAB, Items.BAMBOO_SLAB, Items.CHERRY_SLAB};
     public static final Item[] WOOD_STAIRS = new Item[]{Items.ACACIA_STAIRS, Items.BIRCH_STAIRS, Items.CRIMSON_STAIRS,
             Items.DARK_OAK_STAIRS, Items.OAK_STAIRS, Items.JUNGLE_STAIRS, Items.SPRUCE_STAIRS, Items.WARPED_STAIRS,
-            Items.MANGROVE_STAIRS, Items.BAMBOO_STAIRS, Items.CHERRY_STAIRS, Items.PALE_OAK_STAIRS};
+            Items.MANGROVE_STAIRS, Items.BAMBOO_STAIRS, Items.CHERRY_STAIRS};
     public static final Item[] WOOD_TRAPDOOR = new Item[]{Items.ACACIA_TRAPDOOR, Items.BIRCH_TRAPDOOR,
             Items.CRIMSON_TRAPDOOR, Items.DARK_OAK_TRAPDOOR, Items.OAK_TRAPDOOR, Items.JUNGLE_TRAPDOOR,
             Items.SPRUCE_TRAPDOOR, Items.WARPED_TRAPDOOR, Items.MANGROVE_TRAPDOOR, Items.BAMBOO_TRAPDOOR,
-            Items.CHERRY_TRAPDOOR, Items.PALE_OAK_TRAPDOOR};
+            Items.CHERRY_TRAPDOOR};
     public static final Item[] LOG = new Item[]{Items.ACACIA_LOG, Items.BIRCH_LOG, Items.DARK_OAK_LOG, Items.OAK_LOG, Items.JUNGLE_LOG, Items.SPRUCE_LOG,
             Items.ACACIA_WOOD, Items.BIRCH_WOOD, Items.DARK_OAK_WOOD, Items.OAK_WOOD, Items.JUNGLE_WOOD, Items.SPRUCE_WOOD,
             Items.STRIPPED_ACACIA_LOG, Items.STRIPPED_BIRCH_LOG, Items.STRIPPED_DARK_OAK_LOG, Items.STRIPPED_OAK_LOG, Items.STRIPPED_JUNGLE_LOG, Items.STRIPPED_SPRUCE_LOG,
@@ -113,15 +113,15 @@ public class ItemHelper {
             Items.CRIMSON_STEM, Items.WARPED_STEM, Items.CRIMSON_HYPHAE, Items.WARPED_HYPHAE,
             Items.STRIPPED_CRIMSON_STEM, Items.STRIPPED_WARPED_STEM, Items.STRIPPED_CRIMSON_HYPHAE,
             Items.STRIPPED_WARPED_HYPHAE, Items.MANGROVE_LOG, Items.MANGROVE_WOOD, Items.STRIPPED_MANGROVE_LOG,
-            Items.STRIPPED_MANGROVE_WOOD, Items.CHERRY_LOG, Items.PALE_OAK_LOG, Items.CHERRY_WOOD, Items.PALE_OAK_WOOD, Items.STRIPPED_CHERRY_LOG, Items.STRIPPED_PALE_OAK_LOG,
-            Items.STRIPPED_CHERRY_WOOD, Items.STRIPPED_PALE_OAK_WOOD};
+            Items.STRIPPED_MANGROVE_WOOD, Items.CHERRY_LOG, Items.CHERRY_WOOD, Items.STRIPPED_CHERRY_LOG,
+            Items.STRIPPED_CHERRY_WOOD};
     public static final Item[] STRIPPED_LOGS = new Item[]{Items.STRIPPED_ACACIA_LOG, Items.STRIPPED_BIRCH_LOG,
             Items.STRIPPED_DARK_OAK_LOG, Items.STRIPPED_OAK_LOG, Items.STRIPPED_JUNGLE_LOG, Items.STRIPPED_SPRUCE_LOG,
             Items.STRIPPED_CRIMSON_STEM, Items.STRIPPED_WARPED_STEM, Items.STRIPPED_MANGROVE_LOG,
-            Items.STRIPPED_CHERRY_LOG, Items.STRIPPED_PALE_OAK_LOG};
+            Items.STRIPPED_CHERRY_LOG};
     public static final Item[] STRIPPABLE_LOGS = new Item[]{Items.ACACIA_LOG, Items.BIRCH_LOG, Items.DARK_OAK_LOG,
             Items.OAK_LOG, Items.JUNGLE_LOG, Items.SPRUCE_LOG, Items.CRIMSON_STEM, Items.WARPED_STEM, Items.MANGROVE_LOG,
-            Items.CHERRY_LOG, Items.PALE_OAK_LOG};
+            Items.CHERRY_LOG};
     public static final Item[] DYE = new Item[]{Items.WHITE_DYE, Items.BLACK_DYE, Items.BLUE_DYE, Items.BROWN_DYE, Items.CYAN_DYE, Items.GRAY_DYE, Items.GREEN_DYE, Items.LIGHT_BLUE_DYE, Items.LIGHT_GRAY_DYE, Items.LIME_DYE, Items.MAGENTA_DYE, Items.ORANGE_DYE, Items.PINK_DYE, Items.PURPLE_DYE, Items.RED_DYE, Items.YELLOW_DYE};
     public static final Item[] WOOL = new Item[]{Items.WHITE_WOOL, Items.BLACK_WOOL, Items.BLUE_WOOL, Items.BROWN_WOOL, Items.CYAN_WOOL, Items.GRAY_WOOL, Items.GREEN_WOOL, Items.LIGHT_BLUE_WOOL, Items.LIGHT_GRAY_WOOL, Items.LIME_WOOL, Items.MAGENTA_WOOL, Items.ORANGE_WOOL, Items.PINK_WOOL, Items.PURPLE_WOOL, Items.RED_WOOL, Items.YELLOW_WOOL};
     public static final Item[] BED = new Item[]{Items.WHITE_BED, Items.BLACK_BED, Items.BLUE_BED, Items.BROWN_BED, Items.CYAN_BED, Items.GRAY_BED, Items.GREEN_BED, Items.LIGHT_BLUE_BED, Items.LIGHT_GRAY_BED, Items.LIME_BED, Items.MAGENTA_BED, Items.ORANGE_BED, Items.PINK_BED, Items.PURPLE_BED, Items.RED_BED, Items.YELLOW_BED};
@@ -129,8 +129,8 @@ public class ItemHelper {
     public static final Item[] SHULKER_BOXES = new Item[]{Items.WHITE_SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.BLUE_SHULKER_BOX, Items.BROWN_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.GREEN_SHULKER_BOX, Items.LIGHT_BLUE_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX, Items.LIME_SHULKER_BOX, Items.MAGENTA_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, Items.PINK_SHULKER_BOX, Items.PURPLE_SHULKER_BOX, Items.RED_SHULKER_BOX, Items.YELLOW_SHULKER_BOX};
     public static final Item[] FLOWER = new Item[]{Items.ALLIUM, Items.AZURE_BLUET, Items.BLUE_ORCHID, Items.CORNFLOWER, Items.DANDELION, Items.LILAC, Items.LILY_OF_THE_VALLEY, Items.ORANGE_TULIP, Items.OXEYE_DAISY, Items.PINK_TULIP, Items.POPPY, Items.PEONY, Items.RED_TULIP, Items.ROSE_BUSH, Items.SUNFLOWER, Items.WHITE_TULIP};
     // what vanilla's suspicious_stew_from_* recipes take (the small_flowers tag). FLOWER above is wider: it has lilac, peony, rose bush and sunflower
-    public static final Item[] SUSPICIOUS_STEW_FLOWERS = new Item[]{Items.ALLIUM, Items.AZURE_BLUET, Items.BLUE_ORCHID, Items.CLOSED_EYEBLOSSOM, Items.CORNFLOWER, Items.DANDELION,
-            Items.LILY_OF_THE_VALLEY, Items.OPEN_EYEBLOSSOM, Items.ORANGE_TULIP, Items.OXEYE_DAISY, Items.PINK_TULIP, Items.POPPY, Items.RED_TULIP, Items.TORCHFLOWER,
+    public static final Item[] SUSPICIOUS_STEW_FLOWERS = new Item[]{Items.ALLIUM, Items.AZURE_BLUET, Items.BLUE_ORCHID, Items.CORNFLOWER, Items.DANDELION,
+            Items.LILY_OF_THE_VALLEY, Items.ORANGE_TULIP, Items.OXEYE_DAISY, Items.PINK_TULIP, Items.POPPY, Items.RED_TULIP, Items.TORCHFLOWER,
             Items.WHITE_TULIP, Items.WITHER_ROSE};
     public static final Item[] LEATHER_ARMORS =new Item[]{Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_HELMET, Items.LEATHER_BOOTS};
     public static final Item[] GOLDEN_ARMORS = new Item[]{Items.GOLDEN_CHESTPLATE, Items.GOLDEN_LEGGINGS, Items.GOLDEN_HELMET, Items.GOLDEN_BOOTS};
@@ -147,7 +147,7 @@ public class ItemHelper {
             Blocks.OAK_SIGN, Blocks.JUNGLE_SIGN, Blocks.SPRUCE_SIGN, Blocks.ACACIA_WALL_SIGN, Blocks.BIRCH_WALL_SIGN,
             Blocks.DARK_OAK_WALL_SIGN, Blocks.OAK_WALL_SIGN, Blocks.JUNGLE_WALL_SIGN, Blocks.SPRUCE_WALL_SIGN,
             Blocks.MANGROVE_SIGN, Blocks.MANGROVE_WALL_SIGN, Blocks.BAMBOO_SIGN, Blocks.BAMBOO_WALL_SIGN,
-            Blocks.CHERRY_SIGN, Blocks.PALE_OAK_SIGN, Blocks.CHERRY_WALL_SIGN, Blocks.PALE_OAK_WALL_SIGN,
+            Blocks.CHERRY_SIGN, Blocks.CHERRY_WALL_SIGN,
             Blocks.CRIMSON_SIGN, Blocks.CRIMSON_WALL_SIGN, Blocks.WARPED_SIGN, Blocks.WARPED_WALL_SIGN};
     public static final Block[] WOOD_HANGING_SIGNS_ALL = new Block[]{Blocks.ACACIA_HANGING_SIGN,
             Blocks.ACACIA_WALL_HANGING_SIGN, Blocks.BIRCH_HANGING_SIGN, Blocks.BIRCH_WALL_HANGING_SIGN,
@@ -155,18 +155,14 @@ public class ItemHelper {
             Blocks.OAK_WALL_HANGING_SIGN, Blocks.JUNGLE_HANGING_SIGN, Blocks.JUNGLE_WALL_HANGING_SIGN,
             Blocks.SPRUCE_HANGING_SIGN, Blocks.SPRUCE_WALL_HANGING_SIGN, Blocks.MANGROVE_HANGING_SIGN,
             Blocks.MANGROVE_WALL_HANGING_SIGN, Blocks.BAMBOO_HANGING_SIGN, Blocks.BAMBOO_WALL_HANGING_SIGN,
-            Blocks.CHERRY_HANGING_SIGN, Blocks.PALE_OAK_HANGING_SIGN, Blocks.CHERRY_WALL_HANGING_SIGN, Blocks.PALE_OAK_WALL_HANGING_SIGN,
+            Blocks.CHERRY_HANGING_SIGN, Blocks.CHERRY_WALL_HANGING_SIGN,
             Blocks.CRIMSON_HANGING_SIGN, Blocks.CRIMSON_WALL_HANGING_SIGN, Blocks.WARPED_HANGING_SIGN, Blocks.WARPED_WALL_HANGING_SIGN};
     private static final Map<Item, Item> _logToPlanks = new HashMap<>() {
         {
             put(Items.CHERRY_LOG, Items.CHERRY_PLANKS);
-            put(Items.PALE_OAK_LOG, Items.PALE_OAK_PLANKS);
             put(Items.CHERRY_WOOD, Items.CHERRY_PLANKS);
-            put(Items.PALE_OAK_WOOD, Items.PALE_OAK_PLANKS);
             put(Items.STRIPPED_CHERRY_LOG, Items.CHERRY_PLANKS);
-            put(Items.STRIPPED_PALE_OAK_LOG, Items.PALE_OAK_PLANKS);
             put(Items.STRIPPED_CHERRY_WOOD, Items.CHERRY_PLANKS);
-            put(Items.STRIPPED_PALE_OAK_WOOD, Items.PALE_OAK_PLANKS);
             put(Items.MANGROVE_LOG, Items.MANGROVE_PLANKS);
             put(Items.MANGROVE_WOOD, Items.MANGROVE_PLANKS);
             put(Items.STRIPPED_MANGROVE_LOG, Items.MANGROVE_PLANKS);
@@ -208,7 +204,6 @@ public class ItemHelper {
     private static final Map<Item, Item> _planksToLogs = new HashMap<>() {
         {
             put(Items.CHERRY_PLANKS, Items.CHERRY_LOG);
-            put(Items.PALE_OAK_PLANKS, Items.PALE_OAK_LOG);
             put(Items.MANGROVE_PLANKS, Items.MANGROVE_LOG);
             put(Items.ACACIA_PLANKS, Items.ACACIA_LOG);
             put(Items.BIRCH_PLANKS, Items.BIRCH_LOG);
@@ -223,7 +218,6 @@ public class ItemHelper {
     private static final Map<Item, Item> _strippedToLogs = new HashMap<>() {
         {
             put(Items.STRIPPED_CHERRY_LOG, Items.CHERRY_LOG);
-            put(Items.STRIPPED_PALE_OAK_LOG, Items.PALE_OAK_LOG);
             put(Items.STRIPPED_MANGROVE_LOG, Items.MANGROVE_LOG);
             put(Items.STRIPPED_ACACIA_LOG, Items.ACACIA_LOG);
             put(Items.STRIPPED_BIRCH_LOG, Items.BIRCH_LOG);
@@ -264,7 +258,6 @@ public class ItemHelper {
     private static final Map<WoodType, WoodItems> _woodMap = new HashMap<WoodType, WoodItems>() {
         {
             p(WoodType.CHERRY, "cherry", Items.CHERRY_PLANKS, Items.CHERRY_LOG, Items.STRIPPED_CHERRY_LOG, Items.STRIPPED_CHERRY_WOOD, Items.CHERRY_WOOD, Items.CHERRY_SIGN, Items.CHERRY_HANGING_SIGN, Items.CHERRY_DOOR, Items.CHERRY_BUTTON, Items.CHERRY_STAIRS, Items.CHERRY_SLAB, Items.CHERRY_FENCE, Items.CHERRY_FENCE_GATE, Items.CHERRY_BOAT, Items.CHERRY_SAPLING, Items.CHERRY_LEAVES, Items.CHERRY_PRESSURE_PLATE, Items.CHERRY_TRAPDOOR);
-            p(WoodType.PALE_OAK, "pale_oak", Items.PALE_OAK_PLANKS, Items.PALE_OAK_LOG, Items.STRIPPED_PALE_OAK_LOG, Items.STRIPPED_PALE_OAK_WOOD, Items.PALE_OAK_WOOD, Items.PALE_OAK_SIGN, Items.PALE_OAK_HANGING_SIGN, Items.PALE_OAK_DOOR, Items.PALE_OAK_BUTTON, Items.PALE_OAK_STAIRS, Items.PALE_OAK_SLAB, Items.PALE_OAK_FENCE, Items.PALE_OAK_FENCE_GATE, Items.PALE_OAK_BOAT, Items.PALE_OAK_SAPLING, Items.PALE_OAK_LEAVES, Items.PALE_OAK_PRESSURE_PLATE, Items.PALE_OAK_TRAPDOOR);
             p(WoodType.BAMBOO, "bamboo", null, null, Items.STRIPPED_BAMBOO_BLOCK, null, null, Items.BAMBOO_SIGN, Items.BAMBOO_HANGING_SIGN, Items.BAMBOO_DOOR, Items.BAMBOO_BUTTON, Items.BAMBOO_STAIRS, Items.BAMBOO_SLAB, Items.BAMBOO_FENCE, Items.BAMBOO_FENCE_GATE, Items.BAMBOO_RAFT, Items.BAMBOO, null, Items.BAMBOO_PRESSURE_PLATE, Items.BAMBOO_TRAPDOOR);
             p(WoodType.MANGROVE, "mangrove", Items.MANGROVE_PLANKS, Items.MANGROVE_LOG, Items.STRIPPED_MANGROVE_LOG, Items.STRIPPED_MANGROVE_WOOD, Items.MANGROVE_WOOD, Items.MANGROVE_SIGN, Items.MANGROVE_HANGING_SIGN, Items.MANGROVE_DOOR, Items.MANGROVE_BUTTON, Items.MANGROVE_STAIRS, Items.MANGROVE_SLAB, Items.MANGROVE_FENCE, Items.MANGROVE_FENCE_GATE, Items.MANGROVE_BOAT, Items.MANGROVE_PROPAGULE, Items.MANGROVE_LEAVES, Items.MANGROVE_PRESSURE_PLATE, Items.MANGROVE_TRAPDOOR);
             p(WoodType.ACACIA, "acacia", Items.ACACIA_PLANKS, Items.ACACIA_LOG, Items.STRIPPED_ACACIA_LOG, Items.STRIPPED_ACACIA_WOOD, Items.ACACIA_WOOD, Items.ACACIA_SIGN, Items.ACACIA_HANGING_SIGN, Items.ACACIA_DOOR, Items.ACACIA_BUTTON, Items.ACACIA_STAIRS, Items.ACACIA_SLAB, Items.ACACIA_FENCE, Items.ACACIA_FENCE_GATE, Items.ACACIA_BOAT, Items.ACACIA_SAPLING, Items.ACACIA_LEAVES, Items.ACACIA_PRESSURE_PLATE, Items.ACACIA_TRAPDOOR);
@@ -295,7 +288,6 @@ public class ItemHelper {
     };
     public static final Item[] RAW_FOODS = _cookableFoodMap.keySet().toArray(Item[]::new);
     private static Map<Item, Integer> _fuelTimeMap = null;
-    private static FuelValues _fuelValues = null;
 
     public static String stripItemName(Item item) {
         String[] possibilities = new String[]{"item.minecraft.", "block.minecraft."};
@@ -467,19 +459,9 @@ public class ItemHelper {
     }
 
     private static Map<Item, Integer> getFuelTimeMap() {
-        // 1.21.2: the fuel table lives on the level now (it is data driven), not in a static on the furnace
-        var level = Minecraft.getInstance().level;
-        if (level == null) {
-            return _fuelTimeMap == null ? Map.of() : _fuelTimeMap;
-        }
-        FuelValues values = level.fuelValues();
-        if (_fuelTimeMap == null || values != _fuelValues) {
-            Map<Item, Integer> map = new HashMap<>();
-            for (Item item : values.fuelItems()) {
-                map.put(item, values.burnDuration(new ItemStack(item)));
-            }
-            _fuelTimeMap = map;
-            _fuelValues = values;
+        // 1.21.1 keeps the vanilla fuel table on the furnace
+        if (_fuelTimeMap == null) {
+            _fuelTimeMap = AbstractFurnaceBlockEntity.getFuel();
         }
         return _fuelTimeMap;
     }
@@ -554,8 +536,14 @@ public class ItemHelper {
         return (float) mainHandAttribute(item, Attributes.ATTACK_SPEED, PLAYER_BASE_ATTACK_SPEED);
     }
 
-    private static double mainHandAttribute(Item item, Holder<Attribute> attribute, double base) {
+    // 1.21.1 armor supplies defaults through the item, while tools already use the component
+    private static ItemAttributeModifiers defaultModifiers(Item item) {
         ItemAttributeModifiers modifiers = item.components().get(DataComponents.ATTRIBUTE_MODIFIERS);
+        return modifiers == null || modifiers.modifiers().isEmpty() ? item.getDefaultAttributeModifiers() : modifiers;
+    }
+
+    private static double mainHandAttribute(Item item, Holder<Attribute> attribute, double base) {
+        ItemAttributeModifiers modifiers = defaultModifiers(item);
         if (modifiers == null) {
             return base;
         }
@@ -593,7 +581,7 @@ public class ItemHelper {
 
     private static double wornAttribute(Item item, Holder<Attribute> attribute) {
         net.minecraft.world.entity.EquipmentSlot slot = getEquipSlot(item);
-        ItemAttributeModifiers modifiers = item.components().get(DataComponents.ATTRIBUTE_MODIFIERS);
+        ItemAttributeModifiers modifiers = defaultModifiers(item);
         if (slot == null || modifiers == null) {
             return 0;
         }
@@ -648,15 +636,14 @@ public class ItemHelper {
      * Stand in for `instanceof Equipable`, anything with the equippable component can be worn.
      */
     public static boolean isEquippable(Item item) {
-        return item.components().has(DataComponents.EQUIPPABLE);
+        return item instanceof net.minecraft.world.item.Equipable;
     }
 
     /**
      * Stand in for ArmorItem#getEquipmentSlot, the slot an equippable item goes in. Null if it doesn't go anywhere.
      */
     public static net.minecraft.world.entity.EquipmentSlot getEquipSlot(Item item) {
-        var equippable = item.components().get(DataComponents.EQUIPPABLE);
-        return equippable == null ? null : equippable.slot();
+        return item instanceof net.minecraft.world.item.Equipable equippable ? equippable.getEquipmentSlot() : null;
     }
 
     public static double getFuelAmount(Item... items) {

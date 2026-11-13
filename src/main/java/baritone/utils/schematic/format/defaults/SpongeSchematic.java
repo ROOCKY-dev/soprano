@@ -155,9 +155,8 @@ public final class SpongeSchematic extends StaticSchematic implements ParseRepor
 
         private BlockState deserialize() {
             if (this.blockState == null) {
-                Block found = BuiltInRegistries.BLOCK.get(this.resourceLocation)
-                    .map(Holder.Reference::value)
-                    .orElse(null);
+                Block found = BuiltInRegistries.BLOCK.getOptional(this.resourceLocation)
+                                        .orElse(null);
                 this.unknownBlock = found == null;
                 Block block = found == null ? Blocks.AIR : found;
                 this.blockState = block.defaultBlockState();

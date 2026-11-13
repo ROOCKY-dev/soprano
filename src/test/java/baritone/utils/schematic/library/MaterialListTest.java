@@ -33,7 +33,7 @@ public class MaterialListTest {
 
     // the coloured blocks aren't plain fields on Blocks any more, so look them up by id
     private static Block block(String id) {
-        return BuiltInRegistries.BLOCK.getValue(net.minecraft.resources.ResourceLocation.parse("minecraft:" + id));
+        return BuiltInRegistries.BLOCK.get(net.minecraft.resources.ResourceLocation.parse("minecraft:" + id));
     }
 
     private static MaterialList of(BlockState... states) {

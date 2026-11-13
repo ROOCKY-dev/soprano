@@ -7,10 +7,9 @@
 **The Minecraft pathfinding bot [Baritone](https://github.com/cabaletta/baritone), with extra movement tech and [AltoClef](https://github.com/gaucho-matrero/altoclef) built in.**
 
 [![Release](https://img.shields.io/github/v/release/AverWasTaken/soprano?style=flat-square)](https://github.com/AverWasTaken/soprano/releases)
-[![Build](https://img.shields.io/github/actions/workflow/status/AverWasTaken/soprano/gradle_build.yml?branch=1.21.4&style=flat-square&label=build)](https://github.com/AverWasTaken/soprano/actions/workflows/gradle_build.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/AverWasTaken/soprano/gradle_build.yml?branch=1.21.1&style=flat-square&label=build)](https://github.com/AverWasTaken/soprano/actions/workflows/gradle_build.yml)
 [![License](https://img.shields.io/badge/license-LGPL--3.0-blue?style=flat-square)](LICENSE)
 
-<a href="https://github.com/AverWasTaken/soprano/releases/tag/soprano-v1.0.3"><img alt="Download Soprano v1.0.3" src="https://img.shields.io/badge/Download-v1.0.3%20for%201.21.4-2ea44f?style=for-the-badge&logo=github&logoColor=white"></a>
 <a href="https://discord.gg/ccjQaGSSkT"><img alt="Join the Discord" src="https://img.shields.io/badge/Discord-join%20the%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white"></a>
 
 [Install](#install) · [Quick start](#quick-start) · [What's new](CHANGES.md) · [Usage](USAGE.md) · [Features](FEATURES.md) · [Building](SETUP.md) · [Contributing](CONTRIBUTING.md)
@@ -26,6 +25,8 @@
 > Soprano is a drop-in replacement for Baritone. Don't install both.
 
 ## Install
+
+This branch ports Soprano to **Minecraft 1.21.1** (Java 21), based on the upstream 1.21.4 branch. This port targets **NeoForge 21.1.265 or newer**. Build it with `./gradlew build -Prelease_version=1.3.0`; install `soprano-api-neoforge-1.3.0.jar` from `dist/`. There is no upstream 1.21.1 release yet.
 
 | Minecraft | Latest Soprano | Loaders | Download |
 |:--|:--|:--|:--|
@@ -65,14 +66,14 @@ Most people want the `api` jar.
 <summary><b>Updating</b></summary>
 <br>
 
-From the next 1.21.4 release after 1.0.3 on, Soprano updates itself. A card in the top left of the title screen tells you when a new version is out. Press Update and it swaps in when you close the game. 1.0.3 and older don't have this, so the first one goes in by hand.
+The updater only offers releases labeled for Minecraft 1.21.1. A card in the top left of the title screen tells you when a new version is out. Press Update and it swaps in when you close the game. 1.0.3 and older don't have this, so the first one goes in by hand.
 
 Don't want it? `#set checkForUpdates false`.
 
 </details>
 
 > [!NOTE]
-> Each branch of this repo is one Minecraft version, named after it (`1.21.4`, `1.21.11`, `26.3`). The newest version lives on `26.3`, the default branch. You're looking at **1.21.4**. To build it yourself, see [SETUP.md](SETUP.md).
+> Each branch of this repo is one Minecraft version, named after it (`1.21.1`, `1.21.4`, `1.21.11`, `26.3`). The newest version lives on `26.3`, the default branch. You're looking at **1.21.1**. To build it yourself, see [SETUP.md](SETUP.md).
 
 ## Quick start
 

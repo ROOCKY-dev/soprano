@@ -137,7 +137,7 @@ public class MLGBucketFallChain extends SingleTaskChain implements ITaskOverride
             return cleanup;
         }
         if (mod.getPlayer().hasEffect(MobEffects.LEVITATION) &&
-                !mod.getPlayer().getCooldowns().isOnCooldown(new ItemStack(Items.CHORUS_FRUIT)) &&
+                !mod.getPlayer().getCooldowns().isOnCooldown(Items.CHORUS_FRUIT) &&
                 mod.getPlayer().getActiveEffectsMap().get(MobEffects.LEVITATION).getDuration() <= 70 &&
                 mod.getItemStorage().hasItemInventoryOnly(Items.CHORUS_FRUIT) &&
                 !mod.getItemStorage().hasItemInventoryOnly(Items.WATER_BUCKET)) {

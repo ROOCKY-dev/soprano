@@ -326,7 +326,7 @@ public final class FurnaceWatch {
     private Task start(AltoClef mod, GamerContext ctx, FurnacePlan.Verdict v) {
         RunState.FurnaceJob job = v.job();
         long now = ctx.facts().gameTime();
-        Block block = BuiltInRegistries.BLOCK.getValue(ResourceLocation.withDefaultNamespace(job.kind));
+        Block block = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(job.kind));
         target = job;
         quick = v.call() == FurnacePlan.Call.STAND_BY && v.why() == FurnacePlan.Why.QUICK;
         if (quick) {

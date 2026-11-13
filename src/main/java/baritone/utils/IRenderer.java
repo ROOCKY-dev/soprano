@@ -24,10 +24,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShaderProgram;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -72,7 +70,7 @@ public interface IRenderer {
         startTranslucent(ignoreDepth);
         glColor(color, alpha);
         RenderSystem.lineWidth(lineWidth);
-        RenderSystem.setShader(CoreShaders.RENDERTYPE_LINES);
+        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
         return tessellator.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
     }
 
@@ -98,7 +96,7 @@ public interface IRenderer {
     // same tesselator as the lines, so finish your quads before you start your lines (or the other way around)
     static BufferBuilder startQuads(boolean ignoreDepth) {
         startTranslucent(ignoreDepth);
-        RenderSystem.setShader(CoreShaders.POSITION_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
         return tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
     }
 

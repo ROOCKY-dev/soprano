@@ -76,9 +76,8 @@ public final class MCEditSchematic extends StaticSchematic implements ParseRepor
                     ResourceLocation blockKey = ResourceLocation.tryParse(itemId);
                     Block block = blockKey == null
                         ? null
-                        : BuiltInRegistries.BLOCK.get(blockKey)
-                            .map(Holder.Reference::value)
-                            .orElse(null);
+                        : BuiltInRegistries.BLOCK.getOptional(blockKey)
+                                                        .orElse(null);
                     if (block == null) {
                         // an item-only id (a shovel in a block array), still air like it always was
                         unknown.merge(blockKey == null ? "id " + blockID : itemId, 1, Integer::sum);

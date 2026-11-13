@@ -930,7 +930,7 @@ public class SchematicBuildTask extends Task {
 
     private static Item item(String id) {
         ResourceLocation key = ResourceLocation.tryParse(id);
-        return key == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(key);
+        return key == null ? Items.AIR : BuiltInRegistries.ITEM.get(key);
     }
 
     // taskExists too, not just isObtainable: an item only reachable through a group entry (no single item task)

@@ -253,7 +253,7 @@ public class PlaceBlockNearbyTask extends Task {
             //Debug.logMessage("TEMP: A: " + bpos);
             IPlayerContext ctx = mod.getClientBaritone().getPlayerContext();
             if (MovementHelper.canPlaceAgainst(ctx, bpos)) {
-                BlockPos placePos = bhit.getBlockPos().offset(bhit.getDirection().getUnitVec3i());
+                BlockPos placePos = bhit.getBlockPos().offset(bhit.getDirection().getNormal());
                 // Don't place inside the player.
                 if (WorldHelper.isInsidePlayer(mod, placePos)) {
                     return null;
@@ -287,9 +287,10 @@ public class PlaceBlockNearbyTask extends Task {
             assert Minecraft.getInstance().gameMode != null;
             // any Success counts, not just == SUCCESS, a click that hands back a changed stack is a fresh one. same check
             // as BlockPlaceHelper
-            if (Minecraft.getInstance().gameMode.useItemOn(mod.getPlayer(), hand, (BlockHitResult) mouseOver) instanceof InteractionResult.Success success &&
+            InteractionResult result = Minecraft.getInstance().gameMode.useItemOn(mod.getPlayer(), hand, (BlockHitResult) mouseOver);
+            if (result.consumesAction() &&
                     mod.getPlayer().isShiftKeyDown()) {
-                if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
+                if (result.shouldSwing()) {
                     mod.getPlayer().swing(hand);
                 }
                 _justPlaced = targetPlace;

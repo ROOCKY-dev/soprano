@@ -54,7 +54,7 @@ public final class ChunkPacker {
         final int height = chunk.getLevel().dimensionType().height();
         BitSet bitSet = new BitSet(CachedChunk.size(height));
         // this goes through the level and a Holder every time, and we used to ask for it twice per block
-        final int minY = chunk.getMinY();
+        final int minY = chunk.getMinBuildHeight();
         try {
             LevelChunkSection[] chunkInternalStorageArray = chunk.getSections();
             for (int y0 = 0; y0 < height / 16; y0++) {

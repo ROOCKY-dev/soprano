@@ -82,7 +82,7 @@ public class EntityHelper {
     private static boolean isNeutralNow(AltoClef mod, Mob mob) {
         String type = BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getPath();
         boolean bright = mob instanceof Spider spider && spider.getLightLevelDependentMagicValue() >= SPIDER_BRIGHT;
-        boolean gold = mob instanceof Piglin && PiglinAi.isWearingSafeArmor(mod.getPlayer());
+        boolean gold = mob instanceof Piglin && PiglinAi.isWearingGold(mod.getPlayer());
         return NeutralMobs.neutralNow(type, bright, gold);
     }
 

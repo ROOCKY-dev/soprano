@@ -72,15 +72,6 @@ public class ToolSet {
      * see {@link #getMaterialCost(ItemStack)}
      * Prefer tools with lower material cost (lower index in this list).
      */
-    private static final List<TagKey<Item>> materialTagsPriorityList = List.of(
-        ItemTags.WOODEN_TOOL_MATERIALS,
-        ItemTags.STONE_TOOL_MATERIALS,
-        ItemTags.IRON_TOOL_MATERIALS,
-        ItemTags.GOLD_TOOL_MATERIALS,
-        ItemTags.DIAMOND_TOOL_MATERIALS,
-        ItemTags.NETHERITE_TOOL_MATERIALS
-    );
-
     public ToolSet(LocalPlayer player) {
         breakStrengthCache = new Object2DoubleOpenHashMap<>();
         this.player = player;
@@ -119,9 +110,16 @@ public class ToolSet {
      * @return values from 0 up
      */
     private int getMaterialCost(ItemStack itemStack) {
-        for (int i = 0; i < materialTagsPriorityList.size(); i++) {
-            final TagKey<Item> tag = materialTagsPriorityList.get(i);
-            if (itemStack.is(tag)) return i;
+        if (itemStack.getItem() instanceof net.minecraft.world.item.TieredItem tool
+                && tool.getTier() instanceof net.minecraft.world.item.Tiers tier) {
+            return switch (tier) {
+                case WOOD -> 0;
+                case STONE -> 1;
+                case IRON -> 2;
+                case GOLD -> 3;
+                case DIAMOND -> 4;
+                case NETHERITE -> 5;
+            };
         }
         return -1;
     }

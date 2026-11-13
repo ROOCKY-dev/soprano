@@ -284,7 +284,7 @@ public class SettingsUtil {
         ),
         ITEM(
             Item.class,
-                str -> BuiltInRegistries.ITEM.get(ResourceLocation.parse(str.trim())).map(Holder.Reference::value).orElse(null),
+                str -> BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(str.trim())).orElse(null),
                 item -> BuiltInRegistries.ITEM.getKey(item).toString()
         ),
         // any enum, matched on its constant names without caring about case. after MIRROR and ROTATION, which got here first

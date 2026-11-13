@@ -38,9 +38,6 @@ public abstract class MixinMusicManager {
     @Final
     private Minecraft minecraft;
 
-    @Shadow
-    private float currentGain;
-
     @Unique
     private boolean soprano$owned;
 
@@ -67,15 +64,11 @@ public abstract class MixinMusicManager {
         ci.cancel();
     }
 
-    // once per takeover: whatever vanilla had going stops, and its fade gain goes back to full. a pale garden fades
-    // that gain down and only vanilla's own tick (the one we're cancelling) would bring it back up. here the gain only
-    // ever lands on vanilla's own track, never the channel, so ours can't whisper, this is just a clean slate for
-    // when vanilla gets the music back
+    // 1.21.1 has no pale garden gain to reset
     @Unique
     private void soprano$takeOver() {
         try {
             stopPlaying();
-            currentGain = 1f;
         } catch (Throwable t) {
             Safe.report("menu music takeover", t);
         }

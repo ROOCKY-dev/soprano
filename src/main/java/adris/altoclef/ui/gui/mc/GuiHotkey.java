@@ -60,7 +60,7 @@ public final class GuiHotkey {
         if (mc.getOverlay() != null) {
             return "The game is still loading. Try again in a second.";
         }
-        mc.schedule(() -> {
+        mc.tell(() -> {
             try {
                 if (canOpen(mc)) {
                     show(mc);

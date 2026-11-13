@@ -37,7 +37,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.item.ItemStack;
@@ -400,7 +400,7 @@ public class CalculationContext {
     // a boat in the bag, or one we're sitting in, or a trip between placing one and boarding it. without the last two a
     // replan from the middle of a crossing priced the lake as wading and the shore looked great
     private static boolean hasBoat(IBaritone baritone, LocalPlayer player) {
-        if (player.getVehicle() instanceof AbstractBoat) {
+        if (player.getVehicle() instanceof Boat) {
             return true;
         }
         PathExecutor current = ((Baritone) baritone).getPathingBehavior().getCurrent();

@@ -35,7 +35,7 @@ public class IconResolverTest {
             return false;
         }
         ResourceLocation rl = ResourceLocation.tryParse(id);
-        return rl != null && BuiltInRegistries.ITEM.containsKey(rl) && BuiltInRegistries.ITEM.getValue(rl) != Items.AIR;
+        return rl != null && BuiltInRegistries.ITEM.containsKey(rl) && BuiltInRegistries.ITEM.get(rl) != Items.AIR;
     }
 
     @Test

@@ -44,7 +44,7 @@ public class TunnelCommand extends Command {
             int width = args.getAs(Integer.class);
             int depth = args.getAs(Integer.class);
 
-            if (width < 1 || height < 2 || depth < 1 || height > ctx.world().getMaxY()){
+            if (width < 1 || height < 2 || depth < 1 || height > ctx.world().getMaxBuildHeight()){
                 logDirect("Width and depth must at least be 1 block; Height must at least be 2 blocks, and cannot be greater than the build limit.");
                 cont = false;
             }

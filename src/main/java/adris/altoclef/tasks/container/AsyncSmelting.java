@@ -230,7 +230,7 @@ public final class AsyncSmelting {
         if (!FOOD_OUTPUTS.contains(outputName)) {
             return 0;
         }
-        Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.ResourceLocation.withDefaultNamespace(outputName));
+        Item item = BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(outputName));
         FoodProperties food = item.components().get(DataComponents.FOOD);
         return food == null ? 0 : food.nutrition();
     }

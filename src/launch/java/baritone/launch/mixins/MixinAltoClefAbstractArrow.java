@@ -20,13 +20,12 @@ package baritone.launch.mixins;
 import baritone.utils.accessor.IPersistentProjectile;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractArrow.class)
 public abstract class MixinAltoClefAbstractArrow implements IPersistentProjectile {
 
-    // inGround stopped being a field and became synced entity data, so we call the protected getter instead of reading a field
-    @Invoker("isInGround")
+    @Accessor("inGround")
     @Override
     public abstract boolean callIsInGround();
 }

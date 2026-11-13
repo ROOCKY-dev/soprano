@@ -274,7 +274,7 @@ public class MobDefenseChain extends SingleTaskChain {
             // the creeper's shield is up, leave it be
         } else if (!_creeperStep.active() && mode != CombatCommit.Mode.RUN && !mod.getFoodChain().needsToEat() && Baritone.settings().altoDodgeProjectiles.value && hasShield(mod)
                 && isProjectileClose(mod) && !mod.getEntityTracker().entityFound(ThrownPotion.class)
-                && !player.getCooldowns().isOnCooldown(new ItemStack(offhandItem))
+                && !player.getCooldowns().isOnCooldown(offhandItem)
                 && (fighting || mod.getClientBaritone().getPathingBehavior().isSafeToCancel())) {
             if (StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem() != Items.SHIELD) {
                 mod.getSlotHandler().forceEquipItemToOffhand(Items.SHIELD);
@@ -557,7 +557,7 @@ public class MobDefenseChain extends SingleTaskChain {
             seen.clear();
         }
         boolean shieldReady = hasShield(mod) && !mod.getEntityTracker().entityFound(ThrownPotion.class)
-                && !player.getCooldowns().isOnCooldown(new ItemStack(StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem()));
+                && !player.getCooldowns().isOnCooldown(StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem());
         CreeperStep.Event event = _creeperStep.step(now, seen, shieldReady, mode, enabled);
         if (event == CreeperStep.Event.START && _creeperStep.shouldLog()) {
             Debug.logInternal(CombatLog.creeperStep(dimension, _creeperStep.startedAt()));

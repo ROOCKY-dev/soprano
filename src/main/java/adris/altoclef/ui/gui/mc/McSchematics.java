@@ -400,14 +400,14 @@ public final class McSchematics implements SchematicsAccess {
 
     private static Item itemOf(String id) {
         ResourceLocation key = ResourceLocation.tryParse(id);
-        return key == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(key);
+        return key == null ? Items.AIR : BuiltInRegistries.ITEM.get(key);
     }
 
     private static String itemName(String id) {
         try {
             Item item = itemOf(id);
             if (item != Items.AIR) {
-                String name = item.getDefaultInstance().getItemName().getString();
+                String name = item.getDefaultInstance().getHoverName().getString();
                 // a name that is still a translation key means the language isn't loaded, which is no help to anyone
                 if (!name.isEmpty() && !name.startsWith("item.") && !name.startsWith("block.")) {
                     return name;
@@ -422,7 +422,7 @@ public final class McSchematics implements SchematicsAccess {
     private static String blockName(String id) {
         try {
             ResourceLocation key = ResourceLocation.tryParse(id);
-            Block block = key == null ? Blocks.AIR : BuiltInRegistries.BLOCK.getValue(key);
+            Block block = key == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(key);
             if (block != Blocks.AIR) {
                 String name = block.getName().getString();
                 if (!name.isEmpty() && !name.startsWith("block.")) {
@@ -1212,7 +1212,7 @@ public final class McSchematics implements SchematicsAccess {
         // the click that asked is still being handled by the gui, swapping the screen under it is asking for trouble
         @Override
         public void openMover(String relativePath) {
-            Minecraft.getInstance().schedule(() -> MoveScreen.open(relativePath));
+            Minecraft.getInstance().tell(() -> MoveScreen.open(relativePath));
         }
 
         @Override
@@ -1244,7 +1244,7 @@ public final class McSchematics implements SchematicsAccess {
 
         @Override
         public int minY() {
-            return level.getMinY();
+            return level.getMinBuildHeight();
         }
 
         @Override

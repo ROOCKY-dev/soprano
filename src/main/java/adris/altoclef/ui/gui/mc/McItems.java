@@ -81,7 +81,7 @@ public final class McItems implements ItemsAccess {
         }
         Item[] matches = TaskCatalogue.getItemMatches(name);
         if (matches.length == 0) {
-            Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.ResourceLocation.withDefaultNamespace(name));
+            Item item = BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(name));
             return item == Items.AIR ? "Other" : fallbackCategory(item);
         }
         String group = null;
@@ -101,7 +101,7 @@ public final class McItems implements ItemsAccess {
         if (stack.has(DataComponents.FOOD)) {
             return "Food";
         }
-        if (name.endsWith("_sword") || stack.has(DataComponents.EQUIPPABLE)
+        if (name.endsWith("_sword") || stack.getItem() instanceof net.minecraft.world.item.Equipable
                 || Set.of("bow", "crossbow", "arrow", "spectral_arrow", "tipped_arrow", "shield", "trident", "mace").contains(name)) {
             return "Combat";
         }
@@ -202,7 +202,7 @@ public final class McItems implements ItemsAccess {
 
     private static String nameOf(Item item, String fallbackId) {
         try {
-            String name = item.getName().getString();
+            String name = item.getName(item.getDefaultInstance()).getString();
             return name.isEmpty() ? ItemEntry.titleCase(fallbackId) : name;
         } catch (Throwable t) {
             Safe.report("gui item name", t);

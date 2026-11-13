@@ -2085,12 +2085,7 @@ public final class Settings {
     public final Setting<Boolean> allowWalkOnMagmaBlocks = new Setting<>(false);
 
     /**
-     * Count the bot's work as player activity for vanilla's AFK frame limiter. Since 1.21.2 the game drops to 30 fps
-     * after a minute without keyboard or mouse input (and 10 fps after ten minutes) when the inactivity limit option
-     * is on AFK, and the bot never touches the real keyboard or mouse, so the frame rate would tank while you watch it
-     * work. With this on, any tick where baritone is pathing, a process is in control, or AltoClef is running a task
-     * counts as input. Does nothing while the bot is idle, so the AFK limiter still kicks in then, and your options
-     * are never changed. Takes effect right away.
+     * Has no effect on Minecraft 1.21.1, which predates the AFK input frame limiter.
      */
     public final Setting<Boolean> keepFpsWhileBotting = new Setting<>(true);
 

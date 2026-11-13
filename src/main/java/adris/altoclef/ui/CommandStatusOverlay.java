@@ -11,7 +11,6 @@ import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.util.ARGB;
 
 // the task tree in the top left. same staircase altoclef always drew (one line per task, each nested task 8px
 // further right), just with a backdrop, a shadow and the line you actually care about in white
@@ -232,7 +231,7 @@ public class CommandStatusOverlay {
 
     // Font treats alpha under 4 as "no alpha given" and draws opaque, so the fade never goes all the way down
     private static int fade(int color, float alpha) {
-        int a = Math.max(4, Math.round(ARGB.alpha(color) * alpha));
+        int a = Math.max(4, Math.round((color >>> 24) * alpha));
         return (a << 24) | (color & 0xFFFFFF);
     }
 

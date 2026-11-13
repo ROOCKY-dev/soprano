@@ -431,7 +431,7 @@ public final class SchematicGhostRenderer implements AbstractGameEventListener {
             if (mesh != null) {
                 // see-through faces have to go back to front or a stair's far side paints over its near one. a
                 // BufferSource sorts this type on its way out, a plain draw doesn't, so it's done here
-                mesh.sortQuads(modelBytes, RenderSystem.getProjectionType().vertexSorting());
+                mesh.sortQuads(modelBytes, RenderSystem.getVertexSorting());
                 type.draw(mesh);
             }
         }

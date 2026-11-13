@@ -99,9 +99,8 @@ public final class LitematicaSchematic extends CompositeSchematic implements ISt
             ResourceLocation blockKey = ResourceLocation.tryParse(name);
             Block found = blockKey == null
                 ? null
-                : BuiltInRegistries.BLOCK.get(blockKey)
-                    .map(Holder.Reference::value)
-                    .orElse(null);
+                : BuiltInRegistries.BLOCK.getOptional(blockKey)
+                                        .orElse(null);
             if (found == null) {
                 unknownNames[i] = name.isEmpty() ? "(no name)" : name;
             }

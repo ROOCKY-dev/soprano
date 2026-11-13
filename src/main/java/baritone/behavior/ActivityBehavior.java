@@ -17,10 +17,8 @@
 
 package baritone.behavior;
 
-import adris.altoclef.AltoClef;
 import baritone.Baritone;
 import baritone.api.event.events.TickEvent;
-import net.minecraft.client.Minecraft;
 
 public final class ActivityBehavior extends Behavior {
 
@@ -28,27 +26,8 @@ public final class ActivityBehavior extends Behavior {
         super(baritone);
     }
 
-    // vanilla drops you to 30 fps after a minute with no keyboard or mouse. we drive the player through the input
-    // override and rotations so vanilla never sees any input and thinks you went to make a sandwich
+    // the afk input limiter was added in 1.21.2; 1.21.1 needs no activity timestamp override
     @Override
     public void onPostTick(TickEvent event) {
-        if (event.getType() != TickEvent.Type.IN || !Baritone.settings().keepFpsWhileBotting.value) {
-            return;
-        }
-        if (botIsBusy()) {
-            // only the activity timestamp, the user's options.txt never hears about this
-            Minecraft.getInstance().getFramerateLimitTracker().onInputReceived();
-        }
-    }
-
-    private boolean botIsBusy() {
-        // post tick, so mostRecentInControl is whoever just drove this tick (temporary ones like combat pause count too)
-        if (baritone.getPathingBehavior().isPathing() || baritone.getPathingControlManager().mostRecentInControl().isPresent()) {
-            return true;
-        }
-        // the idle task is the bot waiting around for something to do, which is exactly when afk should be allowed
-        AltoClef alto = AltoClef.getInstance();
-        return alto != null && alto.getUserTaskChain() != null
-                && alto.getUserTaskChain().isActive() && !alto.getUserTaskChain().isRunningIdleTask();
     }
 }

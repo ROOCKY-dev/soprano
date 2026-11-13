@@ -171,7 +171,7 @@ public class VineLogPathTest {
             }
 
             @Override
-            public int getMinY() {
+            public int getMinBuildHeight() {
                 return -64;
             }
         };

@@ -124,7 +124,7 @@ final class McDraw {
         // items draw at z 150 with the depth test on, so anything drawn after them (a dropdown, the toast) would sit
         // behind their little cubes. nothing in this screen uses depth, so wipe it
         g.flush();
-        RenderSystem.clear(256);
+        RenderSystem.clear(256, Minecraft.ON_OSX);
         return true;
     }
 

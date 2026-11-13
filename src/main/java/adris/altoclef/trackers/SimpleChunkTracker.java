@@ -74,7 +74,7 @@ public class SimpleChunkTracker {
         if (levelChunk instanceof EmptyLevelChunk) {
             return null;
         }
-        return findInSections(levelChunk.getSections(), levelChunk.getMinY(), chunk.getMinBlockX(), chunk.getMinBlockZ(), state);
+        return findInSections(levelChunk.getSections(), levelChunk.getMinBuildHeight(), chunk.getMinBlockX(), chunk.getMinBlockZ(), state);
     }
 
     public boolean chunkHas(ChunkPos chunk, Predicate<BlockState> state) {

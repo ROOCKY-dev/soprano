@@ -73,7 +73,7 @@ public class SurfacingTest {
         }
 
         @Override
-        public int getMinY() {
+        public int getMinBuildHeight() {
             return -64;
         }
     }

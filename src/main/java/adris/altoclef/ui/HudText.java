@@ -91,7 +91,7 @@ public final class HudText {
     public static String item(Item item) {
         if (item == null) return "something";
         try {
-            return item.getName().getString();
+            return item.getName(item.getDefaultInstance()).getString();
         } catch (Throwable t) {
             return ItemHelper.stripItemName(item).replace('_', ' ');
         }
@@ -443,7 +443,7 @@ public final class HudText {
             if (b == null) continue;
             String path = BuiltInRegistries.BLOCK.getKey(b).getPath();
             if (path.startsWith("deepslate_")) {
-                Block plain = BuiltInRegistries.BLOCK.getValue(ResourceLocation.withDefaultNamespace(path.substring("deepslate_".length())));
+                Block plain = BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(path.substring("deepslate_".length())));
                 if (plain != b && all.contains(plain)) continue;
             }
             out.add(b);

@@ -64,12 +64,12 @@ public abstract class MixinPlayerController implements IPlayerControllerMP {
             method = "performUseItemOn",
             at = @At(
                     value = "INVOKE",
-                    target = "net/minecraft/world/level/block/state/BlockState.useItemOn(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;"
+                    target = "net/minecraft/world/level/block/state/BlockState.useItemOn(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/ItemInteractionResult;"
             )
     )
-    private InteractionResult onBlockUseItemOn(BlockState state, ItemStack stack, Level level, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        InteractionResult result = state.useItemOn(stack, level, player, hand, hitResult);
-        onBlockUsed(player, hitResult, result);
+    private net.minecraft.world.ItemInteractionResult onBlockUseItemOn(BlockState state, ItemStack stack, Level level, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        net.minecraft.world.ItemInteractionResult result = state.useItemOn(stack, level, player, hand, hitResult);
+        onBlockUsed(player, hitResult, result.result());
         return result;
     }
 

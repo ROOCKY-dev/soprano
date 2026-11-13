@@ -464,8 +464,8 @@ public final class PathRenderer implements IRenderer {
             boxes.add(new GoalBox(color, minX, maxX, minZ, maxZ, minY, maxY, y1, y2, GOAL_FILL_ALPHA * breath, 0));
         } else if (goal instanceof GoalXZ) {
             GoalXZ goalPos = (GoalXZ) goal;
-            minY = ctx.world().getMinY();
-            maxY = ctx.world().getMaxY();
+            minY = ctx.world().getMinBuildHeight();
+            maxY = ctx.world().getMaxBuildHeight();
 
             if (settings.renderGoalXZBeacon.value) {
                 //TODO: check

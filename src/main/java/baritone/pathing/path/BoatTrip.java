@@ -40,7 +40,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.BoatItem;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -74,7 +74,7 @@ public final class BoatTrip implements Helper {
         EXIT
     }
 
-    // vanilla boat physics, from AbstractBoat.controlBoat and floatBoat: left/right add a degree a tick to
+    // vanilla boat physics, from Boat.controlBoat and floatBoat: left/right add a degree a tick to
     // the spin, forward adds 0.04 a tick of speed, and both decay by 0.9 a tick on water. so top speed is
     // 0.4 a tick, and after you let go, whatever spin or speed you have carries nine times over
     private static final double WATER_COAST = 9;
@@ -149,7 +149,7 @@ public final class BoatTrip implements Helper {
     private boolean lastFwd;
     private int bumps;
     private int ticksStuck;
-    private AbstractBoat boat;
+    private Boat boat;
     private Vec3 placeAt;
     private int placeAttempts;
     private int boatsHeld;
@@ -179,7 +179,7 @@ public final class BoatTrip implements Helper {
             return null;
         }
         IPlayerContext ctx = baritone.getPlayerContext();
-        if (ctx.player().getVehicle() instanceof AbstractBoat) {
+        if (ctx.player().getVehicle() instanceof Boat) {
             int end = runEnd(new BlockStateInterface(ctx), path, pos);
             if (end > pos) {
                 return new BoatTrip(baritone, path, pos, end, Phase.RIDE);
@@ -248,7 +248,7 @@ public final class BoatTrip implements Helper {
             return runs;
         }
         IPlayerContext ctx = baritone.getPlayerContext();
-        if (ctx.player() == null || (boatSlot(ctx.player().getInventory()) < 0 && !(ctx.player().getVehicle() instanceof AbstractBoat))) {
+        if (ctx.player() == null || (boatSlot(ctx.player().getInventory()) < 0 && !(ctx.player().getVehicle() instanceof Boat))) {
             return runs;
         }
         BlockStateInterface bsi = new BlockStateInterface(ctx);
@@ -595,7 +595,7 @@ public final class BoatTrip implements Helper {
     private Result abort(String why) {
         logDebug(why);
         report("aborted");
-        if (ctx.player().getVehicle() instanceof AbstractBoat) {
+        if (ctx.player().getVehicle() instanceof Boat) {
             // get out first, the movements can't do anything from inside a boat
             aborting = true;
             enter(Phase.EXIT);
@@ -653,7 +653,7 @@ public final class BoatTrip implements Helper {
     private Result place() {
         // look for the boat before looking for the item: with a single boat in the bag, the click that
         // places it also empties the slot, and the entity shows up a tick or two after that
-        AbstractBoat placed = findBoat(placeAt, 2.5);
+        Boat placed = findBoat(placeAt, 2.5);
         if (placed != null) {
             boat = placed;
             logDebug("ahoy! we can sail the seven seas!");
@@ -747,10 +747,10 @@ public final class BoatTrip implements Helper {
 
     private Result ride() {
         Entity vehicle = ctx.player().getVehicle();
-        if (!(vehicle instanceof AbstractBoat)) {
+        if (!(vehicle instanceof Boat)) {
             return abort("we fell out of the boat somehow. swimming");
         }
-        boat = (AbstractBoat) vehicle;
+        boat = (Boat) vehicle;
         List<BetterBlockPos> positions = path.positions();
         Vec3 at = boat.position();
         if (ticksInPhase > (end - start) * 15 + 200) {
@@ -1100,7 +1100,7 @@ public final class BoatTrip implements Helper {
 
     private Result scuttle() {
         Entity vehicle = ctx.player().getVehicle();
-        if (!(vehicle instanceof AbstractBoat)) {
+        if (!(vehicle instanceof Boat)) {
             // it broke and dumped us in the water, and the item dropped right where we're floating
             enter(Phase.PICKUP);
             return Result.CONTINUE;
@@ -1137,7 +1137,7 @@ public final class BoatTrip implements Helper {
     }
 
     private Result exit() {
-        if (!(ctx.player().getVehicle() instanceof AbstractBoat)) {
+        if (!(ctx.player().getVehicle() instanceof Boat)) {
             // same as pickup: the dismount drops us above the water, let the feet find the water before
             // the movements get us back, or they spend a second going on about the wrong y coordinate
             boolean settled = ctx.player().onGround() || ctx.player().isInWater();
@@ -1154,10 +1154,10 @@ public final class BoatTrip implements Helper {
         return Result.CONTINUE;
     }
 
-    private AbstractBoat findBoat(Vec3 near, double radius) {
-        AbstractBoat best = null;
+    private Boat findBoat(Vec3 near, double radius) {
+        Boat best = null;
         double bestDist = Double.MAX_VALUE;
-        for (AbstractBoat candidate : ctx.world().getEntitiesOfClass(AbstractBoat.class, new AABB(near, near).inflate(radius))) {
+        for (Boat candidate : ctx.world().getEntitiesOfClass(Boat.class, new AABB(near, near).inflate(radius))) {
             if (!candidate.getPassengers().isEmpty()) {
                 continue;
             }

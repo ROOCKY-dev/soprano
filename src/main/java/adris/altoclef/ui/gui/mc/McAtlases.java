@@ -140,7 +140,8 @@ final class McAtlases {
         for (int y = 0; y < h; y++) {
             int row = y * w;
             for (int x = 0; x < w; x++) {
-                image.setPixel(x, y, argb[row + x]);
+                int color = argb[row + x];
+                image.setPixelRGBA(x, y, (color & 0xff00ff00) | ((color >>> 16) & 255) | ((color & 255) << 16));
             }
         }
     }
@@ -157,7 +158,9 @@ final class McAtlases {
                 // a smooth picture gets drawn a bit off its baked size (a dock tile mid magnification), nearest would
                 // make its round corners crawl. clamped so the linear sample doesn't pull in the opposite edge
                 tex.setFilter(true, false);
-                tex.setClamp(true);
+                tex.bind();
+                com.mojang.blaze3d.platform.GlStateManager._texParameter(org.lwjgl.opengl.GL11.GL_TEXTURE_2D, org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S, org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE);
+                com.mojang.blaze3d.platform.GlStateManager._texParameter(org.lwjgl.opengl.GL11.GL_TEXTURE_2D, org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T, org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE);
             } else {
                 // nearest like the pages, the map is drawn at its own size
                 tex.setFilter(false, false);
@@ -224,7 +227,7 @@ final class McAtlases {
         Slot slot = instance.images.remove(picture);
         if (slot != null) {
             Minecraft mc = Minecraft.getInstance();
-            mc.schedule(() -> mc.schedule(() -> {
+            mc.tell(() -> mc.tell(() -> {
                 try {
                     mc.getTextureManager().release(slot.location);
                 } catch (Throwable t) {

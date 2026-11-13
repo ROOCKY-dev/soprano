@@ -315,7 +315,7 @@ public class PlaceBedAndSetSpawnTask extends Task {
                     /*
                     BlockPos targetMove = toSleepIn.offset(side).offset(side); // Twice, juust to make sure...
                      */
-                            return new GetToBlockTask(_bedForSpawnPoint.offset(side.getUnitVec3i()));
+                            return new GetToBlockTask(_bedForSpawnPoint.offset(side.getNormal()));
                         } catch (IllegalArgumentException e) {
                             // If bed is not loaded, this will happen. In that case just get to the bed first.
                         }

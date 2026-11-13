@@ -119,7 +119,7 @@ public class KillAura {
                     entities.get().getClass() != Zoglin.class && entities.get().getClass() != Warden.class &&
                     entities.get().getClass() != WitherBoss.class
                     && (mod.getItemStorage().hasItem(Items.SHIELD) || mod.getItemStorage().hasItemInOffhand(Items.SHIELD))
-                    && !mod.getPlayer().getCooldowns().isOnCooldown(new ItemStack(offhandItem))
+                    && !mod.getPlayer().getCooldowns().isOnCooldown(offhandItem)
                     // mid movement or knocked back mid movement the path is never safe to cancel, and a fight waiting for it
                     // took its hits with the shield down. same deal as the arrow shield in MobDefenseChain
                     && (_fighting || mod.getClientBaritone().getPathingBehavior().isSafeToCancel())) {

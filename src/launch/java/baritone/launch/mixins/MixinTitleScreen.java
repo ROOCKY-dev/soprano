@@ -154,7 +154,7 @@ public abstract class MixinTitleScreen extends Screen {
         try {
             // the blur is real gl on whatever is already drawn, so the panorama's queued vignette goes down first
             g.flush();
-            renderBlurredBackground();
+            renderBlurredBackground(a);
         } catch (Throwable t) {
             // a sharp panorama is still a title screen
             Safe.report("title blur", t);

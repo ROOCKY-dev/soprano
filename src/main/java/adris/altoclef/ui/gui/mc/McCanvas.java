@@ -8,7 +8,7 @@ import adris.altoclef.ui.gui.kit.TexturedCanvas;
 import adris.altoclef.ui.gui.kit.Theme;
 import adris.altoclef.ui.gui.kit.Weight;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.RenderType;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.resources.ResourceLocation;
 
 // the two primitives TexturedCanvas wants, on top of GuiGraphics. no layout and no decisions in here. one of these
@@ -69,8 +69,7 @@ final class McCanvas extends TexturedCanvas {
         }
         try {
             ResourceLocation tex = atlases.texture(page);
-            draw.g.blit(RenderType::guiTextured, tex, x0, y0, (float) sx, (float) sy, w, h, sw, sh,
-                    page.width(), page.height(), argb);
+            blitTinted(tex, x0, y0, w, h, sx, sy, sw, sh, page.width(), page.height(), argb);
         } catch (Throwable t) {
             Safe.report("gui atlas blit", t);
             broken = true;
@@ -91,11 +90,27 @@ final class McCanvas extends TexturedCanvas {
             return;
         }
         try {
-            draw.g.blit(RenderType::guiTextured, atlases.texture(image), x0, y0, 0f, 0f, dw, dh, image.width(), image.height(),
+            blitTinted(atlases.texture(image), x0, y0, dw, dh, 0, 0, image.width(), image.height(),
                     image.width(), image.height(), tint);
         } catch (Throwable t) {
             Safe.report("gui image blit", t);
             broken = true;
+        }
+    }
+
+    // 1.21.1 blits take the tint from shader state; restore it before another widget draws
+    private void blitTinted(ResourceLocation texture, int x, int y, int w, int h,
+                            int u, int v, int sw, int sh, int tw, int th, int tint) {
+        draw.g.flush();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(((tint >>> 16) & 255) / 255f, ((tint >>> 8) & 255) / 255f,
+                (tint & 255) / 255f, ((tint >>> 24) & 255) / 255f);
+        try {
+            draw.g.blit(texture, x, y, w, h, (float) u, (float) v, sw, sh, tw, th);
+        } finally {
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+            RenderSystem.disableBlend();
         }
     }
 

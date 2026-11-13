@@ -92,13 +92,13 @@ public abstract class MixinLivingEntity extends Entity implements ILivingEntity 
     }
 
     @Inject(
-            method = "updateFallFlyingMovement",
+            method = "travel",
             at = @At(
                     value = "INVOKE",
                     target = "net/minecraft/world/entity/LivingEntity.getLookAngle()Lnet/minecraft/world/phys/Vec3;"
             )
     )
-    private void onPreElytraMove(Vec3 direction, final CallbackInfoReturnable<Vec3> cir) {
+    private void onPreElytraMove(Vec3 direction, final CallbackInfo ci) {
         this.getBaritone().ifPresent(baritone -> {
             this.elytraRotationEvent = new RotationMoveEvent(RotationMoveEvent.Type.MOTION_UPDATE, this.getYRot(), this.getXRot());
             baritone.getGameEventHandler().onPlayerRotationMove(this.elytraRotationEvent);
@@ -108,14 +108,10 @@ public abstract class MixinLivingEntity extends Entity implements ILivingEntity 
     }
 
     @Inject(
-            method = "travelFallFlying",
-            at = @At(
-                    value = "INVOKE",
-                    target = "net/minecraft/world/entity/LivingEntity.move(Lnet/minecraft/world/entity/MoverType;Lnet/minecraft/world/phys/Vec3;)V",
-                    shift = At.Shift.AFTER
-            )
+            method = "travel",
+            at = @At("RETURN")
     )
-    private void onPostElytraMove(final CallbackInfo ci) {
+    private void onPostElytraMove(Vec3 direction, final CallbackInfo ci) {
         if (this.elytraRotationEvent != null) {
             this.setYRot(this.elytraRotationEvent.getOriginal().getYaw());
             this.setXRot(this.elytraRotationEvent.getOriginal().getPitch());
