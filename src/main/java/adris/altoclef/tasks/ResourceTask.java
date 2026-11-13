@@ -36,7 +36,7 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
@@ -167,7 +167,7 @@ public abstract class ResourceTask extends Task implements ITaskCanForce {
             setDebugState("Moving from cursor");
             Optional<Slot> moveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(StorageHelper.getItemStackInCursorSlot(), false);
             if (moveTo.isPresent()) {
-                mod.getSlotHandler().clickSlot(moveTo.get(), 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(moveTo.get(), 0, ClickType.PICKUP);
                 return null;
             }
             // full bag. the old tail ended in "throw the cursor", and the cursor here is the thing we came for (the fresh

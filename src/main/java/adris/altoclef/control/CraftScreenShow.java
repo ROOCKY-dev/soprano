@@ -53,7 +53,7 @@ public final class CraftScreenShow {
         }
         boolean showing = _ours != null;
         _idleTicks = clicked || !showing ? 0 : _idleTicks + 1;
-        Screen screen = mc.gui.screen();
+        Screen screen = mc.screen;
         // the runner going off (a #stop, the idle gate) counts as the setting going off: nobody is crafting anymore
         boolean on = Baritone.settings().altoShowInventoryWhenCrafting.value && mod.getTaskRunner().isActive();
         CraftScreenRules.Facts f = new CraftScreenRules.Facts(on, showing, showing && screen == _ours, screen != null, clicked,
@@ -62,7 +62,7 @@ public final class CraftScreenShow {
         switch (CraftScreenRules.decide(f)) {
             case OPEN -> {
                 _ours = new InventoryScreen(player);
-                mc.gui.setScreen(_ours);
+                mc.setScreen(_ours);
             }
             case CLOSE -> {
                 _ours = null;

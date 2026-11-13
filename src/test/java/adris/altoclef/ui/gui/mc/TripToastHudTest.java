@@ -7,7 +7,7 @@ import baritone.behavior.trip.Trip;
 import baritone.behavior.trip.TripToast;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.input.KeyEvent;
+import baritone.compat.input.KeyEvent;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -110,7 +110,7 @@ public class TripToastHudTest {
         assertTrue(SopranoKeys.isNo(new KeyEvent(InputConstants.KEY_N, 0, 0)));
         assertFalse(SopranoKeys.isYes(new KeyEvent(InputConstants.KEY_N, 0, 0)));
         try {
-            yes.setKey(InputConstants.Type.KEYBOARD.getOrCreate(InputConstants.KEY_B));
+            yes.setKey(InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B));
             assertFalse("the old key is just a key now", SopranoKeys.isYes(new KeyEvent(InputConstants.KEY_Y, 0, 0)));
             assertTrue(SopranoKeys.isYes(new KeyEvent(InputConstants.KEY_B, 0, 0)));
             yes.setKey(InputConstants.UNKNOWN);

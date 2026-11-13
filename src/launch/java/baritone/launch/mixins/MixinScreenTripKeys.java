@@ -19,9 +19,9 @@ package baritone.launch.mixins;
 
 import adris.altoclef.ui.gui.kit.Safe;
 import adris.altoclef.ui.gui.mc.TripToastHud;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
+import baritone.compat.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -40,9 +40,9 @@ public class MixinScreenTripKeys {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void soprano$tripKeys(final KeyEvent event, final CallbackInfoReturnable<Boolean> cir) {
+    private void soprano$tripKeys(final int key, final int scan, final int mods, final CallbackInfoReturnable<Boolean> cir) {
         try {
-            if (TripToastHud.onScreenKey((Screen) (Object) this, event)) {
+            if (TripToastHud.onScreenKey((Screen) (Object) this, new KeyEvent(key, scan, mods))) {
                 cir.setReturnValue(true);
             }
         } catch (Throwable t) {
@@ -54,10 +54,10 @@ public class MixinScreenTripKeys {
     // after the screen and its tooltips, where vanilla's toasts go too. the final wrapper, so a screen that overrides
     // extractRenderState without calling super still gets it
     @Inject(
-            method = "extractRenderStateWithTooltipAndSubtitles",
+            method = "renderWithTooltip",
             at = @At("TAIL")
     )
-    private void soprano$tripToastOver(final GuiGraphicsExtractor g, final int mouseX, final int mouseY, final float partialTick, final CallbackInfo ci) {
+    private void soprano$tripToastOver(final GuiGraphics g, final int mouseX, final int mouseY, final float partialTick, final CallbackInfo ci) {
         try {
             TripToastHud.overScreen((Screen) (Object) this, g);
         } catch (Throwable t) {

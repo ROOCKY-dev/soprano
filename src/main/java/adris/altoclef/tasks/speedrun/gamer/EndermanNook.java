@@ -65,7 +65,7 @@ public final class EndermanNook {
     // how far a calm one can be and still be worth a stare, and how long one stare gets before it counts as ignored
     public static final double STARE_RANGE = 48;
     public static final int STARE_TICKS = 100;
-    // vanilla (Enderman$EndermanLookForPlayerGoal): an angry enderman only teleports toward its target from further than this,
+    // vanilla (EnderMan$EndermanLookForPlayerGoal): an angry enderman only teleports toward its target from further than this,
     // closer in it walks, and a walk does not cross lava
     public static final double TELEPORT_TOWARDS_RANGE = 16;
 

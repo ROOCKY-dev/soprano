@@ -22,28 +22,26 @@ import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.TaskCollection;
+import org.gradle.api.tasks.compile.ForkOptions;
+import org.gradle.api.tasks.compile.JavaCompile;
+import org.gradle.internal.jvm.Jvm;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
 import org.gradle.jvm.toolchain.JavaLauncher;
 import org.gradle.jvm.toolchain.JavaToolchainService;
 import xyz.wagyourtail.unimined.api.UniminedExtension;
 import xyz.wagyourtail.unimined.api.minecraft.MinecraftConfig;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * @author Brady
@@ -80,7 +78,7 @@ public class ProguardTask extends BaritoneGradleTask {
 
     private File getMcJar() {
         MinecraftConfig mcc = ext.getMinecrafts().get(sourceSets.getByName("main"));
-        return mcc.getMinecraft(mcc.getMcPatcher().getProdNamespace()).toFile();
+        return mcc.getMinecraft(mcc.getMcPatcher().getProdNamespace(), mcc.getMcPatcher().getProdNamespace()).toFile();
     }
 
     private boolean isMcJar(File f) {
@@ -127,35 +125,6 @@ public class ProguardTask extends BaritoneGradleTask {
         return toolchain;
     }
 
-    // java.net.http is the updater's http client. proguard refuses to run at all if it can't see it
-    private static final List<String> JDK_MODULES = List.of("java.base", "java.desktop", "jdk.unsupported", "java.net.http");
-
-    private Path extractJdkClasses() throws IOException {
-        Path home = getJavaLauncherForProguard().getMetadata().getInstallationPath().getAsFile().toPath();
-        // the module count is in the name so a cached jar from before a module got added isn't quietly reused
-        Path jar = getTemporaryFile("jdk-classes-" + getProject().findProperty("java_version") + "-" + JDK_MODULES.size() + ".jar");
-        if (Files.exists(jar)) {
-            return jar;
-        }
-        // jrt: of another jdk than the one gradle runs on, it only reads the classfiles so the version gap doesn't matter
-        try (FileSystem jrt = FileSystems.newFileSystem(URI.create("jrt:/"), Map.of("java.home", home.toString()));
-             ZipOutputStream out = new ZipOutputStream(Files.newOutputStream(jar))) {
-            for (String module : JDK_MODULES) {
-                Path root = jrt.getPath("/modules", module);
-                List<Path> classes;
-                try (Stream<Path> files = Files.walk(root)) {
-                    classes = files.filter(f -> f.toString().endsWith(".class") && !f.getFileName().toString().equals("module-info.class")).collect(Collectors.toList());
-                }
-                for (Path file : classes) {
-                    out.putNextEntry(new ZipEntry(root.relativize(file).toString().replace('\\', '/')));
-                    Files.copy(file, out);
-                    out.closeEntry();
-                }
-            }
-        }
-        return jar;
-    }
-
     private void generateConfigs() throws Exception {
         Files.copy(getRootRelativeFile(PROGUARD_CONFIG_TEMPLATE), getTemporaryFile(PROGUARD_CONFIG_DEST), StandardCopyOption.REPLACE_EXISTING);
 
@@ -164,14 +133,11 @@ public class ProguardTask extends BaritoneGradleTask {
         template.add(0, "-injars '" + this.artifactPath.toString() + "'");
         template.add(1, "-outjars '" + this.getTemporaryFile(PROGUARD_EXPORT_PATH) + "'");
 
-        if (Files.exists(getJavaLauncherForProguard().getMetadata().getInstallationPath().getAsFile().toPath().resolve("jmods/java.base.jmod"))) {
-            for (int i = 0; i < JDK_MODULES.size(); i++) {
-                template.add(2 + i, "-libraryjars  <java.home>/jmods/" + JDK_MODULES.get(i) + ".jmod(!**.jar;!module-info.class)");
-            }
-        } else {
-            // temurin 25 doesn't ship jmods anymore (zulu still does), so read the same modules out of the runtime image
-            template.add(2, "-libraryjars '" + extractJdkClasses() + "'");
-        }
+        template.add(2, "-libraryjars  <java.home>/jmods/java.base.jmod(!**.jar;!module-info.class)");
+        template.add(3, "-libraryjars  <java.home>/jmods/java.desktop.jmod(!**.jar;!module-info.class)");
+        template.add(4, "-libraryjars  <java.home>/jmods/jdk.unsupported.jmod(!**.jar;!module-info.class)");
+        // java.net.http is the updater's http client. proguard refuses to run at all if it can't see it
+        template.add(5, "-libraryjars  <java.home>/jmods/java.net.http.jmod(!**.jar;!module-info.class)");
 
         {
             final Stream<File> libraries;

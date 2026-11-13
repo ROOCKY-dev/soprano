@@ -23,16 +23,16 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.illager.Pillager;
-import net.minecraft.world.entity.monster.skeleton.Skeleton;
-import net.minecraft.world.entity.monster.skeleton.Stray;
+import net.minecraft.world.entity.monster.Pillager;
+import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.Stray;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.warden.Warden;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownLingeringPotion;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -135,7 +135,7 @@ public class KillAura {
         if (nearest.isEmpty() || !_shieldAllowed || mod.getFoodChain().needsToEat() || mod.getMLGBucketChain().isFallingOhNo(mod)
                 || !mod.getMLGBucketChain().doneMLG() || mod.getMLGBucketChain().isChorusFruiting()
                 || !(mod.getItemStorage().hasItem(Items.SHIELD) || mod.getItemStorage().hasItemInOffhand(Items.SHIELD))
-                || mod.getPlayer().getCooldowns().isOnCooldown(new ItemStack(offhandItem))) {
+                || mod.getPlayer().getCooldowns().isOnCooldown(offhandItem)) {
             stopShielding(mod);
             return;
         }
@@ -178,7 +178,7 @@ public class KillAura {
         // (a cornered fight at hp 8 never bails, and going quiet under the flee line meant dropping the shield right when it
         // was the only thing between us and the respawn screen)
         if (entities.isPresent() && (CombatRules.aboveFleeLine(mod.getPlayer().getHealth()) || _fighting) &&
-                !mod.getEntityTracker().entityFound(ThrownSplashPotion.class, ThrownLingeringPotion.class) && !mod.getFoodChain().needsToEat() &&
+                !mod.getEntityTracker().entityFound(ThrownPotion.class, ThrownPotion.class) && !mod.getFoodChain().needsToEat() &&
                 (Double.isInfinite(_forceFieldRange) || entities.get().distanceToSqr(mod.getPlayer()) < _forceFieldRange * _forceFieldRange ||
                         entities.get().distanceToSqr(mod.getPlayer()) < 40) &&
                 !mod.getMLGBucketChain().isFallingOhNo(mod) && mod.getMLGBucketChain().doneMLG() &&
@@ -192,7 +192,7 @@ public class KillAura {
             } else if (entities.get().getClass() != Creeper.class && entities.get().getClass() != Warden.class &&
                     entities.get().getClass() != WitherBoss.class
                     && (mod.getItemStorage().hasItem(Items.SHIELD) || mod.getItemStorage().hasItemInOffhand(Items.SHIELD))
-                    && !mod.getPlayer().getCooldowns().isOnCooldown(new ItemStack(offhandItem))
+                    && !mod.getPlayer().getCooldowns().isOnCooldown(offhandItem)
                     // mid movement or knocked back mid movement the path is never safe to cancel, and a fight waiting for it
                     // took its hits with the shield down. same deal as the arrow shield in MobDefenseChain
                     && (_fighting || mod.getClientBaritone().getPathingBehavior().isSafeToCancel())) {
@@ -386,7 +386,7 @@ public class KillAura {
                 if (!spaceSlots.isEmpty()) {
                     for (ItemStack spaceSlot : spaceSlots) {
                         if (spaceSlot.isEmpty()) {
-                            mod.getSlotHandler().clickSlot(PlayerSlot.getEquipSlot(), 0, ContainerInput.QUICK_MOVE);
+                            mod.getSlotHandler().clickSlot(PlayerSlot.getEquipSlot(), 0, ClickType.QUICK_MOVE);
                             return;
                         }
                     }
@@ -404,7 +404,7 @@ public class KillAura {
                 Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
                 if (toMoveTo.isPresent()) {
                     Slot garbageSlot = toMoveTo.get();
-                    mod.getSlotHandler().clickSlot(garbageSlot, 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(garbageSlot, 0, ClickType.PICKUP);
                 }
             }
             // only our claims. a key somebody else still holds stays down, the food chain's plain hold for a bite included

@@ -181,16 +181,16 @@ public enum FasterWorldScanner implements IWorldScanner {
     private Stream<BlockPos> scanChunkInternal(IPlayerContext ctx, BlockOptionalMetaLookup lookup, ChunkPos pos, int max, HitFilter hitFilter) {
         ChunkSource chunkProvider = ctx.world().getChunkSource();
         // if chunk is not loaded, return empty stream
-        if (!chunkProvider.hasChunk(pos.x(), pos.z())) {
+        if (!chunkProvider.hasChunk(pos.x, pos.z)) {
             return Stream.empty();
         }
 
-        long chunkX = (long) pos.x() << 4;
-        long chunkZ = (long) pos.z() << 4;
+        long chunkX = (long) pos.x << 4;
+        long chunkZ = (long) pos.z << 4;
 
-        int playerSectionY = (ctx.playerFeet().y - ctx.world().getMinY()) >> 4;
+        int playerSectionY = (ctx.playerFeet().y - ctx.world().getMinBuildHeight()) >> 4;
 
-        LevelChunk chunk = chunkProvider.getChunk(pos.x(), pos.z(), false);
+        LevelChunk chunk = chunkProvider.getChunk(pos.x, pos.z, false);
         if (chunk == null) { // unloaded between hasChunk and here, we're not on the main thread
             return Stream.empty();
         }
@@ -203,7 +203,7 @@ public enum FasterWorldScanner implements IWorldScanner {
         // the caller only keeps the first max hits overall, in order, so no one chunk can ever contribute more than max
         // stop there. #mine stone used to build ~12k BlockPos per chunk, in every chunk, and throw nearly all of them out
         List<BlockPos> blocks = new ArrayList<>();
-        int chunkY = chunk.getMinY();
+        int chunkY = chunk.getMinBuildHeight();
         LevelChunkSection[] sections = chunk.getSections();
         int l = sections.length;
         int i = playerSection - 1;

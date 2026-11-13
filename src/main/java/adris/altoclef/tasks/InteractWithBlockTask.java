@@ -35,7 +35,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -232,7 +232,7 @@ public class InteractWithBlockTask extends Task {
 
         boolean sideMatters = interactSide != null;
         if (sideMatters) {
-            Vec3i offs = interactSide.getUnitVec3i();
+            Vec3i offs = interactSide.getNormal();
             if (offs.getY() == -1) {
                 // If we're below, place ourselves two blocks below.
                 offs = offs.below();
@@ -482,20 +482,20 @@ public class InteractWithBlockTask extends Task {
             if (!cursorStack.isEmpty()) {
                 Optional<Slot> moveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorStack, false);
                 if (moveTo.isPresent()) {
-                    mod.getSlotHandler().clickSlot(moveTo.get(), 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(moveTo.get(), 0, ClickType.PICKUP);
                     return ClickResponse.WAIT_FOR_CLICK;
                 }
                 if (ItemHelper.canDropStack(mod, cursorStack)) {
-                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                     return ClickResponse.WAIT_FOR_CLICK;
                 }
                 Optional<Slot> garbage = StorageHelper.getGarbageSlot(mod);
                 // Try throwing away cursor slot if it's garbage
                 if (garbage.isPresent()) {
-                    mod.getSlotHandler().clickSlot(garbage.get(), 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(garbage.get(), 0, ClickType.PICKUP);
                     return ClickResponse.WAIT_FOR_CLICK;
                 }
-                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                 return ClickResponse.WAIT_FOR_CLICK;
             } else {
                 StorageHelper.closeScreen();

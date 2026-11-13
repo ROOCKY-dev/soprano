@@ -12,9 +12,9 @@ import baritone.utils.accessor.IChatComponent;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.GuiMessage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.ChatVisiblity;
 
@@ -54,7 +54,7 @@ public final class StatusPanelHud {
 
     // every frame while altoclef is up. rows null means switched off (altoShowTaskChains), empty means nothing is
     // running (the idle pill's cue). hidden is f1 or f3: the panel keeps counting, it just doesn't draw
-    public static void render(GuiGraphicsExtractor g, List<StatusPanel.Row> rows, int keepTop, String timer, boolean hidden) {
+    public static void render(GuiGraphics g, List<StatusPanel.Row> rows, int keepTop, String timer, boolean hidden) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) {
             if (panel != null) {
@@ -64,7 +64,7 @@ public final class StatusPanelHud {
             return;
         }
         Window win = mc.getWindow();
-        int guiScale = Math.max(1, win.getGuiScale());
+        int guiScale = Math.max(1, (int) win.getGuiScale());
         float scale = scale(guiScale, AltoSettings.hudScale());
         if (surface == null || surfaceScale != scale) {
             // the old one (if any) keeps drawing until the new one is ready
@@ -88,8 +88,8 @@ public final class StatusPanelHud {
         }
         long now = System.nanoTime();
         float inv = 1f / guiScale;
-        g.pose().pushMatrix();
-        g.pose().scale(inv, inv);
+        g.pose().pushPose();
+        g.pose().scale(inv, inv, 1f);
         boolean began = false;
         try {
             surface.begin(g, winW, winH);
@@ -103,7 +103,7 @@ public final class StatusPanelHud {
                     surface.end();
                 }
             } finally {
-                g.pose().popMatrix();
+                g.pose().popPose();
             }
         }
         surface.afterFrame();
@@ -116,7 +116,7 @@ public final class StatusPanelHud {
 
     private static int bosses(Minecraft mc) {
         try {
-            if (mc.gui.hud.getBossOverlay() instanceof IBossHealthOverlay b) {
+            if (mc.gui.getBossOverlay() instanceof IBossHealthOverlay b) {
                 return b.soprano$events().size();
             }
         } catch (Throwable t) {
@@ -137,7 +137,7 @@ public final class StatusPanelHud {
             if (o.chatVisibility().get() == ChatVisiblity.HIDDEN) {
                 return 0f;
             }
-            ChatComponent chat = mc.gui.hud.getChat();
+            ChatComponent chat = mc.gui.getChat();
             double scale = o.chatScale().get();
             if (chat.isChatFocused()) {
                 return (float) (ChatComponent.getHeight(o.chatHeightFocused().get()) * scale);
@@ -145,7 +145,7 @@ public final class StatusPanelHud {
             if (!(chat instanceof IChatComponent c)) {
                 return (float) (ChatComponent.getHeight(o.chatHeightUnfocused().get()) * scale);
             }
-            int now = mc.gui.hud.getGuiTicks();
+            int now = mc.gui.getGuiTicks();
             int max = chat.getLinesPerPage();
             int lines = 0;
             // newest first, so the first one past its fade means everything after it is gone too
@@ -168,7 +168,7 @@ public final class StatusPanelHud {
             return;
         }
         building = true;
-        mc.schedule(() -> {
+        mc.tell(() -> {
             try {
                 build(scale);
             } catch (Throwable t) {
@@ -210,7 +210,7 @@ public final class StatusPanelHud {
             if (mc.player == null) {
                 return;
             }
-            mc.gui.hud.getChat().addClientSystemMessage(Component.empty().append(Helper.getPrefix()).append(" " + line));
+            mc.gui.getChat().addMessage(Component.empty().append(Helper.getPrefix()).append(" " + line));
         } catch (Throwable t) {
             // telling them it broke broke. stderr has it twice now, that's plenty
             Safe.report("hud off line", t);

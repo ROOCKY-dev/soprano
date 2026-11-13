@@ -17,7 +17,7 @@ import adris.altoclef.tasksystem.Task;
 import adris.altoclef.world.FrameGeometry;
 import baritone.api.utils.Dimension;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -219,13 +219,13 @@ public class OpenPhase implements PhaseHandler {
                     + eyes + ", pearls " + pearls + ", powder " + facts.count(Items.BLAZE_POWDER) + ", rods " + facts.count(Items.BLAZE_ROD) + ")");
             ctx.save();
         }
-        if (endermanSeenAt < 0 || mod.getEntityTracker().entityFound(Enderman.class)) {
+        if (endermanSeenAt < 0 || mod.getEntityTracker().entityFound(EnderMan.class)) {
             endermanSeenAt = now;
         }
         String ending = null;
         if (!StrongholdRules.starved(facts, state)) {
             ending = "the frames are covered";
-        } else if (OpenTopUp.over(now - state.openTopUpStart, mod.getWorld().isBrightOutside(), now - endermanSeenAt)) {
+        } else if (OpenTopUp.over(now - state.openTopUpStart, mod.getWorld().isDay(), now - endermanSeenAt)) {
             ending = "gave up";
         }
         if (ending != null) {

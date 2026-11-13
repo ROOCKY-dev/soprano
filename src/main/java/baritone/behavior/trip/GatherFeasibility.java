@@ -72,7 +72,7 @@ public final class GatherFeasibility {
     }
 
     private static boolean hasAnyPickaxe(IPlayerContext ctx) {
-        for (ItemStack stack : ctx.player().getInventory().getNonEquipmentItems()) {
+        for (ItemStack stack : ctx.player().getInventory().items) {
             if (stack.is(ItemTags.PICKAXES)) {
                 return true;
             }

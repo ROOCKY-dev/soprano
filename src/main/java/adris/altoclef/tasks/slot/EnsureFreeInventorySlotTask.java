@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 
 public class EnsureFreeInventorySlotTask extends Task {
@@ -108,7 +108,7 @@ public class EnsureFreeInventorySlotTask extends Task {
             case CLICK_GARBAGE -> {
                 setDebugState("Picking up garbage");
                 pickAim(mod);
-                mod.getSlotHandler().clickSlot(garbage.get(), 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(garbage.get(), 0, ClickType.PICKUP);
             }
             case THROW_CURSOR -> {
                 setDebugState("Throwing the held stack");
@@ -116,12 +116,12 @@ public class EnsureFreeInventorySlotTask extends Task {
                 // backstop for that
                 pickAim(mod);
                 if (aimed(mod)) {
-                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                 }
             }
             case PUT_BACK -> {
                 setDebugState("Putting the held stack back");
-                mod.getSlotHandler().clickSlot(containerSlot.get(), 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(containerSlot.get(), 0, ClickType.PICKUP);
             }
             default -> setDebugState("All items are protected.");
         }
@@ -156,7 +156,7 @@ public class EnsureFreeInventorySlotTask extends Task {
         _stuck = false;
         setDebugState("Throwing out " + ItemHelper.stripItemName(_victim.getItem()) + " to make room");
         pickAim(mod);
-        if (aimed(mod) && mod.getSlotHandler().clickSlot(_evict, 1, ContainerInput.THROW)) {
+        if (aimed(mod) && mod.getSlotHandler().clickSlot(_evict, 1, ClickType.THROW)) {
             _onThrown.run();
         }
         mod.getInputControls().forceLook(_aimYaw, ThrowAim.PITCH);

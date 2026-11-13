@@ -10,7 +10,7 @@ import adris.altoclef.util.helpers.DropRoom;
 import adris.altoclef.util.helpers.StorageHelper;
 import adris.altoclef.util.slots.Slot;
 import java.util.Optional;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -126,7 +126,7 @@ public class EnsureFreeCursorSlotTask extends Task {
     }
 
     private boolean click(AltoClef mod, Slot slot, ItemStack cursor) {
-        if (mod.getSlotHandler().clickSlot(slot, 0, ContainerInput.PICKUP)) {
+        if (mod.getSlotHandler().clickSlot(slot, 0, ClickType.PICKUP)) {
             _clicked = true;
             _clickedWith = cursor.copy();
             return true;

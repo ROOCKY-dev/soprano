@@ -15,11 +15,11 @@ import baritone.Baritone;
 import baritone.api.Settings;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.CharacterEvent;
+import baritone.compat.input.KeyEvent;
+import baritone.compat.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -170,7 +170,6 @@ public class GuiScreen extends Screen {
             shell.open(now);
             // sdl only sends characters while text input is on, and vanilla turns it on per edit box. ours are not edit
             // boxes it knows about, so it stays on for as long as the screen is up (setScreen turns it off again)
-            mc.textInputManager().startTextInput(this);
         }
     }
 
@@ -183,8 +182,8 @@ public class GuiScreen extends Screen {
             if (shell.closed(System.nanoTime())) {
                 closeNow = true;
             }
-            if (closeNow && mc.gui.screen() == this) {
-                mc.gui.setScreen(null);
+            if (closeNow && mc.screen == this) {
+                mc.setScreen(null);
             }
         } catch (Throwable t) {
             Safe.report("gui tick", t);
@@ -208,8 +207,8 @@ public class GuiScreen extends Screen {
     // everything in the strata before it (the world and the hud) and leaves the ones after it sharp, and it quietly does
     // nothing when the menu blur option is at 0
     @Override
-    public void extractBackground(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
-        extractBlurredBackground(g);
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partial) {
+        renderBlurredBackground(partial);
     }
 
     @Override
@@ -223,7 +222,6 @@ public class GuiScreen extends Screen {
     }
 
     // the viewport is read from the window every frame, so all a resize has to do is not rebuild the screen
-    @Override
     public void resize(int w, int h) {
         this.width = w;
         this.height = h;
@@ -239,7 +237,7 @@ public class GuiScreen extends Screen {
     // ----- drawing
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
         Window win = mc.getWindow();
         int winW = win.getWidth();
         int winH = win.getHeight();
@@ -249,9 +247,9 @@ public class GuiScreen extends Screen {
 
         boolean began = false;
         // the kit works in real pixels, so the whole screen draws under 1/guiScale
-        float inv = 1f / Math.max(1, win.getGuiScale());
-        g.pose().pushMatrix();
-        g.pose().scale(inv, inv);
+        float inv = 1f / Math.max(1, (int) win.getGuiScale());
+        g.pose().pushPose();
+        g.pose().scale(inv, inv, 1f);
         try {
             float wanted = Theme.scaleFor(winH);
             if (rebuild || (wanted != theme.scale && wanted != failedScale)) {
@@ -290,7 +288,7 @@ public class GuiScreen extends Screen {
             } catch (Throwable t) {
                 Safe.report("gui render end", t);
             }
-            g.pose().popMatrix();
+            g.pose().popPose();
         }
 
         if (atlasCanvas != null && atlasCanvas.broken) {
@@ -298,12 +296,12 @@ public class GuiScreen extends Screen {
             plainOnly = true;
             rebuild = true;
         }
-        if (closeNow && mc.gui.screen() == this) {
-            mc.gui.setScreen(null);
+        if (closeNow && mc.screen == this) {
+            mc.setScreen(null);
         }
     }
 
-    private void begin(GuiGraphicsExtractor g, int w, int h) {
+    private void begin(GuiGraphics g, int w, int h) {
         if (atlasCanvas != null) {
             atlasCanvas.begin(g, w, h);
         } else {
@@ -351,19 +349,16 @@ public class GuiScreen extends Screen {
     }
 
     // the game counts buttons from 1 (left, middle, right), the kit from 0. McKeys does the remap
-    @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         guarded("mouse down", () -> shell.mouseDown(pointerX(), pointerY(), McKeys.buttonToKit(event.button()), McKeys.mods(event)));
         return true;
     }
 
-    @Override
     public boolean mouseReleased(MouseButtonEvent event) {
         guarded("mouse up", () -> shell.mouseUp(pointerX(), pointerY(), McKeys.buttonToKit(event.button()), McKeys.mods(event)));
         return true;
     }
 
-    @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         double s = scale();
         guarded("mouse drag", () -> shell.mouseDrag(pointerX(), pointerY(), McKeys.buttonToKit(event.button()),
@@ -386,20 +381,17 @@ public class GuiScreen extends Screen {
     // always true: a key the shell did not want still must not reach the game or the default screen handling
     // event.key() is an sdl scancode (escape is 41), the kit wants glfw's numbers (escape is 256). the modifiers come in
     // the event, McKeys turns them into the kit's bits
-    @Override
     public boolean keyPressed(KeyEvent event) {
         guarded("key down", () -> shell.keyDown(McKeys.toKit(event.key()), McKeys.mods(event)));
         return true;
     }
 
-    @Override
     public boolean keyReleased(KeyEvent event) {
         guarded("key up", () -> shell.keyUp(McKeys.toKit(event.key())));
         return true;
     }
 
     // the game hands over a code point now, the shell still takes the utf-16 chars it always got
-    @Override
     public boolean charTyped(CharacterEvent event) {
         guarded("char", () -> {
             for (char c : Character.toChars(event.codepoint())) {
@@ -412,4 +404,26 @@ public class GuiScreen extends Screen {
     private static void guarded(String where, Runnable r) {
         Safe.run(where, r);
     }
+
+    // adapt the GLFW callbacks while retaining the shared GUI event handlers
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) { return keyPressed(new KeyEvent(key, scan, mods)); }
+
+    @Override
+    public boolean keyReleased(int key, int scan, int mods) { return keyReleased(new KeyEvent(key, scan, mods)); }
+
+    @Override
+    public boolean charTyped(char codepoint, int mods) { return charTyped(new CharacterEvent(codepoint, mods)); }
+
+    @Override
+    public boolean mouseClicked(double x, double y, int button) { return mouseClicked(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers()), false); }
+
+    @Override
+    public boolean mouseReleased(double x, double y, int button) { return mouseReleased(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers())); }
+
+    @Override
+    public boolean mouseDragged(double x, double y, int button, double dx, double dy) { return mouseDragged(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers()), dx, dy); }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft mc, int w, int h) { resize(w, h); }
 }

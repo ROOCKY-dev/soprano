@@ -67,7 +67,7 @@ import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
+import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.inventory.SmokerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;

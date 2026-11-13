@@ -45,7 +45,6 @@ import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.ChestType;
 import net.minecraft.world.level.dimension.BuiltinDimensionTypes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -211,8 +210,8 @@ public interface WorldHelper {
     static int getGroundHeight(AltoClef mod, int x, int z) {
         // one mutable pos instead of a fresh BlockPos per y. and no scanning void below the end/nether floor
         BlockPos.MutableBlockPos check = new BlockPos.MutableBlockPos();
-        int top = Math.min(WORLD_CEILING_Y, mod.getWorld().getMaxY());
-        int bottom = Math.max(WORLD_FLOOR_Y, mod.getWorld().getMinY());
+        int top = Math.min(WORLD_CEILING_Y, mod.getWorld().getMaxBuildHeight());
+        int bottom = Math.max(WORLD_FLOOR_Y, mod.getWorld().getMinBuildHeight());
         for (int y = top; y >= bottom; --y) {
             if (isSolid(mod, check.set(x, y, z))) return y;
         }
@@ -238,8 +237,8 @@ public interface WorldHelper {
     static int getGroundHeight(AltoClef mod, int x, int z, Block... groundBlocks) {
         // callers pass one or two blocks, so a linear look beats building a HashSet on every call
         BlockPos.MutableBlockPos check = new BlockPos.MutableBlockPos();
-        int top = Math.min(WORLD_CEILING_Y, mod.getWorld().getMaxY());
-        int bottom = Math.max(WORLD_FLOOR_Y, mod.getWorld().getMinY());
+        int top = Math.min(WORLD_CEILING_Y, mod.getWorld().getMaxBuildHeight());
+        int bottom = Math.max(WORLD_FLOOR_Y, mod.getWorld().getMinBuildHeight());
         for (int y = top; y >= bottom; --y) {
             Block found = mod.getWorld().getBlockState(check.set(x, y, z)).getBlock();
             for (Block ground : groundBlocks) {
@@ -260,8 +259,8 @@ public interface WorldHelper {
     // what a break could be done with: the bag and the offhand (the tool gates count a pick over there too)
     static java.util.List<net.minecraft.world.item.ItemStack> bagOf(AltoClef mod) {
         net.minecraft.world.entity.player.Inventory inv = mod.getPlayer().getInventory();
-        java.util.List<net.minecraft.world.item.ItemStack> bag = new java.util.ArrayList<>(inv.getNonEquipmentItems().size() + 1);
-        bag.addAll(inv.getNonEquipmentItems());
+        java.util.List<net.minecraft.world.item.ItemStack> bag = new java.util.ArrayList<>(inv.items.size() + 1);
+        bag.addAll(inv.items);
         bag.add(mod.getPlayer().getItemBySlot(net.minecraft.world.entity.EquipmentSlot.OFFHAND));
         return bag;
     }
@@ -376,7 +375,7 @@ public interface WorldHelper {
                 return level.getBlockState(at).getCollisionShape(level, at).isEmpty();
             }
         };
-        return DropBurnRules.dropWouldBurn(cells, pos.getX(), pos.getY(), pos.getZ(), level.getMinY());
+        return DropBurnRules.dropWouldBurn(cells, pos.getX(), pos.getY(), pos.getZ(), level.getMinBuildHeight());
     }
 
     static boolean canPlace(AltoClef mod, BlockPos pos) {
@@ -600,16 +599,16 @@ public interface WorldHelper {
 
     static boolean canSleep() {
         ClientLevel world = Minecraft.getInstance().level;
-        // the game's own rule (ServerPlayer.startSleepInBed refuses while Level.isBrightOutside()): dusk to dawn, 12542 to 23459 in clear
+        // the game's own rule (ServerPlayer.startSleepInBed refuses while Level.isDay()): dusk to dawn, 12542 to 23459 in clear
         // weather, and any time in a thunderstorm. the hand copied window this had ended at 23992, which is the end of a rainy
         // night. a nether or end bed explodes, so only a dimension where beds work counts
         // the dimension type, see overworldType
-        return world != null && overworldType(world) && !world.isBrightOutside();
+        return world != null && overworldType(world) && !world.isDay();
     }
 
     // ultraWarm used to be the nether-only flag, water_evaporates is the synced attribute that took its job. vanilla's bucket
     // asks it per position, but nothing in the vanilla data layers it by biome, so the dimension wide value is the same answer
     static boolean waterEvaporates(Level world) {
-        return world.environmentAttributes().getDimensionValue(EnvironmentAttributes.WATER_EVAPORATES);
+        return world.dimensionType().ultraWarm();
     }
 }

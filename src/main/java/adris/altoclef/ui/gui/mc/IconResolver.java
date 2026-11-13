@@ -3,9 +3,9 @@ package adris.altoclef.ui.gui.mc;
 import adris.altoclef.TaskCatalogue;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
@@ -68,7 +68,7 @@ public final class IconResolver {
     }
 
     public static String forEntityType(EntityType<?> type) {
-        if (type == null || type == EntityTypes.PLAYER) {
+        if (type == null || type == EntityType.PLAYER) {
             return null;
         }
         String cached = TYPE_CACHE.computeIfAbsent(type, t -> {
@@ -79,9 +79,9 @@ public final class IconResolver {
     }
 
     private static String resolveType(EntityType<?> type) {
-        Optional<Holder<Item>> egg = SpawnEggItem.byId(type);
-        if (egg.isPresent()) {
-            return idOf(egg.get().value());
+        SpawnEggItem egg = SpawnEggItem.byId(type);
+        if (egg != null) {
+            return idOf(egg);
         }
         String path = BuiltInRegistries.ENTITY_TYPE.getKey(type).getPath();
         String standIn = ENTITY_STAND_INS.get(path);
@@ -97,7 +97,7 @@ public final class IconResolver {
         if (id == null) {
             return null;
         }
-        Identifier rl = Identifier.tryParse(id.contains(":") ? id : "minecraft:" + id);
+        ResourceLocation rl = ResourceLocation.tryParse(id.contains(":") ? id : "minecraft:" + id);
         if (rl == null) {
             return null;
         }

@@ -433,7 +433,7 @@ public class GatherBillTask extends Task {
 
     private static int freeSlots(AltoClef mod) {
         int free = 0;
-        for (ItemStack stack : mod.getPlayer().getInventory().getNonEquipmentItems()) {
+        for (ItemStack stack : mod.getPlayer().getInventory().items) {
             if (stack.isEmpty()) free++;
         }
         return free;

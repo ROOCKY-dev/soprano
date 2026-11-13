@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -143,7 +143,7 @@ final class RoutineHost implements RoutineRunner.Host {
     private static Task taskFor(AltoClef mod, GraphAction action) {
         return switch (action) {
             case GraphAction.Mine mine -> {
-                Block block = BuiltInRegistries.BLOCK.getOptional(Identifier.tryParse(mine.block())).orElse(null);
+                Block block = BuiltInRegistries.BLOCK.getOptional(ResourceLocation.tryParse(mine.block())).orElse(null);
                 if (block == null) {
                     throw new IllegalArgumentException("\"" + mine.block() + "\" is not a block");
                 }
@@ -156,7 +156,7 @@ final class RoutineHost implements RoutineRunner.Host {
             }
             case GraphAction.Craft craft -> {
                 // the same road as get: the whole shopping list, then craft. it gets the ingredients first if it has to
-                Item item = BuiltInRegistries.ITEM.getOptional(Identifier.tryParse(craft.item())).orElse(null);
+                Item item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.tryParse(craft.item())).orElse(null);
                 if (item == null || !TaskCatalogue.taskExists(craft.item())) {
                     throw new IllegalArgumentException("\"" + craft.item() + "\" is not something altoclef can make");
                 }

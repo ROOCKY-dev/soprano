@@ -16,14 +16,14 @@ import baritone.utils.accessor.ISubtitleOverlay;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.KeyEvent;
+import baritone.compat.input.MouseButtonEvent;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.sounds.SoundEvents;
 
@@ -93,7 +93,7 @@ public final class TripToastHud {
         }
     }
 
-    public static void render(GuiGraphicsExtractor g, int subtitleRows) {
+    public static void render(GuiGraphics g, int subtitleRows) {
         // cleared first, so a toast that's gone (or a draw that threw) isn't dodged by the status panel forever
         HudObstacles.toast(null);
         lastSubtitleRows = subtitleRows;
@@ -101,7 +101,7 @@ public final class TripToastHud {
         overSeen = false;
         // the screen draws it on top of itself in a moment (overScreen), but only once it has been seen doing that. a
         // loader that draws screens some other way would otherwise lose the toast under pause, and its Y / N with it
-        if (over && drawsOverScreen(cover(Minecraft.getInstance().gui.screen()))) {
+        if (over && drawsOverScreen(cover(Minecraft.getInstance().screen))) {
             return;
         }
         guard("trip toast render", () -> draw(g, subtitleRows));
@@ -109,8 +109,8 @@ public final class TripToastHud {
 
     // MixinScreenTripKeys, at the end of a screen's extract. the pause menu blurs and tints everything the hud drew, the
     // toast under it was a smudge with a question in it. vanilla's own toasts draw over screens too
-    public static void overScreen(Screen screen, GuiGraphicsExtractor g) {
-        if (screen != Minecraft.getInstance().gui.screen() || !drawsOverScreen(cover(screen))) {
+    public static void overScreen(Screen screen, GuiGraphics g) {
+        if (screen != Minecraft.getInstance().screen || !drawsOverScreen(cover(screen))) {
             return;
         }
         overSeen = true;
@@ -129,17 +129,17 @@ public final class TripToastHud {
         }
     }
 
-    private static void draw(GuiGraphicsExtractor g, int subtitleRows) {
+    private static void draw(GuiGraphics g, int subtitleRows) {
         Minecraft mc = Minecraft.getInstance();
         TripToast.View view = currentView();
-        if (mc.player == null || mc.level == null || mc.gui.hud.isHidden()) {
+        if (mc.player == null || mc.level == null || mc.options.hideGui) {
             view = null;
         }
         if (card == null && view == null) {
             return;
         }
         Window win = mc.getWindow();
-        int guiScale = Math.max(1, win.getGuiScale());
+        int guiScale = Math.max(1, (int) win.getGuiScale());
         float scale = ToastPlacement.scale(KitSurface.scaleFor(guiScale), AltoSettings.hudScale());
         if (surface == null || surfaceScale != scale) {
             // the old one (if any) keeps drawing until the new one is ready
@@ -157,7 +157,7 @@ public final class TripToastHud {
             labelsAt = now;
             card.setKeys(SopranoKeys.label(true), SopranoKeys.label(false));
         }
-        card.setButtonsLive(buttonsLive(cover(mc.gui.screen()), typing(mc.gui.screen())));
+        card.setButtonsLive(buttonsLive(cover(mc.screen), typing(mc.screen)));
         boolean fresh = card.show(view, now);
         if (!card.visible()) {
             return;
@@ -190,8 +190,8 @@ public final class TripToastHud {
         // the status panel keeps out of this next frame
         HudObstacles.toast(new float[]{card.x(), card.y(), card.w(), card.h()});
         float inv = 1f / guiScale;
-        g.pose().pushMatrix();
-        g.pose().scale(inv, inv);
+        g.pose().pushPose();
+        g.pose().scale(inv, inv, 1f);
         boolean began = false;
         try {
             surface.begin(g, winW, winH);
@@ -205,7 +205,7 @@ public final class TripToastHud {
                     surface.end();
                 }
             } finally {
-                g.pose().popMatrix();
+                g.pose().popPose();
             }
         }
         surface.afterFrame();
@@ -225,7 +225,7 @@ public final class TripToastHud {
             return;
         }
         building = true;
-        mc.schedule(() -> {
+        mc.tell(() -> {
             try {
                 build(scale);
             } catch (Throwable t) {
@@ -260,7 +260,7 @@ public final class TripToastHud {
     }
 
     private static boolean chatOpen(Minecraft mc) {
-        return mc.gui.screen() instanceof ChatScreen;
+        return mc.screen instanceof ChatScreen;
     }
 
     static Cover cover(Screen screen) {
@@ -323,7 +323,7 @@ public final class TripToastHud {
         }
         try {
             Minecraft mc = Minecraft.getInstance();
-            if (!keysAnswer(cover(mc.gui.screen()), false, false)) {
+            if (!keysAnswer(cover(mc.screen), false, false)) {
                 return false;
             }
             return press(mc, event, action);
@@ -340,7 +340,7 @@ public final class TripToastHud {
         }
         try {
             Minecraft mc = Minecraft.getInstance();
-            if (screen != mc.gui.screen()) {
+            if (screen != mc.screen) {
                 return false;
             }
             if (!keysAnswer(cover(screen), true, typing(screen))) {
@@ -356,7 +356,7 @@ public final class TripToastHud {
     private static boolean press(Minecraft mc, KeyEvent event, int action) {
         TripToast.View view = currentView();
         // on screen means this very toast got drawn, not the last one still fading out
-        boolean ready = mc.player != null && !mc.gui.hud.isHidden() && card != null
+        boolean ready = mc.player != null && !mc.options.hideGui && card != null
                 && view != null && card.view() != null && card.view().id() == view.id();
         TripToastCard.Hit hit = keyHit(view, ready, action, SopranoKeys.isYes(event), SopranoKeys.isNo(event));
         if (hit == null) {
@@ -387,7 +387,7 @@ public final class TripToastHud {
             return false;
         }
         try {
-            int guiScale = Math.max(1, Minecraft.getInstance().getWindow().getGuiScale());
+            int guiScale = Math.max(1, (int) Minecraft.getInstance().getWindow().getGuiScale());
             float px = ToastPlacement.toDevice(event.x(), guiScale);
             float py = ToastPlacement.toDevice(event.y(), guiScale);
             TripToast.View view = currentView();

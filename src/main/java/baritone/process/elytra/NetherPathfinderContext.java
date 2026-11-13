@@ -33,7 +33,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.chunk.PaletteResize;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.phys.Vec3;
 
@@ -95,7 +94,7 @@ public final class NetherPathfinderContext implements IElytraPathFinder {
     }
 
     public boolean hasChunk(ChunkPos pos) {
-        return this.context.hasChunkFromCaller(pos.x(), pos.z());
+        return this.context.hasChunkFromCaller(pos.x, pos.z);
     }
 
     public void queueCacheCulling(int chunkX, int chunkZ, int maxDistanceBlocks) {
@@ -121,7 +120,7 @@ public final class NetherPathfinderContext implements IElytraPathFinder {
                 try {
                     // we might replace this chunk
                     this.boi.clearCache();
-                    final Chunk packed = this.context.allocateAndInsertChunk(chunk.getPos().x(), chunk.getPos().z());
+                    final Chunk packed = this.context.allocateAndInsertChunk(chunk.getPos().x, chunk.getPos().z);
                     writeChunkData(chunk, packed);
                 } finally {
                     writeLock.unlock();
@@ -136,7 +135,7 @@ public final class NetherPathfinderContext implements IElytraPathFinder {
             // not inserting or deleting from the cache hashmap but it would still be bad for this function to race with itself
             writeLock.lock();
             try {
-                final Chunk chunk = this.context.getChunk(chunkPos.x(), chunkPos.z());
+                final Chunk chunk = this.context.getChunk(chunkPos.x, chunkPos.z);
                 if (chunk == null) return; // this shouldn't ever happen
                 event.getBlocks().forEach(pair -> {
                     BlockPos pos = pair.first().below(minY);

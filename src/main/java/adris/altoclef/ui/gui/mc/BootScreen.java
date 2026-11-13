@@ -7,8 +7,8 @@ import adris.altoclef.ui.gui.kit.Safe;
 import adris.altoclef.ui.gui.kit.Theme;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.util.Util;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.Util;
 
 // our look for vanilla's loading overlay: black, the soprano logo, a thin bar. vanilla keeps the whole lifecycle (the
 // reload, the progress smoothing, its two second fade out and taking itself off screen), MixinLoadingOverlay only
@@ -53,7 +53,7 @@ public final class BootScreen {
     }
 
     // the overlay's tail. the clock numbers are vanilla's own fields, currentProgress already moved this frame
-    public static void draw(GuiGraphicsExtractor g, boolean fadeIn, long fadeInStart, long fadeOutStart, float progress) {
+    public static void draw(GuiGraphics g, boolean fadeIn, long fadeInStart, long fadeOutStart, float progress) {
         // the logo redirect is require 0. if another loading screen mod got that call first, mojang's logo is still
         // there and ours would sit right on top of it. two logos is worse than theirs alone
         boolean ours = logoSkipped;
@@ -94,10 +94,10 @@ public final class BootScreen {
         if (markA <= 0f && barA <= 0f) {
             return;
         }
-        int gs = Math.max(1, win.getGuiScale());
+        int gs = Math.max(1, (int) win.getGuiScale());
         float inv = 1f / gs;
-        g.pose().pushMatrix();
-        g.pose().scale(inv, inv);
+        g.pose().pushPose();
+        g.pose().scale(inv, inv, 1f);
         boolean began = false;
         try {
             if (!ensureCanvas()) {
@@ -119,7 +119,7 @@ public final class BootScreen {
                 Safe.report("boot screen end", t);
                 broken = true;
             }
-            g.pose().popMatrix();
+            g.pose().popPose();
         }
         if (canvas != null && canvas.broken) {
             broken = true;

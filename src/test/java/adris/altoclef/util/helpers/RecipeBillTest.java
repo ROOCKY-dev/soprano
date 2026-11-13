@@ -57,7 +57,7 @@ public class RecipeBillTest {
 
     @Test
     public void lanternChainAndBucketPoolTheirIron() {
-        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "iron_chain", 1, "bucket", 1), bag(), NOTHING_NEAR);
+        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "chain", 1, "bucket", 1), bag(), NOTHING_NEAR);
         // nuggets: 8 for the lantern + 2 for the chain = 10, two crafts of 9. ingots: 2 for those + 1 chain + 3 bucket = 6
         assertEquals(10, bill.need("iron_nugget"));
         assertEquals(6, bill.need("iron_ingot"));
@@ -82,7 +82,7 @@ public class RecipeBillTest {
 
     @Test
     public void heldIngotsAndNuggetsComeOffOnce() {
-        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "iron_chain", 1, "bucket", 1),
+        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "chain", 1, "bucket", 1),
                 bag(Items.IRON_INGOT, 3, Items.IRON_NUGGET, 4), NOTHING_NEAR);
         // 10 nuggets wanted, 4 held: one craft, one ingot. ingots 1 + 1 + 3 = 5, 3 held: 2 raw iron
         assertEquals(1, bill.node("iron_nugget").runs());
@@ -129,7 +129,7 @@ public class RecipeBillTest {
     @Test
     public void blastFurnacePartsOnlyWhenTheIronRunWouldBuildOne() {
         RecipeBill.World blasts = new RecipeBill.World(false, false, 0, n -> n >= 5);
-        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "iron_chain", 1, "bucket", 1), bag(), blasts);
+        RecipeBill.Bill bill = RecipeBill.of(want("lantern", 1, "chain", 1, "bucket", 1), bag(), blasts);
         assertTrue(bill.blast);
         // the ingot target stays 6, the blast eats 5 more on the side
         assertEquals(6, bill.need("iron_ingot"));
@@ -207,7 +207,7 @@ public class RecipeBillTest {
 
     @Test
     public void aliasesFindTheRealRecipe() {
-        assertEquals("iron_chain", CatalogueBook.canonical(new ItemTarget("chain", 1)));
+        assertEquals("chain", CatalogueBook.canonical(new ItemTarget("chain", 1)));
         assertEquals("wooden_pickaxe", CatalogueBook.canonical(new ItemTarget("wooden_pick", 1)));
         assertEquals("planks", CatalogueBook.canonical(new ItemTarget("planks", 1)));
         assertEquals("iron_ingot", CatalogueBook.canonical(new ItemTarget(Items.IRON_INGOT, 1)));

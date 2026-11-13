@@ -134,10 +134,10 @@ public class DropRoomTest {
     @Test
     public void woolPastABedsWorth() {
         // 7 wool: the red two can go and leave five, the white five can't (two left)
-        assertEquals(7, pearl(with(kit(Items.WOOL.white(), 5), kit(Items.WOOL.red(), 2))).slot());
-        assertSame(Decision.NO, pearl(with(kit(Items.WOOL.white(), 4))));
+        assertEquals(7, pearl(with(kit(Items.WHITE_WOOL, 5), kit(Items.RED_WOOL, 2))).slot());
+        assertSame(Decision.NO, pearl(with(kit(Items.WHITE_WOOL, 4))));
         // two stacks are not a spare when together they're one bed
-        assertSame(Decision.NO, pearl(with(kit(Items.WOOL.white(), 1), kit(Items.WOOL.white(), 2))));
+        assertSame(Decision.NO, pearl(with(kit(Items.WHITE_WOOL, 1), kit(Items.WHITE_WOOL, 2))));
     }
 
     @Test
@@ -179,7 +179,7 @@ public class DropRoomTest {
 
     @Test
     public void theEndsBedsAreSpokenForAndTheSpareIsNot() {
-        List<ItemStack> bag = stacks(new ItemStack(Items.BED.white()), new ItemStack(Items.BED.white()), new ItemStack(Items.BED.white()), ItemStack.EMPTY);
+        List<ItemStack> bag = stacks(new ItemStack(Items.WHITE_BED), new ItemStack(Items.WHITE_BED), new ItemStack(Items.WHITE_BED), ItemStack.EMPTY);
         boolean[] kept = DropRoom.reserved(bag, 2);
         assertEquals(true, kept[0]);
         assertEquals(true, kept[1]);
@@ -191,8 +191,8 @@ public class DropRoomTest {
     public void aPearlCannotPushAReserveBedOut() {
         // two white beds look like a duplicate, that's the surplus rule's whole idea of a spare
         List<Stack> bag = keepers();
-        bag.add(kit(Items.BED.white(), 1));
-        bag.add(kit(Items.BED.white(), 1));
+        bag.add(kit(Items.WHITE_BED, 1));
+        bag.add(kit(Items.WHITE_BED, 1));
         assertEquals(bag.size() - 2, DropRoom.victim(bag));
         List<ItemStack> raw = new ArrayList<>();
         for (Stack st : bag) {
@@ -210,18 +210,18 @@ public class DropRoomTest {
     @Test
     public void theWoolThatStillHasToBecomeBedsIsSpokenFor() {
         // 1 bed of 3 reserved, so 6 wool to go. the scraps of another colour can't make a bed
-        List<ItemStack> bag = stacks(new ItemStack(Items.BED.white()), new ItemStack(Items.WOOL.red(), 6), new ItemStack(Items.WOOL.blue(), 2));
+        List<ItemStack> bag = stacks(new ItemStack(Items.WHITE_BED), new ItemStack(Items.RED_WOOL, 6), new ItemStack(Items.BLUE_WOOL, 2));
         boolean[] kept = DropRoom.reserved(bag, 3);
         assertEquals(true, kept[1]);
         assertEquals(false, kept[2]);
         // beds covered: the wool is just wool
-        assertEquals(false, DropRoom.reserved(stacks(new ItemStack(Items.BED.white()), new ItemStack(Items.WOOL.red(), 6)), 1)[1]);
+        assertEquals(false, DropRoom.reserved(stacks(new ItemStack(Items.WHITE_BED), new ItemStack(Items.RED_WOOL, 6)), 1)[1]);
     }
 
     @Test
     public void scrapsDontPayForAnotherColoursWool() {
         // 9 wool owed: 5 red and 5 blue are 3 usable each, so the white three are still needed
-        List<ItemStack> bag = stacks(new ItemStack(Items.WOOL.red(), 5), new ItemStack(Items.WOOL.blue(), 5), new ItemStack(Items.WOOL.white(), 3));
+        List<ItemStack> bag = stacks(new ItemStack(Items.RED_WOOL, 5), new ItemStack(Items.BLUE_WOOL, 5), new ItemStack(Items.WHITE_WOOL, 3));
         boolean[] kept = DropRoom.reserved(bag, 3);
         assertEquals(true, kept[0]);
         assertEquals(true, kept[1]);
@@ -230,7 +230,7 @@ public class DropRoomTest {
 
     @Test
     public void aSetOfThreeSplitOverTwoStacksStaysWhole() {
-        List<ItemStack> bag = stacks(new ItemStack(Items.WOOL.red(), 2), new ItemStack(Items.WOOL.red(), 2));
+        List<ItemStack> bag = stacks(new ItemStack(Items.RED_WOOL, 2), new ItemStack(Items.RED_WOOL, 2));
         boolean[] kept = DropRoom.reserved(bag, 1);
         assertEquals(true, kept[0]);
         assertEquals(true, kept[1]);
@@ -238,7 +238,7 @@ public class DropRoomTest {
 
     @Test
     public void noRunNothingIsSpokenFor() {
-        boolean[] kept = DropRoom.reserved(stacks(new ItemStack(Items.BED.white()), new ItemStack(Items.WOOL.red(), 6)), 0);
+        boolean[] kept = DropRoom.reserved(stacks(new ItemStack(Items.WHITE_BED), new ItemStack(Items.RED_WOOL, 6)), 0);
         assertEquals(false, kept[0]);
         assertEquals(false, kept[1]);
     }
@@ -247,14 +247,14 @@ public class DropRoomTest {
     // in window order, the way the view reads it: the main bag and then the hotbar. bag order is the tie break
     private static List<ItemStack> stuffed() {
         Object[][] rows = {
-                {Items.COOKED_BEEF, 2}, {Items.IRON_HELMET, 1}, {Items.BLAZE_ROD, 1}, {Items.BED.white(), 1}, {Items.WOOL.lightGray(), 2},
-                {Items.COOKED_CHICKEN, 10}, {Items.WOOL.white(), 8}, {Items.BED.white(), 1}, {Items.DIAMOND, 1}, {Items.WOOL.black(), 1},
-                {Items.BUCKET, 1}, {Items.SHEARS, 1}, {Items.ENDER_EYE, 13}, {Items.SHIELD, 1}, {Items.BED.white(), 1},
+                {Items.COOKED_BEEF, 2}, {Items.IRON_HELMET, 1}, {Items.BLAZE_ROD, 1}, {Items.WHITE_BED, 1}, {Items.LIGHT_GRAY_WOOL, 2},
+                {Items.COOKED_CHICKEN, 10}, {Items.WHITE_WOOL, 8}, {Items.WHITE_BED, 1}, {Items.DIAMOND, 1}, {Items.BLACK_WOOL, 1},
+                {Items.BUCKET, 1}, {Items.SHEARS, 1}, {Items.ENDER_EYE, 13}, {Items.SHIELD, 1}, {Items.WHITE_BED, 1},
                 {Items.FLINT_AND_STEEL, 1}, {Items.WATER_BUCKET, 1}, {Items.COAL, 1}, {Items.FURNACE, 3}, {Items.SHIELD, 1},
-                {Items.RAW_GOLD, 4}, {Items.IRON_PICKAXE, 1}, {Items.SMOKER, 1}, {Items.BED.white(), 1}, {Items.STONE_SWORD, 1},
-                {Items.BED.white(), 1}, {Items.IRON_SWORD, 1},
-                {Items.DIAMOND_PICKAXE, 1}, {Items.CRAFTING_TABLE, 1}, {Items.LADDER, 3}, {Items.BED.white(), 1}, {Items.IRON_SWORD, 1},
-                {Items.BED.white(), 1}, {Items.WOODEN_PICKAXE, 1}, {Items.BED.lightGray(), 1}, {Items.NETHERRACK, 41}};
+                {Items.RAW_GOLD, 4}, {Items.IRON_PICKAXE, 1}, {Items.SMOKER, 1}, {Items.WHITE_BED, 1}, {Items.STONE_SWORD, 1},
+                {Items.WHITE_BED, 1}, {Items.IRON_SWORD, 1},
+                {Items.DIAMOND_PICKAXE, 1}, {Items.CRAFTING_TABLE, 1}, {Items.LADDER, 3}, {Items.WHITE_BED, 1}, {Items.IRON_SWORD, 1},
+                {Items.WHITE_BED, 1}, {Items.WOODEN_PICKAXE, 1}, {Items.LIGHT_GRAY_BED, 1}, {Items.NETHERRACK, 41}};
         List<ItemStack> stacks = new ArrayList<>();
         for (Object[] row : rows) {
             stacks.add(new ItemStack((Item) row[0], (Integer) row[1]));
@@ -304,10 +304,10 @@ public class DropRoomTest {
         for (ItemStack st : stacks) {
             if (!st.isEmpty()) left.add(st.getItem());
         }
-        assertEquals(List.of(Items.COOKED_BEEF, Items.IRON_HELMET, Items.BLAZE_ROD, Items.BED.white(), Items.WOOL.lightGray(), Items.COOKED_CHICKEN,
-                Items.WOOL.white(), Items.BED.white(), Items.DIAMOND, Items.WOOL.black(), Items.BUCKET, Items.ENDER_EYE, Items.BED.white(), Items.FLINT_AND_STEEL, Items.WATER_BUCKET,
-                Items.SHIELD, Items.SMOKER, Items.BED.white(), Items.BED.white(), Items.DIAMOND_PICKAXE, Items.CRAFTING_TABLE, Items.LADDER,
-                Items.BED.white(), Items.IRON_SWORD, Items.BED.white(), Items.BED.lightGray(), Items.NETHERRACK), left);
+        assertEquals(List.of(Items.COOKED_BEEF, Items.IRON_HELMET, Items.BLAZE_ROD, Items.WHITE_BED, Items.LIGHT_GRAY_WOOL, Items.COOKED_CHICKEN,
+                Items.WHITE_WOOL, Items.WHITE_BED, Items.DIAMOND, Items.BLACK_WOOL, Items.BUCKET, Items.ENDER_EYE, Items.WHITE_BED, Items.FLINT_AND_STEEL, Items.WATER_BUCKET,
+                Items.SHIELD, Items.SMOKER, Items.WHITE_BED, Items.WHITE_BED, Items.DIAMOND_PICKAXE, Items.CRAFTING_TABLE, Items.LADDER,
+                Items.WHITE_BED, Items.IRON_SWORD, Items.WHITE_BED, Items.LIGHT_GRAY_BED, Items.NETHERRACK), left);
     }
 
     @Test
@@ -352,7 +352,7 @@ public class DropRoomTest {
 
     @Test
     public void aGarbagePickWeKeepIsNotAnAnswer() {
-        List<Stack> bag = with(kept(Items.BED.white(), 1), kit(Items.IRON_SWORD, 1), kit(Items.IRON_SWORD, 1));
+        List<Stack> bag = with(kept(Items.WHITE_BED, 1), kit(Items.IRON_SWORD, 1), kit(Items.IRON_SWORD, 1));
         int bed = bag.size() - 3;
         assertEquals(bed + 1, DropRoom.shed(bed, bag, FLOOR));
     }
@@ -411,7 +411,7 @@ public class DropRoomTest {
     @Test
     public void theErrandsStuffNeverGoes() {
         List<Stack> bag = bag(rest(Items.OAK_LOG, 1), rest(Items.OAK_LOG, 3), rest(Items.OAK_PLANKS, 2), rest(Items.BIRCH_PLANKS, 5),
-                rest(Items.WOOL.white(), 43), rest(Items.WOOL.black(), 1), rest(Items.BED.white(), 1), rest(Items.BED.white(), 1));
+                rest(Items.WHITE_WOOL, 43), rest(Items.BLACK_WOOL, 1), rest(Items.WHITE_BED, 1), rest(Items.WHITE_BED, 1));
         int log = 0;
         // the garbage pick calls a single log junk, the shed says no
         assertEquals(-1, DropRoom.shed(log, bag, FLOOR));

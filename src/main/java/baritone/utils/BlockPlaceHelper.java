@@ -28,7 +28,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
@@ -161,9 +160,9 @@ public class BlockPlaceHelper {
             // a real place comes back as a fresh Success carrying the shrunk stack (heldItemTransformedTo), so == SUCCESS
             // never matched one. no swing, no scaffold, no trace, and then the off hand clicked too. same split as
             // vanilla startUseItem: success is done, fail is done, only a pass goes on to the item and the other hand
-            if (result instanceof InteractionResult.Success success) {
-                if (success.swingSource() == InteractionResult.SwingSource.PREDICTED) {
-                    ctx.player().swing(hand, SwingAnimation.DEFAULT, false);
+            if (result.consumesAction()) {
+                if (result.shouldSwing()) {
+                    ctx.player().swing(hand);
                 }
                 if (scaffold != null) {
                     pending.add(scaffold);
@@ -173,12 +172,12 @@ public class BlockPlaceHelper {
                 }
                 return;
             }
-            if (result instanceof InteractionResult.Fail) {
+            if (result == InteractionResult.FAIL) {
                 return; // something in the way. trying the off hand on the same spot just puts the wrong block there
             }
             // a bucket says success with the emptied bucket attached, which isn't == SUCCESS, so the off hand used to
             // fire right after every pour
-            if (!ctx.player().getItemInHand(hand).isEmpty() && ctx.playerController().processRightClick(ctx.player(), ctx.world(), hand) instanceof InteractionResult.Success) {
+            if (!ctx.player().getItemInHand(hand).isEmpty() && ctx.playerController().processRightClick(ctx.player(), ctx.world(), hand).consumesAction()) {
                 return;
             }
         }

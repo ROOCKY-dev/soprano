@@ -96,7 +96,7 @@ public class WoodBudgetTest {
         // the spawn bed still to place wants its planks too, a bed in the bag has them already
         f.spawnBedOwed = true;
         assertEquals(3 * (BEDS + 1), WoodBudget.bedPlanksOwed(f, BEDS));
-        f.give(Items.BED.white(), 1);
+        f.give(Items.WHITE_BED, 1);
         assertEquals(3 * BEDS, WoodBudget.bedPlanksOwed(f, BEDS));
     }
 

@@ -28,7 +28,7 @@ import baritone.api.command.exception.CommandErrorMessageException;
 import baritone.api.command.exception.CommandException;
 import baritone.api.command.helpers.TabCompleteHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -87,7 +87,7 @@ public class FollowCommand extends Command {
                 classes.stream()
                         .map(BuiltInRegistries.ENTITY_TYPE::getKey)
                         .map(Objects::requireNonNull)
-                        .map(Identifier::toString)
+                        .map(ResourceLocation::toString)
                         .forEach(this::logDirect);
             }
         }

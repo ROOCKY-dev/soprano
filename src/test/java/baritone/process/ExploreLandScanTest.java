@@ -243,7 +243,7 @@ public class ExploreLandScanTest {
         FrontierScan scan = scan(1);
         assertEquals(4, scan.found().size());
         for (ChunkPos chunk : scan.found()) {
-            assertEquals(6, Math.abs(chunk.x()) + Math.abs(chunk.z()));
+            assertEquals(6, Math.abs(chunk.x) + Math.abs(chunk.z));
         }
     }
 }

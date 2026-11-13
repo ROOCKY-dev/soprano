@@ -22,7 +22,7 @@ public class ChatMessageEvent {
     }
 
     public String senderName() {
-        return sender.name();
+        return sender.getName();
     }
 
     public ChatType messageType() {

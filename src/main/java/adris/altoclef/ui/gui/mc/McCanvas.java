@@ -7,9 +7,11 @@ import adris.altoclef.ui.gui.kit.TextStyle;
 import adris.altoclef.ui.gui.kit.TexturedCanvas;
 import adris.altoclef.ui.gui.kit.Theme;
 import adris.altoclef.ui.gui.kit.Weight;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.resources.ResourceLocation;
 
-// the two primitives TexturedCanvas wants, on top of GuiGraphicsExtractor. no layout and no decisions in here. one of these
+// the two primitives TexturedCanvas wants, on top of GuiGraphics. no layout and no decisions in here. one of these
 // lives as long as its screen (making a TexturedCanvas wipes the atlas caches) and gets the frame's graphics via begin
 final class McCanvas extends TexturedCanvas {
 
@@ -27,7 +29,7 @@ final class McCanvas extends TexturedCanvas {
         this.draw = draw;
     }
 
-    void begin(GuiGraphicsExtractor g, int widthPx, int heightPx) {
+    void begin(GuiGraphics g, int widthPx, int heightPx) {
         draw.begin(g);
         this.width = widthPx;
         this.height = heightPx;
@@ -66,9 +68,9 @@ final class McCanvas extends TexturedCanvas {
             return;
         }
         try {
-            draw.blit(atlases.setup(page), page.width(), page.height(), sx, sy, sw, sh, x0, y0, w, h, argb);
+            ResourceLocation tex = atlases.texture(page);
+            blitTinted(tex, x0, y0, w, h, sx, sy, sw, sh, page.width(), page.height(), argb);
         } catch (Throwable t) {
-            // the page would not upload, the screen swaps to the plain canvas
             Safe.report("gui atlas blit", t);
             broken = true;
         }
@@ -88,10 +90,27 @@ final class McCanvas extends TexturedCanvas {
             return;
         }
         try {
-            draw.blit(atlases.setup(image), image.width(), image.height(), 0, 0, image.width(), image.height(), x0, y0, dw, dh, tint);
+            blitTinted(atlases.texture(image), x0, y0, dw, dh, 0, 0, image.width(), image.height(),
+                    image.width(), image.height(), tint);
         } catch (Throwable t) {
             Safe.report("gui image blit", t);
             broken = true;
+        }
+    }
+
+    // 1.21.1 blits take the tint from shader state; restore it before another widget draws
+    private void blitTinted(ResourceLocation texture, int x, int y, int w, int h,
+                            int u, int v, int sw, int sh, int tw, int th, int tint) {
+        draw.g.flush();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(((tint >>> 16) & 255) / 255f, ((tint >>> 8) & 255) / 255f,
+                (tint & 255) / 255f, ((tint >>> 24) & 255) / 255f);
+        try {
+            draw.g.blit(texture, x, y, w, h, (float) u, (float) v, sw, sh, tw, th);
+        } finally {
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+            RenderSystem.disableBlend();
         }
     }
 

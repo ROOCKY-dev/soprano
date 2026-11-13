@@ -15,7 +15,7 @@ final class McKeyNames implements KeyNames {
         try {
             int scancode = McKeys.toGame(glfwKey);
             if (scancode > 0) {
-                String s = InputConstants.Type.KEYBOARD.getOrCreate(scancode).getDisplayName().getString();
+                String s = InputConstants.Type.KEYSYM.getOrCreate(scancode).getDisplayName().getString();
                 if (s != null && !s.isBlank()) {
                     return s;
                 }

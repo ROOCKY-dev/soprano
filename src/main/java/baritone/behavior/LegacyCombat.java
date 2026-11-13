@@ -21,7 +21,6 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.component.SwingAnimation;
 
 // pre 1.9 combat: no cooldown, spam click, swing packet before the hit. every melee swing goes through hit() so the packet
 // order lives in one place, and the callers that pace themselves off the cooldown ask active() for the clicker instead
@@ -40,11 +39,11 @@ public final class LegacyCombat {
     // ViaFabricPlus only fixes the order inside Minecraft#startAttack and we never go through that
     public static void hit(MultiPlayerGameMode gameMode, LocalPlayer player, Entity target, InteractionHand hand) {
         if (active()) {
-            player.swing(hand, SwingAnimation.DEFAULT, false);
+            player.swing(hand);
             gameMode.attack(player, target);
         } else {
             gameMode.attack(player, target);
-            player.swing(hand, SwingAnimation.DEFAULT, false);
+            player.swing(hand);
         }
     }
 }

@@ -40,7 +40,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -260,7 +260,7 @@ public class WorldSurvivalChain extends SingleTaskChain {
     private static double nearestAngryEnderman(AltoClef mod) {
         double nearest = Double.POSITIVE_INFINITY;
         try {
-            for (Enderman man : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+            for (EnderMan man : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
                 if (man.isAlive() && EntityHelper.isAngryAtPlayer(mod, man)) {
                     nearest = Math.min(nearest, mod.getPlayer().distanceTo(man));
                 }

@@ -31,7 +31,7 @@ import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
 import baritone.api.utils.RayTraceUtils;
 import baritone.altoclef.SettingsOverrides;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -261,7 +261,7 @@ public class AltoClef {
     /// GETTERS AND SETTERS
 
     // Called from Soprano's hud extract mixin at the end of every frame
-    public void onClientRenderOverlay(GuiGraphicsExtractor graphics) {
+    public void onClientRenderOverlay(GuiGraphics graphics) {
         // not behind the check: after a win the runner is idle and the card is still up for a while. it works out for itself when
         // there is nothing to draw. first, so the status panel knows where it went (HudObstacles)
         _gamerHudOverlay.render(this, graphics);

@@ -193,7 +193,7 @@ public class MLGBucketFallChain extends SingleTaskChain implements ITaskOverride
             return upkeep;
         }
         if (mod.getPlayer().hasEffect(MobEffects.LEVITATION) &&
-                !mod.getPlayer().getCooldowns().isOnCooldown(new ItemStack(Items.CHORUS_FRUIT)) &&
+                !mod.getPlayer().getCooldowns().isOnCooldown(Items.CHORUS_FRUIT) &&
                 mod.getPlayer().getActiveEffectsMap().get(MobEffects.LEVITATION).getDuration() <= 70 &&
                 mod.getItemStorage().hasItemInventoryOnly(Items.CHORUS_FRUIT) &&
                 !mod.getItemStorage().hasItemInventoryOnly(Items.WATER_BUCKET)) {
@@ -435,7 +435,7 @@ public class MLGBucketFallChain extends SingleTaskChain implements ITaskOverride
 
     // the full bucket needs a slot of its own when we carry a stack of empties and the bag is full (see BucketFillRules)
     public static boolean fillHasRoom(AltoClef mod) {
-        NonNullList<ItemStack> slots = mod.getPlayer().getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> slots = mod.getPlayer().getInventory().items;
         int[] bucketStacks = new int[slots.size()];
         boolean freeSlot = false;
         for (int i = 0; i < bucketStacks.length; i++) {

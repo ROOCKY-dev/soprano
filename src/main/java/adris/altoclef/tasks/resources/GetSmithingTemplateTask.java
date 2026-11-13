@@ -115,10 +115,10 @@ public class GetSmithingTemplateTask extends ResourceTask {
         // every chest we know around here is opened, so the bastions they're in are done. the searcher skips those
         // chunks and wanders off until a fresh bastion loads in
         for (BlockPos pos : _opened) {
-            ChunkPos c = ChunkPos.containing(pos);
+            ChunkPos c = new ChunkPos(pos);
             for (int dx = -DONE_CHUNK_RADIUS; dx <= DONE_CHUNK_RADIUS; dx++) {
                 for (int dz = -DONE_CHUNK_RADIUS; dz <= DONE_CHUNK_RADIUS; dz++) {
-                    _doneChunks.add(new ChunkPos(c.x() + dx, c.z() + dz));
+                    _doneChunks.add(new ChunkPos(c.x + dx, c.z + dz));
                 }
             }
         }
@@ -235,10 +235,10 @@ public class GetSmithingTemplateTask extends ResourceTask {
         if (until != null && _ticks < until) {
             return false;
         }
-        ChunkPos c = ChunkPos.containing(chest);
+        ChunkPos c = new ChunkPos(chest);
         for (int dx = -BASTION_CHUNK_RADIUS; dx <= BASTION_CHUNK_RADIUS; dx++) {
             for (int dz = -BASTION_CHUNK_RADIUS; dz <= BASTION_CHUNK_RADIUS; dz++) {
-                if (mod.getChunkTracker().chunkHas(new ChunkPos(c.x() + dx, c.z() + dz), GetSmithingTemplateTask::isBastionBlock)) {
+                if (mod.getChunkTracker().chunkHas(new ChunkPos(c.x + dx, c.z + dz), GetSmithingTemplateTask::isBastionBlock)) {
                     _inBastion.add(chest);
                     return true;
                 }

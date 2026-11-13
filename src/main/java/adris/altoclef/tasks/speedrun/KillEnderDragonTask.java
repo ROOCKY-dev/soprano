@@ -30,11 +30,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -106,12 +106,12 @@ public class KillEnderDragonTask extends Task {
 
     // an enderman that has made us its target (creepy is the synced flag, aggressive the melee goal's)
     public static boolean angryEnderman(Entity entity) {
-        return entity instanceof Enderman man && (man.isCreepy() || man.isAggressive());
+        return entity instanceof EnderMan man && (man.isCreepy() || man.isAggressive());
     }
 
     // the aura's list: the dragon, its parts and calm endermen. an angry one is fair game for the aura too
     public static boolean calmDragonFightEntity(Entity entity) {
-        return (entity instanceof Enderman && !angryEnderman(entity)) || entity instanceof EnderDragon || entity instanceof EnderDragonPart;
+        return (entity instanceof EnderMan && !angryEnderman(entity)) || entity instanceof EnderDragon || entity instanceof EnderDragonPart;
     }
 
     @Override

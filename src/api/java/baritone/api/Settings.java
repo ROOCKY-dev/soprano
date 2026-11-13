@@ -26,7 +26,7 @@ import baritone.api.utils.SettingsUtil;
 import baritone.api.utils.TypeUtils;
 import baritone.api.utils.gui.BaritoneToast;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.chat.GuiMessageTag;
+import net.minecraft.client.GuiMessageTag;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
@@ -1792,7 +1792,7 @@ public final class Settings {
     public final Setting<Consumer<Component>> logger = new Setting<>((msg) -> {
         try {
             final GuiMessageTag tag = useMessageTag.value ? Helper.MESSAGE_TAG : null;
-            Minecraft.getInstance().gui.hud.getChat().addPlayerMessage(msg, null, tag);
+            Minecraft.getInstance().gui.getChat().addMessage(msg, null, tag);
         } catch (Throwable t) {
             LOGGER.warn("Failed to log message to chat: " + msg.getString(), t);
         }
@@ -2106,12 +2106,7 @@ public final class Settings {
     public final Setting<Boolean> allowWalkOnMagmaBlocks = new Setting<>(false);
 
     /**
-     * Count the bot's work as player activity for vanilla's AFK frame limiter. Since 1.21.2 the game drops to 30 fps
-     * after a minute without keyboard or mouse input (and 10 fps after ten minutes) when the inactivity limit option
-     * is on AFK, and the bot never touches the real keyboard or mouse, so the frame rate would tank while you watch it
-     * work. With this on, any tick where baritone is pathing, a process is in control, or AltoClef is running a task
-     * counts as input. Does nothing while the bot is idle, so the AFK limiter still kicks in then, and your options
-     * are never changed. Takes effect right away.
+     * Has no effect on Minecraft 1.21.1, which predates the AFK input frame limiter.
      */
     public final Setting<Boolean> keepFpsWhileBotting = new Setting<>(true);
 
@@ -2502,11 +2497,11 @@ public final class Settings {
             Items.NETHERITE_PICKAXE, Items.NETHERITE_SHOVEL, Items.NETHERITE_SWORD, Items.NETHERITE_AXE, Items.NETHERITE_HOE,
             // losing a shulker box with its stuff in it would be pretty bad lol (the undyed one is missing, it always was)
             // (26.3 keeps the dyed ones in a ColorCollection instead of sixteen fields)
-            Items.DYED_SHULKER_BOX.white(), Items.DYED_SHULKER_BOX.black(), Items.DYED_SHULKER_BOX.blue(),
-            Items.DYED_SHULKER_BOX.brown(), Items.DYED_SHULKER_BOX.cyan(), Items.DYED_SHULKER_BOX.gray(), Items.DYED_SHULKER_BOX.green(),
-            Items.DYED_SHULKER_BOX.lightBlue(), Items.DYED_SHULKER_BOX.lightGray(), Items.DYED_SHULKER_BOX.lime(),
-            Items.DYED_SHULKER_BOX.magenta(), Items.DYED_SHULKER_BOX.orange(), Items.DYED_SHULKER_BOX.pink(), Items.DYED_SHULKER_BOX.purple(),
-            Items.DYED_SHULKER_BOX.red(), Items.DYED_SHULKER_BOX.yellow()
+            Items.WHITE_SHULKER_BOX, Items.BLACK_SHULKER_BOX, Items.BLUE_SHULKER_BOX,
+            Items.BROWN_SHULKER_BOX, Items.CYAN_SHULKER_BOX, Items.GRAY_SHULKER_BOX, Items.GREEN_SHULKER_BOX,
+            Items.LIGHT_BLUE_SHULKER_BOX, Items.LIGHT_GRAY_SHULKER_BOX, Items.LIME_SHULKER_BOX,
+            Items.MAGENTA_SHULKER_BOX, Items.ORANGE_SHULKER_BOX, Items.PINK_SHULKER_BOX, Items.PURPLE_SHULKER_BOX,
+            Items.RED_SHULKER_BOX, Items.YELLOW_SHULKER_BOX
     ));
 
     /**

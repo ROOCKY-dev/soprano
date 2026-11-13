@@ -2,7 +2,7 @@ package adris.altoclef;
 
 import adris.altoclef.util.helpers.ItemFixture;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,7 +42,7 @@ public class TaskCatalogueKeysTest {
             if (matches.length != 1 || ALIASES.contains(name) || name.endsWith("_stripped_logs")) {
                 continue;
             }
-            Item vanilla = BuiltInRegistries.ITEM.getOptional(Identifier.withDefaultNamespace(name)).orElse(null);
+            Item vanilla = BuiltInRegistries.ITEM.getOptional(ResourceLocation.withDefaultNamespace(name)).orElse(null);
             if (vanilla == null) {
                 bad.add(name + " is not a vanilla item id (resolves to " + BuiltInRegistries.ITEM.getKey(matches[0]) + ")");
             } else if (vanilla != matches[0]) {
@@ -54,9 +54,9 @@ public class TaskCatalogueKeysTest {
 
     @Test
     public void aliasesPointAtTheSameThingAsTheirTarget() {
-        assertArrayEquals(TaskCatalogue.getItemMatches("iron_chain"), TaskCatalogue.getItemMatches("chain"));
+        assertTrue(!TaskCatalogue.aliases().containsKey("chain"));
         assertTrue(TaskCatalogue.getItemMatches("chain").length == 1);
-        assertTrue(Arrays.stream(TaskCatalogue.getItemMatches("chain")).allMatch(i -> BuiltInRegistries.ITEM.getKey(i).getPath().equals("iron_chain")));
+        assertTrue(Arrays.stream(TaskCatalogue.getItemMatches("chain")).allMatch(i -> BuiltInRegistries.ITEM.getKey(i).getPath().equals("chain")));
         assertArrayEquals(TaskCatalogue.getItemMatches("lapis_lazuli"), TaskCatalogue.getItemMatches("lapis"));
     }
 }

@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.level.chunk.Strategy;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -60,8 +59,8 @@ public class SimpleChunkTrackerTest {
     private static LevelChunkSection[] emptyColumn() {
         LevelChunkSection[] out = new LevelChunkSection[SECTIONS];
         for (int i = 0; i < SECTIONS; i++) {
-            PalettedContainer<BlockState> states = new PalettedContainer<>(Blocks.AIR.defaultBlockState(), Strategy.createForBlockStates(Block.BLOCK_STATE_REGISTRY));
-            PalettedContainer<Holder<Biome>> biomes = new PalettedContainer<>(Holder.direct(null), Strategy.createForBiomes(NO_BIOMES));
+            PalettedContainer<BlockState> states = new PalettedContainer<>(Block.BLOCK_STATE_REGISTRY, Blocks.AIR.defaultBlockState(), PalettedContainer.Strategy.SECTION_STATES);
+            PalettedContainer<Holder<Biome>> biomes = new PalettedContainer<>(NO_BIOMES, Holder.direct(null), PalettedContainer.Strategy.SECTION_BIOMES);
             out[i] = new LevelChunkSection(states, biomes);
         }
         return out;

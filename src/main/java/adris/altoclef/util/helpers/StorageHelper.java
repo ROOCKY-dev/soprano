@@ -59,7 +59,7 @@ public class StorageHelper {
     public static void closeScreen() {
         if (Minecraft.getInstance().player == null)
             return;
-        Screen screen = Minecraft.getInstance().gui.screen();
+        Screen screen = Minecraft.getInstance().screen;
         if (screen == null) {
             closeStaleMenu(Minecraft.getInstance().player);
             return;
@@ -496,7 +496,7 @@ public class StorageHelper {
 
     // an empty slot, or a stack of the same thing with space left, takes at least some of a drop (ItemPickupRules.hasRoom)
     public static boolean hasRoomFor(AltoClef mod, ItemStack drop) {
-        List<ItemStack> slots = mod.getPlayer().getInventory().getNonEquipmentItems();
+        List<ItemStack> slots = mod.getPlayer().getInventory().items;
         int[] counts = new int[slots.size()];
         boolean[] sameKind = new boolean[slots.size()];
         for (int i = 0; i < counts.length; i++) {

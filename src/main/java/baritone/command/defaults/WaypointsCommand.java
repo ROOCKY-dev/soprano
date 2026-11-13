@@ -75,10 +75,10 @@ public class WaypointsCommand extends Command {
             component.append(nameComponent);
             component.append(timestamp);
             component.setStyle(component.getStyle()
-                    .withHoverEvent(new HoverEvent.ShowText(
+                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                             Component.literal("Click to select")
                     ))
-                    .withClickEvent(new ClickEvent.RunCommand(
+                    .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             String.format(
                                     "%s%s %s %s @ %d",
                                     FORCE_COMMAND_PREFIX,
@@ -158,7 +158,7 @@ public class WaypointsCommand extends Command {
             }
             deletedWaypoints.computeIfAbsent(baritone.getWorldProvider().getCurrentWorld(), k -> new ArrayList<>()).addAll(Arrays.<IWaypoint>asList(waypoints));
             MutableComponent textComponent = Component.literal(String.format("Cleared %d waypoints, click to restore them", waypoints.length));
-            textComponent.setStyle(textComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(
+            textComponent.setStyle(textComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                     String.format(
                             "%s%s restore @ %s",
                             FORCE_COMMAND_PREFIX,
@@ -238,7 +238,7 @@ public class WaypointsCommand extends Command {
                     logDirect(transform.apply(waypoint));
                     logDirect(String.format("Position: %s", waypoint.getLocation()));
                     MutableComponent deleteComponent = Component.literal("Click to delete this waypoint");
-                    deleteComponent.setStyle(deleteComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(
+                    deleteComponent.setStyle(deleteComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             String.format(
                                     "%s%s delete %s @ %d",
                                     FORCE_COMMAND_PREFIX,
@@ -248,7 +248,7 @@ public class WaypointsCommand extends Command {
                             )
                     )));
                     MutableComponent goalComponent = Component.literal("Click to set goal to this waypoint");
-                    goalComponent.setStyle(goalComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(
+                    goalComponent.setStyle(goalComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             String.format(
                                     "%s%s goal %s @ %d",
                                     FORCE_COMMAND_PREFIX,
@@ -258,7 +258,7 @@ public class WaypointsCommand extends Command {
                             )
                     )));
                     MutableComponent recreateComponent = Component.literal("Click to show a command to recreate this waypoint");
-                    recreateComponent.setStyle(recreateComponent.getStyle().withClickEvent(new ClickEvent.SuggestCommand(
+                    recreateComponent.setStyle(recreateComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND,
                             String.format(
                                     "%s%s save %s %s %s %s %s",
                                     Baritone.settings().prefix.value, // This uses the normal prefix because it is run by the user.
@@ -271,7 +271,7 @@ public class WaypointsCommand extends Command {
                             )
                     )));
                     MutableComponent backComponent = Component.literal("Click to return to the waypoints list");
-                    backComponent.setStyle(backComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(
+                    backComponent.setStyle(backComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             String.format(
                                     "%s%s list",
                                     FORCE_COMMAND_PREFIX,
@@ -286,7 +286,7 @@ public class WaypointsCommand extends Command {
                     ForWaypoints.waypoints(this.baritone).removeWaypoint(waypoint);
                     deletedWaypoints.computeIfAbsent(baritone.getWorldProvider().getCurrentWorld(), k -> new ArrayList<>()).add(waypoint);
                     MutableComponent textComponent = Component.literal("That waypoint has successfully been deleted, click to restore it");
-                    textComponent.setStyle(textComponent.getStyle().withClickEvent(new ClickEvent.RunCommand(
+                    textComponent.setStyle(textComponent.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                             String.format(
                                     "%s%s restore @ %s",
                                     FORCE_COMMAND_PREFIX,

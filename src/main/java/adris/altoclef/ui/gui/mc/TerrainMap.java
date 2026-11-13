@@ -204,7 +204,8 @@ final class TerrainMap {
         } else {
             brightness = slopeShade(source, x, z, top);
         }
-        return 0xFF000000 | color.calculateARGBColor(brightness);
+        int abgr = color.calculateRGBColor(brightness);
+        return (abgr & 0xff00ff00) | ((abgr >>> 16) & 255) | ((abgr & 255) << 16);
     }
 
     // a block with no colour of its own that holds a fluid (a waterlogged fence) shows the fluid, like vanilla maps

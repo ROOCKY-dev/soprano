@@ -381,7 +381,7 @@ public class GamerTask extends Task {
         }
         // credits can show up between two of our ticks (the dragon dies, the screen opens), record it now so a task that
         // is finished but never stopped (altoRunsWhenIdle) still leaves a saved DONE behind
-        if (begun && !machine.ended() && Minecraft.getInstance().gui.screen() instanceof WinScreen) {
+        if (begun && !machine.ended() && Minecraft.getInstance().screen instanceof WinScreen) {
             machine.finish(true);
         }
         // the win card is handed over here and not only on stop: with altoRunsWhenIdle the runner stays up and a finished task is
@@ -1164,7 +1164,7 @@ public class GamerTask extends Task {
             lastPlayer = player;
             deadSeen = false;
         }
-        boolean dying = player.isDeadOrDying() || Minecraft.getInstance().gui.screen() instanceof DeathScreen;
+        boolean dying = player.isDeadOrDying() || Minecraft.getInstance().screen instanceof DeathScreen;
         if (!deadSeen && dying) {
             deadSeen = true;
             adopt(DeathStash.snapshot(player));
@@ -1334,7 +1334,7 @@ public class GamerTask extends Task {
 
     private boolean darkAndBare(AltoClef mod) {
         return facts.dimension() == Dimension.OVERWORLD
-                && NightShelter.dark(!mod.getWorld().isBrightOutside(), mod.getWorld().getOverworldClockTime(), NightShelter.PILE_LEAD_TICKS)
+                && NightShelter.dark(!mod.getWorld().isDay(), mod.getWorld().getDayTime(), NightShelter.PILE_LEAD_TICKS)
                 && facts.armorPoints() < NightShelter.ARMOR_LINE;
     }
 
@@ -1489,7 +1489,7 @@ public class GamerTask extends Task {
     // starts when NightSleep.decide says so. mob defense hears about the stage through the hook, every tick
     private Task nightSleepTick(AltoClef mod) {
         double seconds = facts.gameTime() * 0.05;
-        nightBudget.roll(NightSleep.nightOf(mod.getWorld().getOverworldClockTime()));
+        nightBudget.roll(NightSleep.nightOf(mod.getWorld().getDayTime()));
         if (nightTrip != null) {
             if (nightTrip.isFinished(mod) || facts.dimension() != Dimension.OVERWORLD) {
                 // (the bed a dead or dropped trip left is picked up by a cleanup trip)
@@ -1510,7 +1510,7 @@ public class GamerTask extends Task {
             return null;
         }
         boolean leftover = leftoverNightBed(mod);
-        boolean windowOpen = !mod.getWorld().isBrightOutside();
+        boolean windowOpen = !mod.getWorld().isDay();
         // the evening's own tasks open screens (a table, the inventory), which are not a reason to stop them halfway
         NightSleep.Busy busy = nightBusy(mod, nightPrep.running());
         boolean fighting = nightFighting(mod);
@@ -1580,7 +1580,7 @@ public class GamerTask extends Task {
     // a new one starts when the trigger says so. the bed trip's budget is not touched either way
     private Task shelterTick(AltoClef mod, boolean leftover, boolean windowOpen, NightSleep.Busy busy) {
         long gameTime = mod.getWorld().getGameTime();
-        long night = NightSleep.nightOf(mod.getWorld().getOverworldClockTime());
+        long night = NightSleep.nightOf(mod.getWorld().getDayTime());
         if (shelter != null) {
             if (shelter.isFinished(mod)) {
                 // a try that gave up gets one more at another spot, anything else (and every other way out) leaves the night spent
@@ -1602,7 +1602,7 @@ public class GamerTask extends Task {
         long sinceDeath = deathGameTime > 0 ? gameTime - deathGameTime : -1;
         // the cheap questions first, the bed hunt and the column scan only when everything else says yes
         // (a daytime thunderstorm opens the window too, it is dark enough to sleep but not to hide from: time of day says dusk)
-        boolean dusk = NightShelter.dark(windowOpen, mod.getWorld().getOverworldClockTime(), 0);
+        boolean dusk = NightShelter.dark(windowOpen, mod.getWorld().getDayTime(), 0);
         // only a fight that is really on counts, the heal-up hold after one is the very case for a hole
         boolean inFight = mod.getMobDefenseChain().combatMode() != CombatCommit.Mode.NONE;
         // a nether or eyes leg home for food with no bed it may use (noBedTonight): no armor or death needed, the hole is the answer
@@ -1656,10 +1656,10 @@ public class GamerTask extends Task {
     // one line when the answer to "why is it not in bed" changes, and only through the evening and the night (a screen opening
     // in the middle of the day is nobody's business). the key is what changed, the rest rides along
     private void sayNight(AltoClef mod, NightSleep.Why why, NightSleep.Busy busy, NightSleep.BedSource source) {
-        long timeOfDay = Math.floorMod(mod.getWorld().getOverworldClockTime(), NightSleep.DAY_LENGTH);
+        long timeOfDay = Math.floorMod(mod.getWorld().getDayTime(), NightSleep.DAY_LENGTH);
         long lead = Math.max(cfg.overworld.nightCraftLeadTicks, cfg.overworld.nightWoolLeadTicks);
         boolean evening = timeOfDay >= NightSleep.EARLIEST_WINDOW - lead && timeOfDay < NightSleep.PREP_END;
-        if (!evening && mod.getWorld().isBrightOutside()) {
+        if (!evening && mod.getWorld().isDay()) {
             return;
         }
         NightSleep.Prep prep = nightPrep.last();
@@ -1725,7 +1725,7 @@ public class GamerTask extends Task {
     // branch runs on, or a screen that closed and opened again during a trip would look like it had been up the whole time
     private void trackNightGates() {
         // (a chat box, the pause menu or the bed screen is not items moving, only a container is)
-        if (Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?>) {
+        if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>) {
             if (screenSince < 0) {
                 screenSince = facts.gameTime();
             }

@@ -155,7 +155,7 @@ public class LavaPoolPortalTask extends Task {
 
     private static Direction faceOf(int dx, int dy, int dz) {
         for (Direction d : Direction.values()) {
-            if (d.getUnitVec3i().getX() == dx && d.getUnitVec3i().getY() == dy && d.getUnitVec3i().getZ() == dz) {
+            if (d.getNormal().getX() == dx && d.getNormal().getY() == dy && d.getNormal().getZ() == dz) {
                 return d;
             }
         }

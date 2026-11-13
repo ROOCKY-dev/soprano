@@ -50,7 +50,7 @@ public final class ChunkPacker {
         final int height = chunk.getLevel().dimensionType().height();
         BitSet bitSet = new BitSet(CachedChunk.size(height));
         // this goes through the level and a Holder every time, and we used to ask for it twice per block
-        final int minY = chunk.getMinY();
+        final int minY = chunk.getMinBuildHeight();
         try {
             LevelChunkSection[] chunkInternalStorageArray = chunk.getSections();
             for (int y0 = 0; y0 < height / 16; y0++) {
@@ -114,7 +114,7 @@ public final class ChunkPacker {
             }
         }
         // @formatter:on
-        return new CachedChunk(chunk.getPos().x(), chunk.getPos().z(), height, bitSet, blocks, specialBlocks, System.currentTimeMillis());
+        return new CachedChunk(chunk.getPos().x, chunk.getPos().z, height, bitSet, blocks, specialBlocks, System.currentTimeMillis());
     }
 
     private static PathingBlockType getPathingBlockType(BlockState state, LevelChunk chunk, int x, int y, int z) {
@@ -135,7 +135,7 @@ public final class ChunkPacker {
                 return PathingBlockType.AVOID;
             }
             if (x == 0 || x == 15 || z == 0 || z == 15) {
-                Vec3 flow = state.getFluidState().getFlow(chunk.getLevel(), new BlockPos(x + (chunk.getPos().x() << 4), y, z + (chunk.getPos().z() << 4)));
+                Vec3 flow = state.getFluidState().getFlow(chunk.getLevel(), new BlockPos(x + (chunk.getPos().x << 4), y, z + (chunk.getPos().z << 4)));
                 if (flow.x != 0.0 || flow.z != 0.0) {
                     return PathingBlockType.WATER;
                 }

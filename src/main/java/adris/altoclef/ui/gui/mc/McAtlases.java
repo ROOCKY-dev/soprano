@@ -9,17 +9,13 @@ import adris.altoclef.ui.gui.kit.ShapeAtlas;
 import adris.altoclef.ui.gui.kit.TextStyle;
 import adris.altoclef.ui.gui.kit.Theme;
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.renderpearl.api.textures.FilterMode;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.image.DataBufferInt;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 
 // the cpu side atlases (they are kept between opens, rasterising inter is the slow part) and the gpu side of each page.
@@ -31,21 +27,12 @@ final class McAtlases {
 
     private static final class Slot {
         final DynamicTexture texture;
-        // built once, the renderer batches draws by comparing these and a fresh record per glyph would be a lot of garbage
-        final TextureSetup setup;
+        final ResourceLocation location;
         int version = -1;
 
-        Slot(DynamicTexture texture) {
-            this(texture, false);
-        }
-
-        Slot(DynamicTexture texture, boolean smooth) {
+        Slot(DynamicTexture texture, ResourceLocation location) {
             this.texture = texture;
-            // a dynamic texture already samples nearest and repeat, which is what a pixel exact atlas wants. a smooth
-            // picture gets drawn a bit off its baked size (a dock tile mid magnification), nearest would make its
-            // round corners crawl, so that one borrows the shared linear clamp sampler (the cache owns it, never close it)
-            this.setup = TextureSetup.singleTexture(texture.getTextureView(),
-                    smooth ? RenderSystem.getSamplerCache().getClampToEdge(FilterMode.LINEAR) : texture.getSampler());
+            this.location = location;
         }
     }
 
@@ -57,6 +44,8 @@ final class McAtlases {
     private final Map<Integer, Slot> slots = new HashMap<>();
     // hand drawn pictures (the placement map), one texture each, keyed by the picture itself
     private final Map<PixelImage, Slot> images = new IdentityHashMap<>();
+    // a picture has no id of its own, so each one gets the next number for its texture name
+    private int pictures;
     private AtlasPage lastPage;
     private Slot lastSlot;
 
@@ -107,9 +96,9 @@ final class McAtlases {
         }
     }
 
-    // what to bind for this page, with the latest pixels in it
-    TextureSetup setup(AtlasPage page) {
-        return ensureUploaded(page).setup;
+    // the texture to bind for this page, with the latest pixels in it
+    ResourceLocation texture(AtlasPage page) {
+        return ensureUploaded(page).location;
     }
 
     private Slot ensureUploaded(AtlasPage page) {
@@ -119,10 +108,13 @@ final class McAtlases {
         }
         Slot slot = slots.get(page.id());
         if (slot == null) {
-            // not registered with the texture manager: the draws carry the view themselves, so nothing needs a name
-            DynamicTexture tex = new DynamicTexture(() -> "soprano gui atlas " + page.id(),
-                    new NativeImage(page.width(), page.height(), true));
-            slot = new Slot(tex);
+            Minecraft mc = Minecraft.getInstance();
+            ResourceLocation rl = ResourceLocation.fromNamespaceAndPath("soprano", "gui/atlas_" + page.id());
+            DynamicTexture tex = new DynamicTexture(new NativeImage(page.width(), page.height(), true));
+            mc.getTextureManager().register(rl, tex);
+            // nearest, the atlas is pixel exact and a linear sample would smear glyphs into their neighbours
+            tex.setFilter(false, false);
+            slot = new Slot(tex, rl);
             slots.put(page.id(), slot);
         }
         int version = page.version();
@@ -148,18 +140,32 @@ final class McAtlases {
         for (int y = 0; y < h; y++) {
             int row = y * w;
             for (int x = 0; x < w; x++) {
-                image.setPixel(x, y, argb[row + x]);
+                int color = argb[row + x];
+                image.setPixelRGBA(x, y, (color & 0xff00ff00) | ((color >>> 16) & 255) | ((color & 255) << 16));
             }
         }
     }
 
     // what to bind for a picture, uploaded on first sight and again whenever its version moved
-    TextureSetup setup(PixelImage picture) {
+    ResourceLocation texture(PixelImage picture) {
         Slot slot = images.get(picture);
         if (slot == null) {
-            DynamicTexture tex = new DynamicTexture(() -> "soprano gui picture",
-                    new NativeImage(picture.width(), picture.height(), true));
-            slot = new Slot(tex, picture.isSmooth());
+            ResourceLocation rl = ResourceLocation.fromNamespaceAndPath("soprano", "gui/picture_" + pictures++);
+            NativeImage pixels = new NativeImage(picture.width(), picture.height(), true);
+            DynamicTexture tex = picture.isSmooth() ? new SmoothTexture(pixels) : new DynamicTexture(pixels);
+            Minecraft.getInstance().getTextureManager().register(rl, tex);
+            if (picture.isSmooth()) {
+                // a smooth picture gets drawn a bit off its baked size (a dock tile mid magnification), nearest would
+                // make its round corners crawl. clamped so the linear sample doesn't pull in the opposite edge
+                tex.setFilter(true, false);
+                tex.bind();
+                com.mojang.blaze3d.platform.GlStateManager._texParameter(org.lwjgl.opengl.GL11.GL_TEXTURE_2D, org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S, org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE);
+                com.mojang.blaze3d.platform.GlStateManager._texParameter(org.lwjgl.opengl.GL11.GL_TEXTURE_2D, org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T, org.lwjgl.opengl.GL12.GL_CLAMP_TO_EDGE);
+            } else {
+                // nearest like the pages, the map is drawn at its own size
+                tex.setFilter(false, false);
+            }
+            slot = new Slot(tex, rl);
             images.put(picture, slot);
         }
         int version = picture.version();
@@ -168,7 +174,7 @@ final class McAtlases {
             slot.texture.upload();
             slot.version = version;
         }
-        return slot.setup;
+        return slot.location;
     }
 
     static void releaseAll() {
@@ -177,48 +183,55 @@ final class McAtlases {
         }
     }
 
-    // the frame that closes the screen has already queued blits against these views, and they only draw after extraction is
-    // done. closing now would hand the renderer a dead texture. scheduled tasks run at the top of the next tick, before that
-    // tick extracts, so by then this frame has drawn. the second hop is belt and braces in case a drain loops
     private void release() {
         Minecraft mc = Minecraft.getInstance();
-        List<DynamicTexture> dead = new ArrayList<>();
         for (Slot slot : slots.values()) {
-            dead.add(slot.texture);
+            try {
+                mc.getTextureManager().release(slot.location);
+            } catch (Throwable t) {
+                Safe.report("gui texture release", t);
+            }
         }
         for (Slot slot : images.values()) {
-            dead.add(slot.texture);
+            try {
+                mc.getTextureManager().release(slot.location);
+            } catch (Throwable t) {
+                Safe.report("gui texture release", t);
+            }
         }
         slots.clear();
         images.clear();
         lastPage = null;
         lastSlot = null;
-        closeLater(mc, dead);
     }
 
-    // one picture that is done for good (a dock tile baked at a size the window no longer has), same delayed close as
-    // release(): this frame may already have queued a blit of it
+    // guiTextured sets nearest on its texture before every batch it draws, so a linear filter set once at upload
+    // lasts exactly zero frames. this one just says no
+    private static final class SmoothTexture extends DynamicTexture {
+        SmoothTexture(NativeImage pixels) {
+            super(pixels);
+        }
+
+        @Override
+        public void setFilter(boolean blur, boolean mipmap) {
+            super.setFilter(true, false);
+        }
+    }
+
+    // one picture that is done for good (a dock tile baked at a size the window no longer has). released a couple of
+    // frames late: this frame may already have queued a blit of it, and a released name draws as the missing texture
     static void release(PixelImage picture) {
         if (instance == null || picture == null) {
             return;
         }
         Slot slot = instance.images.remove(picture);
         if (slot != null) {
-            List<DynamicTexture> dead = new ArrayList<>();
-            dead.add(slot.texture);
-            closeLater(Minecraft.getInstance(), dead);
-        }
-    }
-
-    private static void closeLater(Minecraft mc, List<DynamicTexture> dead) {
-        if (!dead.isEmpty()) {
-            mc.schedule(() -> mc.schedule(() -> {
-                for (DynamicTexture tex : dead) {
-                    try {
-                        tex.close();
-                    } catch (Throwable t) {
-                        Safe.report("gui texture release", t);
-                    }
+            Minecraft mc = Minecraft.getInstance();
+            mc.tell(() -> mc.tell(() -> {
+                try {
+                    mc.getTextureManager().release(slot.location);
+                } catch (Throwable t) {
+                    Safe.report("gui texture release", t);
                 }
             }));
         }

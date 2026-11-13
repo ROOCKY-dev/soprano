@@ -9,7 +9,7 @@ import adris.altoclef.ui.gui.model.Wording;
 import adris.altoclef.ui.gui.model.CreativeCategories;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -85,7 +85,7 @@ public final class McItems implements ItemsAccess {
         }
         Item[] matches = TaskCatalogue.getItemMatches(name);
         if (matches.length == 0) {
-            Item item = BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(name));
+            Item item = BuiltInRegistries.ITEM.get(net.minecraft.resources.ResourceLocation.withDefaultNamespace(name));
             return item == Items.AIR ? "Other" : fallbackCategory(item);
         }
         String group = null;
@@ -105,7 +105,7 @@ public final class McItems implements ItemsAccess {
         if (stack.has(DataComponents.FOOD)) {
             return "Food";
         }
-        if (name.endsWith("_sword") || stack.has(DataComponents.EQUIPPABLE)
+        if (name.endsWith("_sword") || stack.getItem() instanceof net.minecraft.world.item.Equipable
                 || Set.of("bow", "crossbow", "arrow", "spectral_arrow", "tipped_arrow", "shield", "trident", "mace").contains(name)) {
             return "Combat";
         }
@@ -192,10 +192,10 @@ public final class McItems implements ItemsAccess {
             for (EntityType<?> type : BuiltInRegistries.ENTITY_TYPE) {
                 // a spawn egg is the cheapest honest "this is a mob": no world needed to ask, and boats, arrows,
                 // armor stands and the player don't have one. the dragon and the wither do, these days
-                if (SpawnEggItem.byId(type).isEmpty()) {
+                if (SpawnEggItem.byId(type) == null) {
                     continue;
                 }
-                Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+                ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
                 String name = "minecraft".equals(key.getNamespace()) ? key.getPath() : key.toString();
                 String shown = type.getDescription().getString();
                 built.add(new ItemEntry(name, Wording.soprano(shown.isEmpty() ? ItemEntry.titleCase(name) : shown),
@@ -236,7 +236,7 @@ public final class McItems implements ItemsAccess {
     private static String nameOf(Item item, String fallbackId) {
         try {
             // Item#getName wants a stack now, the default instance carries the plain item name
-            String name = item.getDefaultInstance().getItemName().getString();
+            String name = item.getDefaultInstance().getHoverName().getString();
             return name.isEmpty() ? ItemEntry.titleCase(fallbackId) : name;
         } catch (Throwable t) {
             Safe.report("gui item name", t);

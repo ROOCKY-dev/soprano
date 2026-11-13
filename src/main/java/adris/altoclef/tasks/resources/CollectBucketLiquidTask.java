@@ -482,7 +482,7 @@ public class CollectBucketLiquidTask extends ResourceTask {
 
     // what the next fill should do about the slot the full bucket needs (see BucketFillRules)
     private BucketFillRules.Fill fillPlan(AltoClef mod) {
-        NonNullList<ItemStack> slots = mod.getPlayer().getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> slots = mod.getPlayer().getInventory().items;
         int[] bucketStacks = new int[slots.size()];
         int empty = 0;
         for (int i = 0; i < bucketStacks.length; i++) {
@@ -567,7 +567,7 @@ public class CollectBucketLiquidTask extends ResourceTask {
             if (now - _aimedSince >= 2) {
                 _aimedSince = -1;
                 for (int i = BucketFillRules.spares(held); i > 0; i--) {
-                    mod.getController().dropItem(mod.getPlayer(), false);
+                    mod.getPlayer().drop(false);
                 }
                 Debug.logInternal("bucket: held " + BucketFillRules.HOLD_DROP_TICKS / 20 + " s with no free slot, dropped "
                         + BucketFillRules.spares(held) + " spare buckets, filling the last one in place");

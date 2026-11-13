@@ -77,8 +77,8 @@ public final class LandFrontier {
         ChunkPos closest = null;
         double closestDist = Double.MAX_VALUE;
         for (ChunkPos chunk : frontier) {
-            int x = (chunk.x() << 4) + 8;
-            int z = (chunk.z() << 4) + 8;
+            int x = (chunk.x << 4) + 8;
+            int z = (chunk.z << 4) + 8;
             if ((double) (x - dryX) * (meX - dryX) + (double) (z - dryZ) * (meZ - dryZ) > 0) {
                 ahead.add(chunk);
             }

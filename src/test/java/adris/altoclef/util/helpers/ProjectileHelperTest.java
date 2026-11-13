@@ -1,8 +1,8 @@
 package adris.altoclef.util.helpers;
 
-import net.minecraft.world.entity.projectile.arrow.Arrow;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
-import net.minecraft.world.entity.projectile.hurtingprojectile.SmallFireball;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.LargeFireball;
+import net.minecraft.world.entity.projectile.SmallFireball;
 import net.minecraft.world.phys.Vec3;
 import org.junit.Test;
 

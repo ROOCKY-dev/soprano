@@ -32,11 +32,11 @@ import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownExperienceBottle;
+import net.minecraft.world.entity.projectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -391,7 +391,7 @@ public class EntityTracker extends Tracker {
     // all. without a name the "it hit us" memory never hears about the witch, and a fight that stalled on it stays given up on
     // for as long as the poison runs. the nearest witch with a line to us inside FoeRules.WITCH_HIT_RANGE gets the blame
     private void noteWitch(LocalPlayer player, DamageSource source) {
-        boolean harmfulNow = player.hasEffect(MobEffects.POISON) || player.hasEffect(MobEffects.WEAKNESS) || player.hasEffect(MobEffects.SLOWNESS);
+        boolean harmfulNow = player.hasEffect(MobEffects.POISON) || player.hasEffect(MobEffects.WEAKNESS) || player.hasEffect(MobEffects.MOVEMENT_SLOWDOWN);
         boolean gained = harmfulNow && !_hadHarmfulEffect;
         _hadHarmfulEffect = harmfulNow;
         boolean magic = source != null && source != _lastMagicSource && FoeRules.unattributedMagic(source.getMsgId(), source.getEntity() != null);

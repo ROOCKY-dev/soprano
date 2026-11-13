@@ -38,7 +38,7 @@ public class EndGearTest {
     }
 
     private FakeFacts ready() {
-        FakeFacts f = new FakeFacts().with(Items.BED.white(), cfg.beds).with(Items.IRON_SWORD, 1).with(Items.WATER_BUCKET, 1)
+        FakeFacts f = new FakeFacts().with(Items.WHITE_BED, cfg.beds).with(Items.IRON_SWORD, 1).with(Items.WATER_BUCKET, 1)
                 .with(Items.IRON_PICKAXE, 1);
         f.wear(Items.IRON_HELMET).wear(Items.IRON_CHESTPLATE).wear(Items.IRON_LEGGINGS).wear(Items.IRON_BOOTS);
         f.armorPoints = 15;
@@ -56,7 +56,7 @@ public class EndGearTest {
 
     @Test
     public void anEndDeathStillAsksForEveryBed() {
-        FakeFacts f = ready().with(Items.BED.white(), 1);
+        FakeFacts f = ready().with(Items.WHITE_BED, 1);
         assertEquals(cfg.beds - 1, missing(f, diedInEndAt(100)).beds());
         assertFalse(EndGear.mayEnter(1, cfg));
     }
@@ -70,7 +70,7 @@ public class EndGearTest {
         // a night bed lost out of a full bag shuts the gate again, nothing remembers it was ever open
         FakeFacts f = ready();
         assertEquals(0, missing(f, new RunState()).beds());
-        f.with(Items.BED.white(), cfg.beds - 1);
+        f.with(Items.WHITE_BED, cfg.beds - 1);
         assertEquals(1, missing(f, new RunState()).beds());
     }
 
@@ -90,7 +90,7 @@ public class EndGearTest {
 
     @Test
     public void theDeathPileNeverCountsAsBeds() {
-        FakeFacts f = ready().with(Items.BED.white(), cfg.beds - 3);
+        FakeFacts f = ready().with(Items.WHITE_BED, cfg.beds - 3);
         RunState s = diedInEndAt(90_000);
         s.endDrops.put("white_bed", 3);
         f.gameTime = 92_000;
@@ -119,7 +119,7 @@ public class EndGearTest {
     public void gapFollowsTheBucketFacts() {
         GamerConfig all = new GamerConfig();
         all.end = cfg;
-        FakeFacts noWater = new FakeFacts().with(Items.BED.white(), 8).with(Items.IRON_SWORD, 1).with(Items.IRON_PICKAXE, 1)
+        FakeFacts noWater = new FakeFacts().with(Items.WHITE_BED, 8).with(Items.IRON_SWORD, 1).with(Items.IRON_PICKAXE, 1)
                 .with(Items.BUCKET, 1);
         noWater.wear(Items.IRON_HELMET).wear(Items.IRON_CHESTPLATE).wear(Items.IRON_LEGGINGS).wear(Items.IRON_BOOTS);
         noWater.armorPoints = 15;
@@ -227,13 +227,13 @@ public class EndGearTest {
 
     @Test
     public void bedsAreCountedAcrossColours() {
-        FakeFacts f = ready().with(Items.BED.white(), cfg.beds - 2).with(Items.BED.red(), 1);
+        FakeFacts f = ready().with(Items.WHITE_BED, cfg.beds - 2).with(Items.RED_BED, 1);
         assertEquals(1, missing(f, new RunState()).beds());
     }
 
     @Test
     public void noAttemptGoesWithNoBeds() {
-        FakeFacts f = ready().with(Items.BED.white(), 0);
+        FakeFacts f = ready().with(Items.WHITE_BED, 0);
         assertFalse(missing(f, new RunState()).none());
         assertEquals(cfg.beds, missing(f, new RunState()).beds());
     }
@@ -350,9 +350,9 @@ public class EndGearTest {
         assertEquals(0, EndGear.bedShortfall(f, cfg.beds, false));
         assertEquals(1, EndGear.bedShortfall(f, cfg.beds, true));
         // placing the spawn bed takes one out of the inventory and the want goes away with it, no crafting loop
-        f.with(Items.BED.white(), cfg.beds + 1);
+        f.with(Items.WHITE_BED, cfg.beds + 1);
         assertEquals(0, EndGear.bedShortfall(f, cfg.beds, true));
-        f.with(Items.BED.white(), cfg.beds);
+        f.with(Items.WHITE_BED, cfg.beds);
         assertEquals(0, EndGear.bedShortfall(f, cfg.beds, false));
     }
 
@@ -374,9 +374,9 @@ public class EndGearTest {
 
     @Test
     public void pickupOrderIsBedsToolsBucketArmor() {
-        FakeFacts f = new FakeFacts().with(Items.BED.white(), 2);
-        assertEquals(Items.BED.red(), EndGear.nextPickup(f, cfg, item -> item == Items.BED.red() || item == Items.IRON_PICKAXE));
-        assertEquals(Items.IRON_PICKAXE, EndGear.nextPickup(f.with(Items.BED.white(), 8), cfg, item -> item == Items.IRON_PICKAXE || item == Items.WATER_BUCKET));
+        FakeFacts f = new FakeFacts().with(Items.WHITE_BED, 2);
+        assertEquals(Items.RED_BED, EndGear.nextPickup(f, cfg, item -> item == Items.RED_BED || item == Items.IRON_PICKAXE));
+        assertEquals(Items.IRON_PICKAXE, EndGear.nextPickup(f.with(Items.WHITE_BED, 8), cfg, item -> item == Items.IRON_PICKAXE || item == Items.WATER_BUCKET));
         assertEquals(Items.WATER_BUCKET, EndGear.nextPickup(f.with(Items.IRON_PICKAXE, 1).with(Items.IRON_SWORD, 1), cfg, item -> item == Items.WATER_BUCKET || item == Items.DIAMOND_HELMET));
         assertEquals(Items.DIAMOND_HELMET, EndGear.nextPickup(f.with(Items.WATER_BUCKET, 1), cfg, item -> item == Items.DIAMOND_HELMET));
     }
@@ -385,7 +385,7 @@ public class EndGearTest {
     public void nothingToFetchWhenWeAlreadyHaveIt() {
         FakeFacts f = ready();
         assertNull(EndGear.nextPickup(f, cfg, item -> item == Items.IRON_PICKAXE || item == Items.WATER_BUCKET
-                || item == Items.BED.white() || item == Items.IRON_HELMET || item == Items.DIAMOND_HELMET));
+                || item == Items.WHITE_BED || item == Items.IRON_HELMET || item == Items.DIAMOND_HELMET));
     }
 
     @Test

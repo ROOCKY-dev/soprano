@@ -41,7 +41,7 @@ public class AltoSettingsBuildBlockTest {
     @Test
     public void anyFallingBlockDoesNot() {
         assertFalse(AltoSettings.isBuildBlock(Items.RED_SAND));
-        assertFalse(AltoSettings.isBuildBlock(Items.CONCRETE_POWDER.white()));
+        assertFalse(AltoSettings.isBuildBlock(Items.WHITE_CONCRETE_POWDER));
     }
 
     @Test

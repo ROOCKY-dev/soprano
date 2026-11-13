@@ -239,7 +239,7 @@ public final class SelfDefenseProcess extends BaritoneProcessHelper {
         ticksNoLine = 0;
         ticksNoProgress = 0;
         lastHealth = mob.getHealth();
-        int held = ctx.player().getInventory().getSelectedSlot();
+        int held = ctx.player().getInventory().selected;
         int weapon = weaponSlot(held);
         if (weapon >= 0 && weapon != held && baritone.getInventoryBehavior().selectHotbar(weapon, "selfDefense")
                 && restoreSlot < 0) {
@@ -268,7 +268,7 @@ public final class SelfDefenseProcess extends BaritoneProcessHelper {
     // only while the weapon is still what we're holding and alto is off: otherwise alto or the player picked a slot since
     // and it's theirs now
     private void retryRestore() {
-        boolean stillOurs = ctx.player().getInventory().getSelectedSlot() == swordSlot && !AltoClefBridge.isRunning();
+        boolean stillOurs = ctx.player().getInventory().selected == swordSlot && !AltoClefBridge.isRunning();
         if (!stillOurs || baritone.getInventoryBehavior().selectHotbar(restoreSlot, "selfDefense")) {
             restoreSlot = -1;
             swordSlot = -1;
@@ -276,7 +276,7 @@ public final class SelfDefenseProcess extends BaritoneProcessHelper {
     }
 
     private int weaponSlot(int held) {
-        NonNullList<ItemStack> inv = ctx.player().getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> inv = ctx.player().getInventory().items;
         int[] kind = new int[9];
         float[] damage = new float[9];
         for (int i = 0; i < 9; i++) {

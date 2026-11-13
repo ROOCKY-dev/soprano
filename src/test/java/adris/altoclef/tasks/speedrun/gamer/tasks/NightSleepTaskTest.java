@@ -4,7 +4,7 @@ import adris.altoclef.util.helpers.ItemFixture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -126,7 +126,7 @@ public class NightSleepTaskTest {
     }
 
     private static BlockState bed(BedPart part, Direction facing) {
-        return BuiltInRegistries.BLOCK.getValue(Identifier.parse("minecraft:red_bed")).defaultBlockState().setValue(BedBlock.PART, part).setValue(BedBlock.FACING, facing);
+        return BuiltInRegistries.BLOCK.get(ResourceLocation.parse("minecraft:red_bed")).defaultBlockState().setValue(BedBlock.PART, part).setValue(BedBlock.FACING, facing);
     }
 
     private static List<BlockPos> cellsAround(BlockPos footCell) {

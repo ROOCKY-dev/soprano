@@ -92,7 +92,7 @@ public final class TorchProcess extends BaritoneProcessHelper {
 
     // the version specific line: 1.21.4 has no copper torch
     public static boolean isTorch(ItemStack stack) {
-        return stack.is(Items.TORCH) || stack.is(Items.SOUL_TORCH) || stack.is(Items.COPPER_TORCH);
+        return stack.is(Items.TORCH) || stack.is(Items.SOUL_TORCH);
     }
 
     @Override
@@ -242,7 +242,7 @@ public final class TorchProcess extends BaritoneProcessHelper {
     private boolean placeFits() {
         Level world = ctx.world();
         return world.dimension() != Level.NETHER && world.dimension() != Level.END
-                && ctx.minecraft().gui.screen() == null
+                && ctx.minecraft().screen == null
                 && !baritone.getBuilderProcess().isActive()
                 && !(ctx.player().getItemBySlot(EquipmentSlot.OFFHAND).getItem() instanceof BucketItem);
     }

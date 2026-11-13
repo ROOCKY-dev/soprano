@@ -40,7 +40,7 @@ public class NightBedRoomTest {
     private static List<Stack> keepers(Stack... more) {
         List<Stack> bag = new ArrayList<>();
         for (Item item : new Item[]{Items.IRON_INGOT, Items.GOLD_INGOT, Items.DIAMOND, Items.OBSIDIAN, Items.SHIELD, Items.BUCKET,
-                Items.IRON_PICKAXE, Items.COOKED_BEEF, Items.FLINT_AND_STEEL, Items.CRAFTING_TABLE, Items.BED.white()}) {
+                Items.IRON_PICKAXE, Items.COOKED_BEEF, Items.FLINT_AND_STEEL, Items.CRAFTING_TABLE, Items.WHITE_BED}) {
             bag.add(kept(item, 1));
         }
         bag.addAll(List.of(more));
@@ -49,13 +49,13 @@ public class NightBedRoomTest {
 
     // what GarbageView.room does for a bed: no fit, the garbage pick as given, beds are not core
     private static Decision stock(int garbagePick, List<Stack> bag) {
-        Item bed = Items.BED.white();
+        Item bed = Items.WHITE_BED;
         return DropRoom.decide(false, garbagePick, false, false, ItemValue.isCore(bed), bag);
     }
 
     @Test
     public void aBedIsNotCoreSoOnlyGarbageOrTheShedMakeRoom() {
-        assertFalse(ItemValue.isCore(Items.BED.white()));
+        assertFalse(ItemValue.isCore(Items.WHITE_BED));
     }
 
     // GarbageRules' view of the same bag: keepers never go, blocks go once the bag is past the reserve (protectsCore)
@@ -140,7 +140,7 @@ public class NightBedRoomTest {
     @Test
     public void bedsAndTheirMakingsNeverGo() {
         List<Stack> bag = keepers(new Stack(new ItemStack(Items.OAK_LOG, 3), ItemValue.REST, false, true, false),
-                new Stack(new ItemStack(Items.WOOL.white(), 3), ItemValue.REST, false, false));
+                new Stack(new ItemStack(Items.WHITE_WOOL, 3), ItemValue.REST, false, false));
         assertEquals(-1, DropRoom.shedBlocks(bag, NIGHT_FLOOR));
     }
 

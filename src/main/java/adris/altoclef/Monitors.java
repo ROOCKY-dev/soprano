@@ -198,10 +198,10 @@ public final class Monitors {
                     BuiltInRegistries.ENTITY_TYPE.getKey(attacker.getType()).getPath(), attacker.getX(), attacker.getY(), attacker.getZ(), player.getX(), player.getY(), player.getZ(),
                     move.x, move.y, move.z));
         }
-        var input = player.input.keyPresses;
-        byte keys = (byte) ((input.forward() ? FallTrace.FORWARD : 0) | (input.backward() ? FallTrace.BACK : 0)
-                | (input.left() ? FallTrace.LEFT : 0) | (input.right() ? FallTrace.RIGHT : 0)
-                | (input.sprint() ? FallTrace.SPRINT : 0) | (input.jump() ? FallTrace.JUMP : 0) | (input.shift() ? FallTrace.SNEAK : 0));
+        var input = player.input;
+        byte keys = (byte) ((input.up ? FallTrace.FORWARD : 0) | (input.down ? FallTrace.BACK : 0)
+                | (input.left ? FallTrace.LEFT : 0) | (input.right ? FallTrace.RIGHT : 0)
+                | (player.isSprinting() ? FallTrace.SPRINT : 0) | (input.jumping ? FallTrace.JUMP : 0) | (input.shiftKeyDown ? FallTrace.SNEAK : 0));
         Goal goal = mod.getClientBaritone().getPathingBehavior().getGoal();
         fallTrace.push(player.getX(), player.getY(), player.getZ(), move.x, move.y, move.z, player.onGround(), (float) player.fallDistance, keys,
                 player.getYRot(), player.getXRot(), player.verticalCollision, player.verticalCollisionBelow, player.level().getBlockState(underFeet.set(player.getBlockX(), player.getBlockY() - 1, player.getBlockZ())).getBlock(), movement, movement == null ? null : movement.status(), place, goal, player.input.getClass(),
@@ -233,7 +233,7 @@ public final class Monitors {
 
     private void watchCursor() {
         ItemStack carried = StorageHelper.getItemStackInCursorSlot();
-        boolean screen = Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?>;
+        boolean screen = Minecraft.getInstance().screen instanceof AbstractContainerScreen<?>;
         long now = System.currentTimeMillis();
         if (cursorWatch.tick(!carried.isEmpty(), screen, now)) {
             Debug.logInternal(Lines.cursorStuck(name(carried.getItem()), carried.getCount(), cursorWatch.stuckMs(now) / 1000));

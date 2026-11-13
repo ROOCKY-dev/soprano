@@ -84,7 +84,8 @@ public class TerrainMapTest {
     }
 
     private static int argb(MapColor color, MapColor.Brightness b) {
-        return 0xFF000000 | color.calculateARGBColor(b);
+        int abgr = color.calculateRGBColor(b);
+        return (abgr & 0xff00ff00) | ((abgr >>> 16) & 255) | ((abgr & 255) << 16);
     }
 
     @Test
@@ -210,7 +211,7 @@ public class TerrainMapTest {
         for (int i = 0; i < 16; i++) {
             t = map.snapshot(world, level, 0, 0, 2);
         }
-        assertEquals(MapColor.STONE.calculateARGBColor(MapColor.Brightness.HIGH) | 0xFF000000, t.colorAt(1, 1));
+        assertEquals(argb(MapColor.STONE, MapColor.Brightness.HIGH), t.colorAt(1, 1));
     }
 
     @Test

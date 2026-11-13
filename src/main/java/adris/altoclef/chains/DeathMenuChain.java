@@ -102,7 +102,7 @@ public class DeathMenuChain extends TaskChain {
     public float getPriority(AltoClef mod) {
         //MinecraftClient.getInstance().getCurrentServerEntry().address;
 //        MinecraftClient.getInstance().
-        Screen screen = Minecraft.getInstance().gui.screen();
+        Screen screen = Minecraft.getInstance().screen;
         tickDeathCommands(mod);
         // This might fix Weird fail to respawn that happened only once
         if (_prevScreen == DeathScreen.class) {
@@ -140,7 +140,7 @@ public class DeathMenuChain extends TaskChain {
                     _deadPlayer = Minecraft.getInstance().player;
                     _respawnWait = new RespawnWait();
                     Minecraft.getInstance().player.respawn();
-                    Minecraft.getInstance().gui.setScreen(null);
+                    Minecraft.getInstance().setScreen(null);
                 } else {
                     // Cancel if we die and are not auto-respawning. through the bridge so a ";" line or a routine ends
                     // too, the plain cancel ran the line's next part as if the dead task had finished
@@ -155,7 +155,7 @@ public class DeathMenuChain extends TaskChain {
                 if (shouldAutoReconnect(mod)) {
                     Debug.logMessage("Reconnecting...");
                     _reconnecting = true;
-                    Minecraft.getInstance().gui.setScreen(new JoinMultiplayerScreen(new TitleScreen()));
+                    Minecraft.getInstance().setScreen(new JoinMultiplayerScreen(new TitleScreen()));
                 } else {
                     // Cancel if we disconnect and are not auto-reconnecting. same deal as the death one above
                     AltoClefBridge.cancelUserTask();

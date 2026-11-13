@@ -18,10 +18,10 @@
 package baritone.launch.mixins;
 
 import adris.altoclef.ui.gui.mc.BootScreen;
-import com.mojang.renderpearl.api.pipeline.RenderPipeline;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -30,12 +30,13 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.function.Function;
 import java.util.function.IntSupplier;
 
 // the boot screen. vanilla's overlay keeps running exactly as it does (reload, progress smoothing, the fade clock,
 // removing itself), we only take its paint: the brand colour becomes black, the mojang logo and the bar go, and
 // BootScreen draws ours on top at the tail. every hook asks BootScreen.drawing() so the setting and a crash both
-// fall back to vanilla without a restart. ours only goes up on frames where the logo redirect really ran
+// fall back to vanilla without a restart
 @Mixin(LoadingOverlay.class)
 public abstract class MixinLoadingOverlay {
 
@@ -54,9 +55,9 @@ public abstract class MixinLoadingOverlay {
 
     // all three reads of the brand colour: the first boot clear colour and the two fade fills. no ordinal on purpose.
     // require 0 on both redirects: a loading screen mod redirecting the same call would otherwise kill the boot. this
-    // way ours just skips, and BootScreen stays out of the way when the logo one didn't land
+    // way ours just skips and BootScreen draws over whatever that mod paints
     @Redirect(
-            method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+            method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
             at = @At(
                     value = "INVOKE",
                     target = "Ljava/util/function/IntSupplier;getAsInt()I"
@@ -69,40 +70,37 @@ public abstract class MixinLoadingOverlay {
 
     // both halves of the mojang studios logo
     @Redirect(
-            method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+            method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/renderpearl/api/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIIIIII)V"
+                    target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lnet/minecraft/resources/ResourceLocation;IIIIFFIIII)V"
             ),
             require = 0
     )
-    private void soprano$logo(GuiGraphicsExtractor g, RenderPipeline pipeline, Identifier texture, int x, int y,
-                              float u, float v, int w, int h, int uw, int vh, int tw, int th, int color) {
+    private void soprano$logo(GuiGraphics g, ResourceLocation texture,
+                              int x, int y, int w, int h, float u, float v, int uw, int vh, int tw, int th) {
         if (!BootScreen.drawing()) {
-            g.blit(pipeline, texture, x, y, u, v, w, h, uw, vh, tw, th, color);
-        } else {
-            BootScreen.skippedLogo();
+            g.blit(texture, x, y, w, h, u, v, uw, vh, tw, th);
         }
     }
 
     @Inject(
-            method = "extractProgressBar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIIIF)V",
+            method = "drawProgressBar(Lnet/minecraft/client/gui/GuiGraphics;IIIIF)V",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void soprano$bar(GuiGraphicsExtractor g, int x0, int y0, int x1, int y1, float fade, CallbackInfo ci) {
-        // no logo of ours this frame means no bar of ours either, so vanilla keeps its own
-        if (BootScreen.ownsFrame()) {
+    private void soprano$bar(GuiGraphics g, int x0, int y0, int x1, int y1, float fade, CallbackInfo ci) {
+        if (BootScreen.drawing()) {
             ci.cancel();
         }
     }
 
     // after vanilla's frame, so currentProgress has already moved and its own fill is under ours
     @Inject(
-            method = "extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
+            method = "render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
             at = @At("TAIL")
     )
-    private void soprano$draw(GuiGraphicsExtractor g, int mouseX, int mouseY, float a, CallbackInfo ci) {
+    private void soprano$draw(GuiGraphics g, int mouseX, int mouseY, float a, CallbackInfo ci) {
         BootScreen.draw(g, fadeIn, fadeInStart, fadeOutStart, currentProgress);
     }
 }

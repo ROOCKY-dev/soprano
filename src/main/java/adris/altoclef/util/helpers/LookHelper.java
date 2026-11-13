@@ -12,10 +12,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.villager.AbstractVillager;
+import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -52,7 +52,7 @@ public interface LookHelper {
             reachableRotation = RotationUtils.reachable(context, target);
         } else {
             // Calculate the center offset vector based on the side direction
-            Vec3i sideVector = side.getUnitVec3i();
+            Vec3i sideVector = side.getNormal();
             Vec3 centerOffset = new Vec3(0.5 + sideVector.getX() * 0.5, 0.5 + sideVector.getY() * 0.5,
                     0.5 + sideVector.getZ() * 0.5);
 
@@ -438,19 +438,19 @@ public interface LookHelper {
             if (!cursorStack.isEmpty()) {
                 // Find a slot in the player's inventory to move the cursor stack to
                 Optional<Slot> moveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorStack, false);
-                moveTo.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ContainerInput.PICKUP));
+                moveTo.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ClickType.PICKUP));
 
                 // Check if the cursor stack can be thrown away
                 if (ItemHelper.canDropStack(mod, cursorStack)) {
-                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                 }
 
                 // Find the garbage slot and move the cursor stack to it
                 Optional<Slot> garbage = StorageHelper.getGarbageSlot(mod);
-                garbage.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ContainerInput.PICKUP));
+                garbage.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ClickType.PICKUP));
 
                 // Move the cursor stack to an undefined slot
-                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
             } else {
                 // Close the screen if the cursor stack is empty
                 StorageHelper.closeScreen();
@@ -604,9 +604,9 @@ public interface LookHelper {
 
         // Adjust the center coordinates based on the specified side
         if (side != null) {
-            double offsetX = side.getUnitVec3i().getX() * 0.5;
-            double offsetY = side.getUnitVec3i().getY() * 0.5;
-            double offsetZ = side.getUnitVec3i().getZ() * 0.5;
+            double offsetX = side.getNormal().getX() * 0.5;
+            double offsetY = side.getNormal().getY() * 0.5;
+            double offsetZ = side.getNormal().getZ() * 0.5;
             centerX += offsetX;
             centerY += offsetY;
             centerZ += offsetZ;
@@ -634,9 +634,9 @@ public interface LookHelper {
 
         // Adjust the center coordinates based on the specified side
         if (side != null) {
-            double offsetX = side.getUnitVec3i().getX() * 0.5;
-            double offsetY = side.getUnitVec3i().getY() * 0.5;
-            double offsetZ = side.getUnitVec3i().getZ() * 0.5;
+            double offsetX = side.getNormal().getX() * 0.5;
+            double offsetY = side.getNormal().getY() * 0.5;
+            double offsetZ = side.getNormal().getZ() * 0.5;
             centerX += offsetX;
             centerY += offsetY;
             centerZ += offsetZ;

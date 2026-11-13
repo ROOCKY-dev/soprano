@@ -252,7 +252,7 @@ public class MovementFall extends Movement {
             }
 
             if (!paused && ctx.player().position().y - dest.getY() < ctx.playerController().getBlockReachDistance() && !ctx.player().onGround()) {
-                ctx.player().getInventory().setSelectedSlot(ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER));
+                ctx.player().getInventory().selected = ctx.player().getInventory().findSlotMatchingItem(STACK_BUCKET_WATER);
 
                 targetRotation = new Rotation(toDest.getYaw(), 90.0F);
 
@@ -297,7 +297,7 @@ public class MovementFall extends Movement {
             }
             state.setInput(Input.MOVE_FORWARD, true);
         }
-        Vec3i avoid = Optional.ofNullable(avoid()).map(Direction::getUnitVec3i).orElse(null);
+        Vec3i avoid = Optional.ofNullable(avoid()).map(Direction::getNormal).orElse(null);
         if (avoid == null) {
             avoid = src.subtract(dest);
         } else {
@@ -598,7 +598,7 @@ public class MovementFall extends Movement {
         if (!FallCover.pickupReady(destIsSource(), near, ctx.playerHead().distanceTo(water), reach, player.onGround(), player.isInWater(), player.getDeltaMovement().y, emptyBucketOnHotbar())) {
             return false;
         }
-        player.getInventory().setSelectedSlot(player.getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY));
+        player.getInventory().selected = player.getInventory().findSlotMatchingItem(STACK_BUCKET_EMPTY);
         state.setTarget(new MovementTarget(RotationUtils.calcRotationFromVec3d(ctx.playerHead(), water, ctx.playerRotations()), true));
         // click once the crosshair is really on it, asked with the empty bucket's own ray (source water counts). isLookingAt
         // can't see water with fluidHandling at NONE, and an exact rotation never comes with randomLooking113 on

@@ -9,7 +9,7 @@ import adris.altoclef.util.helpers.WorldHelper;
 import baritone.api.utils.Dimension;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.illager.Pillager;
+import net.minecraft.world.entity.monster.Pillager;
 import net.minecraft.world.entity.monster.Witch;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -88,7 +88,7 @@ public final class DangerFilter {
                 continue;
             }
             // outposts put white wool two above their tables
-            boolean outpost = mod.getWorld().getBlockState(pos.above(2)).getBlock() == Blocks.WOOL.white();
+            boolean outpost = mod.getWorld().getBlockState(pos.above(2)).getBlock() == Blocks.WHITE_WOOL;
             if (outpost || nearAny(pos, witches, WITCH_RADIUS)) {
                 BanPolicy.trap(bans, dim, pos.getX(), pos.getY(), pos.getZ(), outpost ? "outpost table" : "witch hut table");
             }

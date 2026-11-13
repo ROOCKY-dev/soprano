@@ -45,7 +45,7 @@ public class LandMemory implements ExploreProcess.LandGate {
 
     private void onLoad(ChunkPos pos) {
         if (active()) {
-            look(pos.x(), pos.z());
+            look(pos.x, pos.z);
         }
     }
 
@@ -82,7 +82,7 @@ public class LandMemory implements ExploreProcess.LandGate {
     }
 
     void note(int x, int z, int waterCols, int total) {
-        long key = ChunkPos.pack(x, z);
+        long key = ChunkPos.asLong(x, z);
         _old.remove(key);
         if (LandFrontier.isWater(waterCols, total)) {
             _water.add(key);
@@ -110,13 +110,13 @@ public class LandMemory implements ExploreProcess.LandGate {
     }
 
     private boolean known(int x, int z) {
-        long key = ChunkPos.pack(x, z);
+        long key = ChunkPos.asLong(x, z);
         return _land.contains(key) || _water.contains(key);
     }
 
     private static boolean anyNbr(LongOpenHashSet set, int x, int z) {
-        return set.contains(ChunkPos.pack(x + 1, z)) || set.contains(ChunkPos.pack(x - 1, z))
-                || set.contains(ChunkPos.pack(x, z + 1)) || set.contains(ChunkPos.pack(x, z - 1));
+        return set.contains(ChunkPos.asLong(x + 1, z)) || set.contains(ChunkPos.asLong(x - 1, z))
+                || set.contains(ChunkPos.asLong(x, z + 1)) || set.contains(ChunkPos.asLong(x, z - 1));
     }
 
     private boolean loaded(int x, int z) {
@@ -130,11 +130,11 @@ public class LandMemory implements ExploreProcess.LandGate {
         if (!active()) {
             return;
         }
-        ChunkPos me = ChunkPos.containing(_mod.getPlayer().blockPosition());
+        ChunkPos me = new ChunkPos(_mod.getPlayer().blockPosition());
         for (int dx = -SWEEP_CHUNKS; dx <= SWEEP_CHUNKS; dx++) {
             for (int dz = -SWEEP_CHUNKS; dz <= SWEEP_CHUNKS; dz++) {
-                if (!known(me.x() + dx, me.z() + dz) && loaded(me.x() + dx, me.z() + dz)) {
-                    look(me.x() + dx, me.z() + dz);
+                if (!known(me.x + dx, me.z + dz) && loaded(me.x + dx, me.z + dz)) {
+                    look(me.x + dx, me.z + dz);
                 }
             }
         }
@@ -161,7 +161,7 @@ public class LandMemory implements ExploreProcess.LandGate {
         if (!_hasExtent || x < _minX - 1 || x > _maxX + 1 || z < _minZ - 1 || z > _maxZ + 1) {
             return false;
         }
-        if (known(x, z) || _banned.contains(ChunkPos.pack(x, z))) {
+        if (known(x, z) || _banned.contains(ChunkPos.asLong(x, z))) {
             return false;
         }
         return LandFrontier.frontierOk(anyNbr(_land, x, z), anyNbr(_water, x, z), anyNbr(_old, x, z));
@@ -173,7 +173,7 @@ public class LandMemory implements ExploreProcess.LandGate {
             look(x, z);
             return;
         }
-        if (_old.add(ChunkPos.pack(x, z))) {
+        if (_old.add(ChunkPos.asLong(x, z))) {
             extend(x, z);
         }
     }
@@ -189,7 +189,7 @@ public class LandMemory implements ExploreProcess.LandGate {
     }
 
     public void ban(ChunkPos chunk) {
-        _banned.add(ChunkPos.pack(chunk.x(), chunk.z()));
+        _banned.add(ChunkPos.asLong(chunk.x, chunk.z));
     }
 
     public boolean crossing() {

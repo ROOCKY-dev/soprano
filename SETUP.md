@@ -1,8 +1,8 @@
 # Installation
 
-Soprano installs as a Fabric, Forge or NeoForge mod. Download the jar for your Minecraft version and loader from the [releases page](https://github.com/AverWasTaken/soprano/releases) and put it in your `mods` folder. If you had Baritone installed, take it out first. Soprano replaces it, and the two will fight over the same classes.
+This port installs as a NeoForge mod for Minecraft 1.21.1 (NeoForge 21.1.265, Java 21). The other loader projects are retained from upstream but are disabled by default and are not validated on this branch. Download the jar for your Minecraft version and loader from the [releases page](https://github.com/AverWasTaken/soprano/releases) and put it in your `mods` folder. If you had Baritone installed, take it out first. Soprano replaces it, and the two will fight over the same classes.
 
-Each branch of the repo is one Minecraft version, and each Minecraft version has its own release line (Soprano 1.1.x is Minecraft 26.3, 1.0.x is Minecraft 1.21.4), tagged like `soprano-v1.1.0`. `26.3` is the newest Minecraft version, and the `1.21.4` branch is 1.21.4. If your version isn't in the releases, there isn't a port yet.
+Each branch of the repo is one Minecraft version, and each Minecraft version has its own release line (Soprano 1.1.x is Minecraft 26.3, 1.0.x is Minecraft 1.21.4, this port uses 1.3.x for Minecraft 1.21.1), tagged like `soprano-v1.1.0`. `26.3` is the newest Minecraft version, and this `1.21.1-latest` branch backports the latest `26.3` source to 1.21.1. The 1.21.1 port must currently be built from source.
 
 Once it's installed, see [the usage page](USAGE.md).
 
@@ -27,7 +27,7 @@ Clone the repo, and check out the branch for the Minecraft version you want (one
 
 ## Java
 
-You need the right Java version for the Minecraft version you're building. [Download Java here](https://adoptium.net/) and check what you're using with `java -version`. 26.3 needs Java 25 and 1.21.4 needs Java 21. `java_version` in `gradle.properties` on a branch says which Java that branch wants.
+You need the right Java version for the Minecraft version you're building. [Download Java here](https://adoptium.net/) and check what you're using with `java -version`. 26.3 needs Java 25; this 1.21.1 backport and 1.21.4 need Java 21. `java_version` in `gradle.properties` on a branch says which Java that branch wants.
 
 ## Command line
 
@@ -35,7 +35,7 @@ On Windows use `gradlew`, on Mac and Linux use `./gradlew`.
 
 `./gradlew build` builds everything, and the finished jars end up in the `dist` directory at the root of the repo, along with `checksums.txt`. There are also mapping files in `dist` if you need to read an obfuscated stack trace.
 
-To start a dev client with Soprano loaded, use `./gradlew :fabric:runClient`. Tests are `./gradlew test`.
+To start a dev client with Soprano loaded, use `./gradlew :neoforge:runClient`. Tests are `./gradlew test`.
 
 ## IntelliJ
 

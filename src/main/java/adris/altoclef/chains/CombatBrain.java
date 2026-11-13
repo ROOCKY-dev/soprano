@@ -11,7 +11,7 @@ import adris.altoclef.tasks.speedrun.gamer.EndermanNook;
 import adris.altoclef.tasks.speedrun.gamer.tasks.PerchTask;
 import adris.altoclef.util.helpers.PearlHuntHook;
 import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import adris.altoclef.tasksystem.Task;
 import adris.altoclef.trackers.EntityTracker;
 import adris.altoclef.tasks.resources.CollectBlazeRodsTask;
@@ -70,9 +70,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
-import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
+import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.monster.cubemob.Slime;
+import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
@@ -183,7 +183,7 @@ final class CombatBrain {
         int id = _commit.targetId();
         if (alive) {
             // (anything else as the target forgets the old enderman, its id could come back as somebody else)
-            _enderId = entity instanceof Enderman ? id : -1;
+            _enderId = entity instanceof EnderMan ? id : -1;
             _enderLastPos = entity.position();
             _enderGoneSaid = false;
             return;
@@ -192,7 +192,7 @@ final class CombatBrain {
         _enderGoneSaid = true;
         Vec3 at = entity != null ? entity.position() : _enderLastPos;
         String why = entity == null ? "left the client world"
-                : entity instanceof Enderman man && man.getHealth() <= 0 ? "died" : "removed with hp left";
+                : entity instanceof EnderMan man && man.getHealth() <= 0 ? "died" : "removed with hp left";
         Debug.logInternal("combat: [" + dimension.name().toLowerCase(java.util.Locale.ROOT) + "] enderman #" + id + " gone: " + why
                 + ", last at " + Math.round(at.x) + " " + Math.round(at.y) + " " + Math.round(at.z) + ", " + Math.round(at.distanceTo(player.position()))
                 + " blocks off, dy " + Math.round(at.y - player.getY()));
@@ -544,7 +544,7 @@ final class CombatBrain {
         // heal hold would sit in the open. the nook it is in (or digging) is the whole answer, so nothing is committed to.
         // the foes stay, the stance (the gapple at 8 hp) and the aura's contact swings still hear about them
         boolean standDown = EndermanNook.brainStandsDown(PearlHuntHook.running(now), mobs.size(),
-                (int) mobs.stream().filter(m -> m instanceof Enderman).count());
+                (int) mobs.stream().filter(m -> m instanceof EnderMan).count());
         enabled &= !standDown;
 
         // the edge scan once a tick for everybody: the way fight's engage, the fight's shield and the run's shield
@@ -593,7 +593,7 @@ final class CombatBrain {
             }
             // same chance for the enderman gone line: one that the step just picked and that blinks off before the next tick
             // would never have been written down
-            if (_commit.mode() == Mode.FIGHT && mod.getWorld().getEntity(_commit.targetId()) instanceof Enderman man && man.isAlive()) {
+            if (_commit.mode() == Mode.FIGHT && mod.getWorld().getEntity(_commit.targetId()) instanceof EnderMan man && man.isAlive()) {
                 noteEnderGone(dimension, man, true, player);
             }
             if (event != Event.NONE) {
@@ -994,7 +994,7 @@ final class CombatBrain {
         }
         String line = CombatLog.hurt(dimension, before - hp, who, how);
         if (source != null && source.is(DamageTypes.HOT_FLOOR)) {
-            line += CombatLog.hotFloor(player.input.keyPresses.shift(), player.onGround(), player.getY(), player.input.getClass().getSimpleName());
+            line += CombatLog.hotFloor(player.input.shiftKeyDown, player.onGround(), player.getY(), player.input.getClass().getSimpleName());
         }
         Debug.logInternal(line);
     }

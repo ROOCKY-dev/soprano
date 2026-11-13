@@ -151,7 +151,7 @@ public final class GhostScan {
     }
 
     private static boolean solid(BlockState state) {
-        return state != null && state.isSolidRender();
+        return state != null && state.isSolidRender(net.minecraft.world.level.EmptyBlockGetter.INSTANCE, net.minecraft.core.BlockPos.ZERO);
     }
 
     private static int index(int x, int y, int z) {

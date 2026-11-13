@@ -5,7 +5,7 @@ import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.SharedConstants;
-import net.minecraft.client.input.KeyEvent;
+import baritone.compat.input.KeyEvent;
 import net.minecraft.server.Bootstrap;
 import org.junit.BeforeClass;
 import org.junit.Test;

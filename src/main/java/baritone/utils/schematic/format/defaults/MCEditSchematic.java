@@ -20,9 +20,10 @@ package baritone.utils.schematic.format.defaults;
 import baritone.utils.schematic.StaticSchematic;
 import baritone.utils.schematic.format.ParseReport;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.ItemIdFix;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -41,19 +42,19 @@ public final class MCEditSchematic extends StaticSchematic implements ParseRepor
     private final Map<String, Integer> unknown = new LinkedHashMap<>();
 
     public MCEditSchematic(CompoundTag schematic) {
-        String type = schematic.getString("Materials").orElseThrow();
+        String type = schematic.getString("Materials");
         if (!type.equals("Alpha")) {
             throw new IllegalStateException("bad schematic " + type);
         }
-        this.x = schematic.getInt("Width").orElse(0);
-        this.y = schematic.getInt("Height").orElse(0);
-        this.z = schematic.getInt("Length").orElse(0);
-        byte[] blocks = schematic.getByteArray("Blocks").orElseThrow();
+        this.x = schematic.getInt("Width");
+        this.y = schematic.getInt("Height");
+        this.z = schematic.getInt("Length");
+        byte[] blocks = schematic.getByteArray("Blocks");
 //        byte[] metadata = schematic.getByteArray("Data");
 
         byte[] additional = null;
         if (schematic.contains("AddBlocks")) {
-            byte[] addBlocks = schematic.getByteArray("AddBlocks").orElseThrow();
+            byte[] addBlocks = schematic.getByteArray("AddBlocks");
             additional = new byte[addBlocks.length * 2];
             for (int i = 0; i < addBlocks.length; i++) {
                 additional[i * 2 + 0] = (byte) ((addBlocks[i] >> 4) & 0xF); // lower nibble
@@ -72,12 +73,11 @@ public final class MCEditSchematic extends StaticSchematic implements ParseRepor
                         blockID |= additional[blockInd] << 8;
                     }
                     String itemId = ItemIdFix.getItem(blockID);
-                    Identifier blockKey = Identifier.tryParse(itemId);
+                    ResourceLocation blockKey = ResourceLocation.tryParse(itemId);
                     Block block = blockKey == null
                         ? null
-                        : BuiltInRegistries.BLOCK.get(blockKey)
-                            .map(Holder.Reference::value)
-                            .orElse(null);
+                        : BuiltInRegistries.BLOCK.getOptional(blockKey)
+                                                        .orElse(null);
                     if (block == null) {
                         // an item-only id (a shovel in a block array), still air like it always was
                         unknown.merge(blockKey == null ? "id " + blockID : itemId, 1, Integer::sum);

@@ -19,7 +19,7 @@ package baritone.launch.mixins;
 
 import adris.altoclef.ui.gui.mc.TripToastHud;
 import net.minecraft.client.gui.screens.ChatScreen;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.MouseButtonEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -35,8 +35,8 @@ public class MixinChatScreenToast {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void soprano$clickToast(final MouseButtonEvent event, final boolean doubleClick, final CallbackInfoReturnable<Boolean> cir) {
-        if (TripToastHud.onChatClick(event)) {
+    private void soprano$clickToast(final double x, final double y, final int button, final CallbackInfoReturnable<Boolean> cir) {
+        if (TripToastHud.onChatClick(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers()))) {
             cir.setReturnValue(true);
         }
     }

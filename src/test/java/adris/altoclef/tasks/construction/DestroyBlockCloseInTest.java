@@ -60,7 +60,7 @@ public class DestroyBlockCloseInTest {
         }
 
         @Override
-        public int getMinY() {
+        public int getMinBuildHeight() {
             return -64;
         }
     }

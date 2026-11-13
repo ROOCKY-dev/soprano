@@ -36,7 +36,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
@@ -399,15 +399,15 @@ public final class McSchematics implements SchematicsAccess {
     // ----- names and icons
 
     private static Item itemOf(String id) {
-        Identifier key = Identifier.tryParse(id);
-        return key == null ? Items.AIR : BuiltInRegistries.ITEM.getValue(key);
+        ResourceLocation key = ResourceLocation.tryParse(id);
+        return key == null ? Items.AIR : BuiltInRegistries.ITEM.get(key);
     }
 
     private static String itemName(String id) {
         try {
             Item item = itemOf(id);
             if (item != Items.AIR) {
-                String name = item.getDefaultInstance().getItemName().getString();
+                String name = item.getDefaultInstance().getHoverName().getString();
                 // a name that is still a translation key means the language isn't loaded, which is no help to anyone
                 if (!name.isEmpty() && !name.startsWith("item.") && !name.startsWith("block.")) {
                     return name;
@@ -421,8 +421,8 @@ public final class McSchematics implements SchematicsAccess {
 
     private static String blockName(String id) {
         try {
-            Identifier key = Identifier.tryParse(id);
-            Block block = key == null ? Blocks.AIR : BuiltInRegistries.BLOCK.getValue(key);
+            ResourceLocation key = ResourceLocation.tryParse(id);
+            Block block = key == null ? Blocks.AIR : BuiltInRegistries.BLOCK.get(key);
             if (block != Blocks.AIR) {
                 String name = block.getName().getString();
                 if (!name.isEmpty() && !name.startsWith("block.")) {
@@ -1099,7 +1099,7 @@ public final class McSchematics implements SchematicsAccess {
         try {
             Path dir = library.directory().toPath();
             Files.createDirectories(dir);
-            Blaze3D.openPath(dir);
+            net.minecraft.Util.getPlatform().openPath(dir);
             return Result.ok("Opened the schematics folder");
         } catch (Throwable t) {
             Safe.report("gui schematic folder", t);
@@ -1119,7 +1119,7 @@ public final class McSchematics implements SchematicsAccess {
         @Override
         public String dimension() {
             ClientLevel level = Minecraft.getInstance().level;
-            return level == null ? null : level.dimension().identifier().toString();
+            return level == null ? null : level.dimension().location().toString();
         }
 
         @Override
@@ -1212,7 +1212,7 @@ public final class McSchematics implements SchematicsAccess {
         // the click that asked is still being handled by the gui, swapping the screen under it is asking for trouble
         @Override
         public void openMover(String relativePath) {
-            Minecraft.getInstance().schedule(() -> MoveScreen.open(relativePath));
+            Minecraft.getInstance().tell(() -> MoveScreen.open(relativePath));
         }
 
         @Override
@@ -1244,7 +1244,7 @@ public final class McSchematics implements SchematicsAccess {
 
         @Override
         public int minY() {
-            return level.getMinY();
+            return level.getMinBuildHeight();
         }
 
         @Override

@@ -40,8 +40,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.animal.chicken.Chicken;
-import net.minecraft.world.entity.animal.rabbit.Rabbit;
+import net.minecraft.world.entity.animal.Chicken;
+import net.minecraft.world.entity.animal.Rabbit;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Leashable;
 import net.minecraft.world.entity.LivingEntity;
@@ -330,7 +330,7 @@ public interface MovementHelper extends ActionCosts, Helper {
             }
 
             BlockState up = bsi.get0(x, y + 1, z);
-            if (!up.getFluidState().isEmpty() || up.getBlock() instanceof LilyPadBlock) {
+            if (!up.getFluidState().isEmpty() || up.getBlock() instanceof WaterlilyBlock) {
                 return false;
             }
             return fluidState.getType() instanceof WaterFluid;
@@ -931,7 +931,7 @@ public interface MovementHelper extends ActionCosts, Helper {
         }
         if (Baritone.settings().autoTool.value && !Baritone.settings().assumeExternalAutoTool.value) {
             // the state, not the block: the Block overload rebuilds a default state and loses what a forced tool predicate looks at
-            ctx.player().getInventory().setSelectedSlot(ts.getBestSlot(b, preferSilkTouch, false));
+            ctx.player().getInventory().selected = ts.getBestSlot(b, preferSilkTouch, false);
         }
     }
 

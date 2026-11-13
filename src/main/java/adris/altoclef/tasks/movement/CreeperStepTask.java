@@ -22,7 +22,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -201,7 +201,7 @@ public class CreeperStepTask extends CustomBaritoneGoalTask {
         try {
             for (Entity e : mod.getEntityTracker().getHostiles()) {
                 if (e == null || !e.isAlive() || e instanceof Creeper) continue;
-                if (e instanceof Enderman && !EntityHelper.isAngryAtPlayer(mod, e)) continue;
+                if (e instanceof EnderMan && !EntityHelper.isAngryAtPlayer(mod, e)) continue;
                 out.add(new CreeperEscape.At(e.getX(), e.getZ()));
             }
         } catch (ConcurrentModificationException | ArrayIndexOutOfBoundsException | NullPointerException ex) {

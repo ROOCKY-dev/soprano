@@ -27,8 +27,11 @@
 
 ## Install
 
+This branch ports the latest Soprano source from upstream `26.3` at `da12c213bffa3448922d136e3db7eb7788991306` (including `soprano-v1.1.7-nightly.15`) to **Minecraft 1.21.1**, **NeoForge 21.1.265**, and **Java 21**. It retains the latest Soprano automation, routines, graph editor, and GUI. Minecraft content introduced after 1.21.1 is unavailable. Build with `./gradlew build -Prelease_version=1.3.1`; install `soprano-api-neoforge-1.3.1.jar` from `dist/`. This is an unofficial backport.
+
 | Minecraft | Latest Soprano | Loaders | Download |
 |:--|:--|:--|:--|
+| 1.21.1 | 1.3.1 (unofficial latest-source backport) | NeoForge | Build this branch; see [port notes](release-notes/1.3.1.md) |
 | 26.3 | 1.1.6 | Fabric, Forge, NeoForge | [Soprano v1.1.6](https://github.com/AverWasTaken/soprano/releases/tag/soprano-v1.1.6) |
 | 1.21.11 | 1.2.0 | Fabric, Forge, NeoForge | [Soprano v1.2.0](https://github.com/AverWasTaken/soprano/releases/tag/soprano-v1.2.0) |
 | 1.21.4 (2b2t) | 1.0.3 | Fabric, Forge, NeoForge | [Soprano v1.0.3](https://github.com/AverWasTaken/soprano/releases/tag/soprano-v1.0.3) |

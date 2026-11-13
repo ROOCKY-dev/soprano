@@ -25,11 +25,10 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.AreaEffectCloud;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
-import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.boss.enderdragon.phases.DragonPhaseInstance;
 import net.minecraft.world.entity.boss.enderdragon.phases.EnderDragonPhase;
-import net.minecraft.world.entity.monster.Enderman;
-import net.minecraft.world.item.component.SwingAnimation;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -314,7 +313,7 @@ public class KillEnderDragonWithBedsTask extends Task {
         BlockHitResult hit = new BlockHitResult(at, Direction.UP, block, false);
         InteractionResult used = Minecraft.getInstance().gameMode.useItemOn(mod.getPlayer(), InteractionHand.MAIN_HAND, hit);
         if (used.consumesAction()) {
-            mod.getPlayer().swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            mod.getPlayer().swing(InteractionHand.MAIN_HAND);
         }
         return used;
     }
@@ -346,7 +345,7 @@ public class KillEnderDragonWithBedsTask extends Task {
     // then it is a fight like any other)
     private boolean ownedOrHeld(Entity entity) {
         if (KillEnderDragonTask.ownedByTheDragonFight(entity)) return true;
-        if (!_holdStand || !(entity instanceof Enderman)) return false;
+        if (!_holdStand || !(entity instanceof EnderMan)) return false;
         return _mod == null || _mod.getPlayer() == null || entity.distanceTo(_mod.getPlayer()) > HOLD_STAND_MELEE;
     }
 

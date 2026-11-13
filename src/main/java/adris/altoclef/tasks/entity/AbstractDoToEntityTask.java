@@ -17,7 +17,7 @@ import adris.altoclef.trackers.EntityTracker;
 import adris.altoclef.util.helpers.ApproachRules;
 import adris.altoclef.util.helpers.EntityHelper;
 import net.minecraft.world.entity.NeutralMob;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Enemy;
 import adris.altoclef.util.helpers.BackOffRules;
 import adris.altoclef.util.helpers.EntityBlockerRules;
@@ -46,7 +46,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -141,14 +141,14 @@ public abstract class AbstractDoToEntityTask extends Task implements ITaskRequir
         ItemStack cursorStack = StorageHelper.getItemStackInCursorSlot();
         if (!cursorStack.isEmpty()) {
             Optional<Slot> moveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorStack, false);
-            moveTo.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ContainerInput.PICKUP));
+            moveTo.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ClickType.PICKUP));
             if (ItemHelper.canDropStack(mod, cursorStack)) {
-                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
             }
             Optional<Slot> garbage = StorageHelper.getGarbageSlot(mod);
             // Try throwing away cursor slot if it's garbage
-            garbage.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ContainerInput.PICKUP));
-            mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+            garbage.ifPresent(slot -> mod.getSlotHandler().clickSlot(slot, 0, ClickType.PICKUP));
+            mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
         } else {
             StorageHelper.closeScreen();
         } // Kinda duct tape but it should be future proof ish
@@ -231,7 +231,7 @@ public abstract class AbstractDoToEntityTask extends Task implements ITaskRequir
                     && mod.getMLGBucketChain().doneMLG() && !mod.getMLGBucketChain().isChorusFruiting();
             ApproachRules.Policy policy = !isKillTask() ? ApproachRules.Policy.OTHER
                     : gatesOpen ? ApproachRules.Policy.KILL : ApproachRules.Policy.KILL_GATED;
-            boolean comesToUs = isKillTask() && entity instanceof Enderman && EntityHelper.isAngryAtPlayer(mod, entity);
+            boolean comesToUs = isKillTask() && entity instanceof EnderMan && EntityHelper.isAngryAtPlayer(mod, entity);
             // while we let it come the head is already on it (legs, CombatAim keeps us out of its eyes): aimStalled only aims in
             // reach, and the swing wants onTarget, so the turn used to start the tick it arrived and it got the first hit
             if (comesToUs && !inReach && sqDist < PRE_AIM_RANGE * PRE_AIM_RANGE) {
@@ -431,7 +431,7 @@ public abstract class AbstractDoToEntityTask extends Task implements ITaskRequir
     private static final java.util.Map<Integer, int[]> LAVA_STARES = new java.util.HashMap<>();
 
     private boolean stareDown(AltoClef mod, Entity entity) {
-        if (!(entity instanceof Enderman man)) {
+        if (!(entity instanceof EnderMan man)) {
             return false;
         }
         var us = mod.getPlayer();
@@ -443,7 +443,7 @@ public abstract class AbstractDoToEntityTask extends Task implements ITaskRequir
             return false;
         }
         int angryNow = 0;
-        for (Enderman other : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+        for (EnderMan other : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
             if (other.isAlive() && other.isCreepy()) {
                 angryNow++;
             }
@@ -856,7 +856,7 @@ public abstract class AbstractDoToEntityTask extends Task implements ITaskRequir
         if (!tooClose && _backOffGoal == null) {
             return;
         }
-        boolean angryEnderman = entity instanceof Enderman && EntityHelper.isAngryAtPlayer(mod, entity);
+        boolean angryEnderman = entity instanceof EnderMan && EntityHelper.isAngryAtPlayer(mod, entity);
         if (CritTiming.noBackOff(LavaShore.underFire(mod.getControllerExtras().ticksSinceHurt(), inReach(mod, entity)), angryEnderman)) {
             dropBackOff(mod, true);
             return;

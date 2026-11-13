@@ -19,11 +19,11 @@ package baritone.cache;
 
 import adris.altoclef.util.helpers.ItemFixture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.core.HolderSet;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.world.attribute.EnvironmentAttributeMap;
-import net.minecraft.world.level.CardinalLighting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.zip.GZIPOutputStream;
 
 import static org.junit.Assert.assertEquals;
@@ -62,10 +63,9 @@ public class CachedSpecialBlocksTest {
 
     // the type only carries the shape now; which dimension it is lives in the ResourceKey the cache is handed
     private static DimensionType dim(int minY, int height) {
-        return new DimensionType(false, true, false, false, 1.0, minY, height, height,
-            HolderSet.empty(), 0.0f, new DimensionType.MonsterSettings(ConstantInt.of(0), 0),
-            DimensionType.Skybox.OVERWORLD, CardinalLighting.Type.DEFAULT, EnvironmentAttributeMap.EMPTY,
-            HolderSet.empty(), Optional.empty());
+        return new DimensionType(OptionalLong.empty(), true, false, false, true, 1.0, true, false, minY, height, height,
+            BlockTags.INFINIBURN_OVERWORLD, ResourceLocation.withDefaultNamespace("overworld"), 0.0f,
+            new DimensionType.MonsterSettings(false, true, ConstantInt.of(0), 0));
     }
 
     private static BlockState[] stoneOverview() {

@@ -14,9 +14,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Blaze;
-import net.minecraft.world.entity.monster.Enderman;
-import net.minecraft.world.entity.monster.cubemob.AbstractCubeMob;
-import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.monster.Spider;
 import net.minecraft.world.entity.monster.piglin.Piglin;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.monster.warden.Warden;
@@ -46,11 +46,11 @@ public class EntityHelper {
     }
 
     public static boolean isGenerallyHostileToPlayer(AltoClef mod, Entity entity) {
-        if (entity instanceof OwnableEntity tameable && tameable.getOwnerReference() != null
-                && tameable.getOwnerReference().getUUID().equals(mod.getPlayer().getUUID())) return false;
+        if (entity instanceof OwnableEntity tameable && tameable.getOwnerUUID() != null
+                && tameable.getOwnerUUID().equals(mod.getPlayer().getUUID())) return false;
         // magma cubes are not slimes, and neither kind ever raises the aggressive flag (nothing in the cube goals does), so
         // the "close enough to bite" rule has to cover the whole family or the aura never swings at a magma cube on us
-        if (entity instanceof AbstractCubeMob cube) {
+        if (entity instanceof Slime cube) {
             if (mod.getPlayer().closerThan(cube, adris.altoclef.util.helpers.CombatRules.cubeBiteRange(cube.getBbWidth()))) return true;
             // a bite throws us past 3 blocks, it is still the one that bit us
             return NeutralMobs.hitRecently(mod.getEntityTracker().getProvocations().sinceHit(cube.getId(), mod.getWorld().getGameTime()));
@@ -59,13 +59,13 @@ public class EntityHelper {
         if (entity instanceof Warden warden && mod.getPlayer().closerThan(warden, 16)) return true;
         // the aggressive flag plus a line of sight is a stare in progress. an enderman that is already angry (creepy is the
         // synced flag) or that just hit us is coming for us whether it can see us this tick or not, it teleports
-        if (entity instanceof Enderman enderman && ((enderman.hasLineOfSight(mod.getPlayer()) && enderman.isAggressive())
+        if (entity instanceof EnderMan enderman && ((enderman.hasLineOfSight(mod.getPlayer()) && enderman.isAggressive())
                 || enderman.isCreepy()
                 || NeutralMobs.hitRecently(mod.getEntityTracker().getProvocations().sinceHit(enderman.getId(), mod.getWorld().getGameTime()))))
             return true;
         if (entity instanceof Blaze blaze && isBlazeThreat(mod, blaze)) return true;
         if (entity instanceof Raider || entity instanceof Warden
-                || entity instanceof Enderman || entity instanceof Blaze) return false;
+                || entity instanceof EnderMan || entity instanceof Blaze) return false;
         if (entity instanceof Mob mob && !isAfterUs(mod, mob)) return false;
         return !isTradingPiglin(entity);
     }
@@ -95,7 +95,7 @@ public class EntityHelper {
     private static boolean isNeutralNow(AltoClef mod, Mob mob) {
         String type = BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).getPath();
         boolean bright = mob instanceof Spider spider && spider.getLightLevelDependentMagicValue() >= SPIDER_BRIGHT;
-        boolean gold = mob instanceof Piglin && PiglinAi.isWearingSafeArmor(mod.getPlayer());
+        boolean gold = mob instanceof Piglin && PiglinAi.isWearingGold(mod.getPlayer());
         return NeutralMobs.neutralNow(type, bright, gold);
     }
 
@@ -151,9 +151,9 @@ public class EntityHelper {
         // Enchantments & Potions
         if (!source.is(DamageTypeTags.BYPASSES_SHIELD)) {
             float k;
-            if (player.hasEffect(MobEffects.RESISTANCE) && source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
+            if (player.hasEffect(MobEffects.DAMAGE_RESISTANCE) && source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
                 //noinspection ConstantConditions
-                k = (player.getEffect(MobEffects.RESISTANCE).getAmplifier() + 1) * 5;
+                k = (player.getEffect(MobEffects.DAMAGE_RESISTANCE).getAmplifier() + 1) * 5;
                 float j = 25 - k;
                 double f = damageAmount * (double) j;
                 double g = damageAmount;

@@ -8,11 +8,11 @@ import baritone.utils.update.Snapshot;
 import baritone.utils.update.Updater;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.KeyEvent;
+import baritone.compat.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 
 import java.net.URI;
@@ -35,7 +35,7 @@ public final class WhatsNewScreen extends Screen {
         super(Component.literal("What's new in Soprano"));
         this.parent = parent;
         this.snapshot = snapshot;
-        this.guiScale = Math.max(1, mc.getWindow().getGuiScale());
+        this.guiScale = Math.max(1, (int) mc.getWindow().getGuiScale());
         try {
             surface = new KitSurface(KitSurface.scaleFor(guiScale));
             panel = new WhatsNewPanel(surface.theme, snapshot, new WhatsNewPanel.Actions() {
@@ -65,7 +65,7 @@ public final class WhatsNewScreen extends Screen {
 
     @Override
     public void onClose() {
-        mc.gui.setScreen(parent);
+        mc.setScreen(parent);
     }
 
     // the kit would not come up: nothing to read here, so back to the title screen. from the tick and not from the
@@ -82,7 +82,6 @@ public final class WhatsNewScreen extends Screen {
         McAtlases.releaseAll();
     }
 
-    @Override
     public void resize(int w, int h) {
         this.width = w;
         this.height = h;
@@ -91,7 +90,7 @@ public final class WhatsNewScreen extends Screen {
     // ----- drawing
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+    public void render(GuiGraphics g, int mouseX, int mouseY, float partial) {
         if (!ok) {
             return;
         }
@@ -102,8 +101,8 @@ public final class WhatsNewScreen extends Screen {
         float dt = lastNanos == 0 ? 0f : Math.min(0.1f, (now - lastNanos) / 1_000_000_000f);
         lastNanos = now;
         float inv = 1f / guiScale;
-        g.pose().pushMatrix();
-        g.pose().scale(inv, inv);
+        g.pose().pushPose();
+        g.pose().scale(inv, inv, 1f);
         boolean began = false;
         try {
             surface.begin(g, winW, winH);
@@ -127,14 +126,13 @@ public final class WhatsNewScreen extends Screen {
             } catch (Throwable t) {
                 Safe.report("whats new render end", t);
             }
-            g.pose().popMatrix();
+            g.pose().popPose();
         }
         surface.afterFrame();
     }
 
     // ----- input, in framebuffer pixels like the gui. always consumed, there are no vanilla widgets on this screen
 
-    @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (ok) {
             Safe.run("whats new mouse down", () -> panel.mouseDown(KitSurface.pointerX(), KitSurface.pointerY(),
@@ -143,7 +141,6 @@ public final class WhatsNewScreen extends Screen {
         return true;
     }
 
-    @Override
     public boolean mouseReleased(MouseButtonEvent event) {
         if (ok) {
             Safe.run("whats new mouse up", () -> panel.mouseUp(KitSurface.pointerX(), KitSurface.pointerY(),
@@ -152,7 +149,6 @@ public final class WhatsNewScreen extends Screen {
         return true;
     }
 
-    @Override
     public boolean mouseDragged(MouseButtonEvent event, double dx, double dy) {
         if (ok) {
             double s = guiScale;
@@ -170,7 +166,6 @@ public final class WhatsNewScreen extends Screen {
         return true;
     }
 
-    @Override
     public boolean keyPressed(KeyEvent event) {
         if (!ok) {
             return true;
@@ -185,4 +180,20 @@ public final class WhatsNewScreen extends Screen {
         });
         return true;
     }
+
+    // adapt the GLFW callbacks while retaining the shared GUI event handlers
+    @Override
+    public boolean keyPressed(int key, int scan, int mods) { return keyPressed(new KeyEvent(key, scan, mods)); }
+
+    @Override
+    public boolean mouseClicked(double x, double y, int button) { return mouseClicked(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers()), false); }
+
+    @Override
+    public boolean mouseReleased(double x, double y, int button) { return mouseReleased(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers())); }
+
+    @Override
+    public boolean mouseDragged(double x, double y, int button, double dx, double dy) { return mouseDragged(new MouseButtonEvent(x, y, button, baritone.compat.input.InputWithModifiers.currentModifiers()), dx, dy); }
+
+    @Override
+    public void resize(net.minecraft.client.Minecraft mc, int w, int h) { resize(w, h); }
 }

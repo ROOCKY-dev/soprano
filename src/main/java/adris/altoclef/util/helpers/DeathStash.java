@@ -76,7 +76,7 @@ public final class DeathStash {
         // climbed out of
         boolean lava = player.isInLava() || lavaRecent(lastLavaHit, level.getGameTime()) || (source != null && source.is(DamageTypes.LAVA))
                 || (level.isLoaded(at) && level.getFluidState(at).is(FluidTags.LAVA));
-        boolean out = at.getY() < level.getMinY() || (source != null && source.is(DamageTypes.FELL_OUT_OF_WORLD));
+        boolean out = at.getY() < level.getMinBuildHeight() || (source != null && source.is(DamageTypes.FELL_OUT_OF_WORLD));
         return new Death(WorldHelper.dimensionOf(level), at.getX(), at.getY(), at.getZ(), level.getGameTime(), lava, out,
                 describe(lava, out, source));
     }

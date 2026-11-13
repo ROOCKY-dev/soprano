@@ -17,6 +17,10 @@
 
 package baritone.api.utils;
 
+import javax.annotation.Nullable;
+import net.minecraft.world.RandomSequences;
+import net.minecraft.server.level.progress.ChunkProgressListener;
+
 import baritone.api.utils.accessor.IItemStack;
 import baritone.api.utils.accessor.ILootTable;
 import com.google.common.collect.ImmutableMap;
@@ -248,8 +252,8 @@ public final class BlockOptionalMeta {
 
     private static synchronized List<Item> drops(Block b) {
         return drops.computeIfAbsent(b, block -> {
-            Optional<ResourceKey<LootTable>> optionalLootTableKey = block.getLootTable();
-            if (optionalLootTableKey.isEmpty()) {
+            ResourceKey<LootTable> lootTableKey = block.getLootTable();
+            if (lootTableKey.equals(net.minecraft.world.level.storage.loot.BuiltInLootTables.EMPTY)) {
                 return Collections.emptyList();
             } else {
                 List<Item> items = new ArrayList<>();
@@ -270,13 +274,13 @@ public final class BlockOptionalMeta {
     }
 
     private static List<ItemStack> getDrops(Block state, LootParams.Builder params) {
-        Optional<ResourceKey<LootTable>> lv = state.getLootTable();
-        if (lv.isEmpty()) {
+        ResourceKey<LootTable> lv = state.getLootTable();
+        if (lv.equals(net.minecraft.world.level.storage.loot.BuiltInLootTables.EMPTY)) {
             return Collections.emptyList();
         } else {
             LootParams lv2 = params.withParameter(LootContextParams.BLOCK_STATE, state.defaultBlockState()).create(LootContextParamSets.BLOCK);
             ServerLevelStub lv3 = (ServerLevelStub) lv2.getLevel();
-            LootTable lv4 = lv3.holder().getLootTable(lv.get());
+            LootTable lv4 = lv3.holder().getLootTable(lv);
             return((ILootTable) lv4).invokeGetRandomItems(new LootContext.Builder(lv2).withOptionalRandomSeed(1).create(null));
         }
     }
@@ -286,8 +290,8 @@ public final class BlockOptionalMeta {
         private static Unsafe unsafe = getUnsafe();
         private static CompletableFuture<RegistryAccess> registryAccess = load();
 
-        public ServerLevelStub(MinecraftServer $$0, Executor $$1, LevelStorageSource.LevelStorageAccess $$2, ServerLevelData $$3, ResourceKey<Level> $$4, LevelStem $$5, boolean $$6, long $$7, List<CustomSpawner> $$8, boolean $$9) {
-            super($$0, $$1, $$2, $$3, $$4, $$5, $$6, $$7, $$8, $$9);
+        public ServerLevelStub(MinecraftServer $$0, Executor $$1, LevelStorageSource.LevelStorageAccess $$2, ServerLevelData $$3, ResourceKey<Level> $$4, LevelStem $$5, ChunkProgressListener $$6, boolean $$7, long $$8, List<CustomSpawner> $$9, boolean $$10, @Nullable RandomSequences $$11) {
+            super($$0, $$1, $$2, $$3, $$4, $$5, $$6, $$7, $$8, $$9, $$10, $$11);
         }
 
         @Override
@@ -331,31 +335,22 @@ public final class BlockOptionalMeta {
             // Simplified from {@link net.minecraft.server.WorldLoader#load()}
             CloseableResourceManager closeableResourceManager = new MultiPackResourceManager(
                 PackType.SERVER_DATA,
-                List.of(ServerPacksSource.createVanillaPackSource().fullResources())
+                List.of(ServerPacksSource.createVanillaPackSource())
             );
             LayeredRegistryAccess<RegistryLayer> baseLayeredRegistry = RegistryLayer.createRegistryAccess();
-            List<Registry.PendingTags<?>> pendingTags = TagLoader.loadTagsForExistingRegistries(
-                closeableResourceManager, baseLayeredRegistry.getLayer(RegistryLayer.STATIC)
-            );
-            List<HolderLookup.RegistryLookup<?>> worldGenRegistryLookupList = TagLoader.buildUpdatedLookups(
-                baseLayeredRegistry.getAccessForLoading(RegistryLayer.WORLD),
-                pendingTags
-            );
             LayeredRegistryAccess<RegistryLayer> layeredRegistryAccess = baseLayeredRegistry.replaceFrom(
-                RegistryLayer.WORLD,
+                RegistryLayer.WORLDGEN,
                 RegistryDataLoader.load(
                     closeableResourceManager,
-                    worldGenRegistryLookupList,
-                    RegistryDataLoader.WORLD_REGISTRIES,
-                    ForkJoinPool.commonPool()
-                ).join()
+                    baseLayeredRegistry.getAccessForLoading(RegistryLayer.WORLDGEN),
+                    RegistryDataLoader.WORLDGEN_REGISTRIES
+                )
             );
             return ReloadableServerRegistries.reload(
                 layeredRegistryAccess,
-                pendingTags,
                 closeableResourceManager,
                 ForkJoinPool.commonPool()
-            ).thenApply(r -> r.layers().compositeAccess());
+            ).thenApply(LayeredRegistryAccess::compositeAccess);
         }
     }
 }

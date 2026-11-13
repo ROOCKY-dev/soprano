@@ -18,7 +18,7 @@ public class SchematicGettableTest {
         ItemFixture.boot();
     }
 
-    private static final String[] WOODS = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry", "pale_oak"};
+    private static final String[] WOODS = {"oak", "spruce", "birch", "jungle", "acacia", "dark_oak", "mangrove", "cherry"};
     // colours whose dye has a source (flowers, bone meal, lapis, cactus, mixes). gray, brown and black have none
     private static final String[] DYED = {"white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "light_gray",
         "cyan", "purple", "blue", "green", "red"};

@@ -23,7 +23,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -411,7 +410,7 @@ public class ShelterTask extends Task {
             confirmed++;
             if (confirmed >= CONFIRM_TICKS) {
                 sealedAt = now;
-                waitCap = NightShelter.waitCap(mod.getWorld().getOverworldClockTime());
+                waitCap = NightShelter.waitCap(mod.getWorld().getDayTime());
                 lastHealth = player.getHealth();
                 lifted = false;
                 enter(Stage.WAIT, now);
@@ -478,7 +477,7 @@ public class ShelterTask extends Task {
         }
         InteractionResult result = Minecraft.getInstance().gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhit);
         if (result.consumesAction()) {
-            player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            player.swing(InteractionHand.MAIN_HAND);
         }
         return true;
     }
@@ -498,7 +497,7 @@ public class ShelterTask extends Task {
         }
         mod.getInputControls().releaseOwnedBy(keys);
         // the sky came back before the day count rolled over (the thunder that opened the window cleared, or dawn)
-        if (level.isBrightOutside()) {
+        if (level.isDay()) {
             enter(Stage.EXIT, now);
             return null;
         }
@@ -506,7 +505,7 @@ public class ShelterTask extends Task {
             lifted = true;
         }
         lastHealth = player.getHealth();
-        if (NightShelter.waitOver(night, mod.getWorld().getOverworldClockTime(), now - sealedAt, waitCap)) {
+        if (NightShelter.waitOver(night, mod.getWorld().getDayTime(), now - sealedAt, waitCap)) {
             enter(Stage.EXIT, now);
         }
         return null;

@@ -4,7 +4,7 @@ import adris.altoclef.ui.gui.kit.Safe;
 import adris.altoclef.ui.gui.mc.GuiHotkey;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.KeyEvent;
+import baritone.compat.input.KeyEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,11 +19,11 @@ public class MixinKeyboardHandler {
             at = @At("HEAD"),
             cancellable = true
     )
-    private void soprano$openGui(final long window, final int action, final KeyEvent event, final CallbackInfo ci) {
+    private void soprano$openGui(final long window, final int key, final int scan, final int action, final int mods, final CallbackInfo ci) {
         try {
             // the event is sdl's: event.key() is a scancode and action is PRESS 1 / RELEASE 0 / REPEAT -1. GuiHotkey does
             // the translation to the glfw numbers the setting holds
-            if (window == Minecraft.getInstance().getWindow().handle() && GuiHotkey.onKey(event, action)) {
+            if (window == Minecraft.getInstance().getWindow().getWindow() && GuiHotkey.onKey(new KeyEvent(key, scan, mods), action)) {
                 ci.cancel();
             }
         } catch (Throwable t) {

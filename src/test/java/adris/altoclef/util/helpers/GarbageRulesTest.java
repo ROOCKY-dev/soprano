@@ -8,7 +8,6 @@ import adris.altoclef.util.helpers.GarbageRules.Cand;
 import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.server.Bootstrap;
-import net.minecraft.world.entity.EntityEquipment;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.CraftingMenu;
@@ -270,7 +269,7 @@ public class GarbageRulesTest {
     // ---- which slots the garbage may look at
 
     private static Inventory inventory() {
-        return new Inventory(null, new EntityEquipment());
+        return new Inventory(null);
     }
 
     @Test

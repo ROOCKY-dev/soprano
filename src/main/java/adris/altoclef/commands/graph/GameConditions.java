@@ -15,7 +15,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -76,7 +76,7 @@ public final class GameConditions implements Conditions.World {
     }
 
     private static <T> T lookup(Registry<T> registry, String name, String what) {
-        Identifier id = Identifier.tryParse(name);
+        ResourceLocation id = ResourceLocation.tryParse(name);
         T found = id == null ? null : registry.getOptional(id).orElse(null);
         if (found == null) {
             throw new Conditions.Unreadable("\"" + name + "\" is not " + what);
@@ -112,7 +112,7 @@ public final class GameConditions implements Conditions.World {
             throw new Conditions.Unreadable("there's no day or night outside the overworld");
         }
         // the clock and not isBrightOutside, a thunderstorm at noon is not night
-        return Conditions.isDayTime(level().getOverworldClockTime());
+        return Conditions.isDayTime(level().getDayTime());
     }
 
     @Override
@@ -124,7 +124,7 @@ public final class GameConditions implements Conditions.World {
     @Override
     public int freeSlots() {
         int free = 0;
-        for (ItemStack stack : player().getInventory().getNonEquipmentItems()) {
+        for (ItemStack stack : player().getInventory().items) {
             free += stack.isEmpty() ? 1 : 0;
         }
         return free;
@@ -183,7 +183,7 @@ public final class GameConditions implements Conditions.World {
         for (int i = 0; i < sections.length; i++) {
             LevelChunkSection section = sections[i];
             // sections[i] starts at minY + i * 16, same trap as SimpleChunkTracker's note
-            int bottom = chunk.getMinY() + i * 16;
+            int bottom = chunk.getMinBuildHeight() + i * 16;
             if (section == null || bottom + 15 < at.getY() - radius || bottom > at.getY() + radius || !section.maybeHas(match)) {
                 continue;
             }

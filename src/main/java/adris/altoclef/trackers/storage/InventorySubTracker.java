@@ -116,7 +116,7 @@ public class InventorySubTracker extends Tracker {
         if (includeCursor) {
             result.add(StorageHelper.getItemStackInCursorSlot());
         }
-        result.addAll(inv.getNonEquipmentItems());
+        result.addAll(inv.items);
         // feet first, same order the armor list used to have
         result.add(player.getItemBySlot(EquipmentSlot.FEET));
         result.add(player.getItemBySlot(EquipmentSlot.LEGS));

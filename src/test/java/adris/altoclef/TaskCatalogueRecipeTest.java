@@ -64,7 +64,9 @@ import static org.junit.Assert.*;
 public class TaskCatalogueRecipeTest {
 
     // name -> why the catalogue is allowed to disagree with vanilla. keep it empty if you can
-    private static final Map<String, String> ALLOWED = new HashMap<>();
+    private static final Map<String, String> ALLOWED = Map.of(
+        "suspicious_stew", "1.21.1 uses crafting_special_suspiciousstew, with no JSON ingredient grid"
+    );
 
     // there are ~290 today. this only exists so the test cannot quietly check nothing
     private static final int MIN_CHECKED = 200;

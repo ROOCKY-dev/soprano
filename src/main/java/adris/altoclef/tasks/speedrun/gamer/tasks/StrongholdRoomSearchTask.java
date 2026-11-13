@@ -817,8 +817,8 @@ public class StrongholdRoomSearchTask extends Task {
         double pz = mod.getPlayer().getZ();
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
-                int cx = here.x() + dx;
-                int cz = here.z() + dz;
+                int cx = here.x + dx;
+                int cz = here.z + dz;
                 if (RoomCoverage.covers(px, py, pz, cx, cz, workY) && state.roomChunksVisited.add(cx + "," + cz)) {
                     chunksReached++;
                     maybeSave(mod);
@@ -851,14 +851,14 @@ public class StrongholdRoomSearchTask extends Task {
             step = "Following the stronghold corridors";
         } else {
             next = StrongholdRoomPlan.next(startChunk, cfg.spiralRadiusChunks, doneOrSkipped(),
-                    new StrongholdRoomPlan.Chunk(here.x(), here.z()));
+                    new StrongholdRoomPlan.Chunk(here.x, here.z));
         }
         if (next.isEmpty() && !skippedChunks.isEmpty() && !retriedSkipped) {
             // skipped is not searched: every chunk we gave up on gets one more go before the spiral calls itself empty
             retriedSkipped = true;
             skippedChunks.clear();
             next = StrongholdRoomPlan.next(startChunk, cfg.spiralRadiusChunks, doneOrSkipped(),
-                    new StrongholdRoomPlan.Chunk(here.x(), here.z()));
+                    new StrongholdRoomPlan.Chunk(here.x, here.z));
         }
         if (next.isEmpty()) {
             Debug.logInternal("stronghold spiral exhausted after " + ctx.state().roomChunksVisited.size() + " chunks");

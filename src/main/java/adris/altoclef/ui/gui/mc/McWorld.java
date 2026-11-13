@@ -16,7 +16,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -92,7 +92,7 @@ public final class McWorld implements WorldAccess {
     public String dimension() {
         try {
             ClientLevel level = mc().level;
-            return level == null ? "overworld" : level.dimension().identifier().getPath();
+            return level == null ? "overworld" : level.dimension().location().getPath();
         } catch (Throwable t) {
             Safe.report("gui dimension", t);
             return "overworld";
@@ -114,7 +114,7 @@ public final class McWorld implements WorldAccess {
             for (AbstractClientPlayer p : level.players()) {
                 seen.add(p.getUUID());
                 boolean self = p.getUUID().equals(me.getUUID());
-                loaded.add(new PlayerEntry(p.getGameProfile().name(), self ? 0 : p.distanceTo(me), self));
+                loaded.add(new PlayerEntry(p.getGameProfile().getName(), self ? 0 : p.distanceTo(me), self));
             }
             loaded.sort(Comparator.comparingDouble(PlayerEntry::distance));
             out.addAll(loaded);
@@ -122,8 +122,8 @@ public final class McWorld implements WorldAccess {
             if (mc.getConnection() != null) {
                 List<PlayerEntry> far = new ArrayList<>();
                 for (PlayerInfo info : mc.getConnection().getOnlinePlayers()) {
-                    if (seen.add(info.getProfile().id())) {
-                        far.add(new PlayerEntry(info.getProfile().name(), -1, false));
+                    if (seen.add(info.getProfile().getId())) {
+                        far.add(new PlayerEntry(info.getProfile().getName(), -1, false));
                     }
                 }
                 far.sort(Comparator.comparing(e -> e.name().toLowerCase(Locale.ROOT)));
@@ -153,7 +153,7 @@ public final class McWorld implements WorldAccess {
                     continue;
                 }
                 EntityType<?> type = e.getType();
-                Identifier key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
+                ResourceLocation key = BuiltInRegistries.ENTITY_TYPE.getKey(type);
                 String custom = e.hasCustomName() ? e.getCustomName().getString() : "";
                 out.add(new EntityEntry(e.getId(), key.toString(), type.getDescription().getString(), custom,
                         e.distanceTo(me), IconResolver.forEntityType(type)));
@@ -176,11 +176,11 @@ public final class McWorld implements WorldAccess {
         try {
             Minecraft mc = mc();
             if (mc.level != null && mc.player != null) {
-                if (name.equalsIgnoreCase(mc.player.getGameProfile().name())) {
+                if (name.equalsIgnoreCase(mc.player.getGameProfile().getName())) {
                     return Result.fail("That is you. Pick someone else.");
                 }
                 // follow swaps in an empty filter before it finds out nobody is there, so a far name must not get that far
-                boolean near = mc.level.players().stream().anyMatch(p -> p.getGameProfile().name().equalsIgnoreCase(name));
+                boolean near = mc.level.players().stream().anyMatch(p -> p.getGameProfile().getName().equalsIgnoreCase(name));
                 if (!near) {
                     return Result.fail(name + " is too far away to follow.");
                 }
@@ -214,7 +214,7 @@ public final class McWorld implements WorldAccess {
     @Override
     public Result followType(String typeId) {
         try {
-            Identifier rl = typeId == null ? null : Identifier.tryParse(typeId);
+            ResourceLocation rl = typeId == null ? null : ResourceLocation.tryParse(typeId);
             EntityType<?> type = rl == null ? null : BuiltInRegistries.ENTITY_TYPE.getOptional(rl).orElse(null);
             if (type == null) {
                 return Result.fail("No mob called " + typeId + ".");

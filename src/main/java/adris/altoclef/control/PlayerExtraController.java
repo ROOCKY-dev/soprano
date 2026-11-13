@@ -37,9 +37,9 @@ import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.piglin.Piglin;
-import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -528,8 +528,8 @@ public class PlayerExtraController {
     private boolean emptyHandReset() {
         Inventory inventory = _mod.getPlayer().getInventory();
         for (int slot = 0; slot < 9; slot++) {
-            if (slot != inventory.getSelectedSlot() && inventory.getItem(slot).isEmpty()) {
-                inventory.setSelectedSlot(slot);
+            if (slot != inventory.selected && inventory.getItem(slot).isEmpty()) {
+                inventory.selected = slot;
                 _resetAt = gameTime();
                 Debug.logInternal("swing: calm neutral near and a full charge, nothing to swap to, empty hand to throw the charge away");
                 return true;
@@ -603,7 +603,7 @@ public class PlayerExtraController {
                         + String.format(java.util.Locale.ROOT, "%.1f", player.getHealth()) + ", last swing " + (now - _swingAt) + " ticks ago");
                 continue;
             }
-            if (!(mob instanceof ZombifiedPiglin || mob instanceof Piglin || mob instanceof Enderman)) {
+            if (!(mob instanceof ZombifiedPiglin || mob instanceof Piglin || mob instanceof EnderMan)) {
                 continue;
             }
             boolean inBox = !target && _swingBox != null && SwordSwing.inSweepBox(_swingBox, mob.getBoundingBox(), player.distanceToSqr(mob));

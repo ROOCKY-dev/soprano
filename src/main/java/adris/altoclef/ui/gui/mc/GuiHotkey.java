@@ -6,7 +6,7 @@ import baritone.Baritone;
 import baritone.api.Settings;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.input.KeyEvent;
+import baritone.compat.input.KeyEvent;
 
 // the front door: the keyboard mixin asks onKey for every press, #gui calls open
 public final class GuiHotkey {
@@ -28,8 +28,8 @@ public final class GuiHotkey {
             // it knows about, so typing it in the search field would flip the narrator. hand it to the screen ourselves
             // same test vanilla runs: the layout's b (shortcutKey is the keycode, not the physical key) and the platform's
             // shortcut modifier, so it also holds on azerty and with cmd on a mac
-            if (event.shortcutKey() == InputConstants.KEYCODE_B && (action == InputConstants.PRESS || action == InputConstants.REPEAT)
-                    && event.hasControlDownWithQuirk() && mc.gui.screen() instanceof GuiScreen gui) {
+            if (event.shortcutKey() == InputConstants.KEY_B && (action == InputConstants.PRESS || action == InputConstants.REPEAT)
+                    && event.hasControlDownWithQuirk() && mc.screen instanceof GuiScreen gui) {
                 gui.keyPressed(event);
                 return true;
             }
@@ -40,7 +40,7 @@ public final class GuiHotkey {
             Settings s = Baritone.settings();
             KeyBind bind = new KeyBind(s.guiKey.value);
             bind.enabled = s.guiKeyEnabled.value;
-            if (!bind.opens(key, mc.gui.screen() != null) || !canOpen(mc)) {
+            if (!bind.opens(key, mc.screen != null) || !canOpen(mc)) {
                 return false;
             }
             show(mc);
@@ -56,16 +56,16 @@ public final class GuiHotkey {
     // open on the next tick, when chat is gone
     public static String open() {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.gui.screen() instanceof GuiScreen) {
+        if (mc.screen instanceof GuiScreen) {
             return null;
         }
         if (mc.player == null || mc.level == null) {
             return "Join a world first, the gui needs one behind it.";
         }
-        if (mc.gui.overlay() != null) {
+        if (mc.getOverlay() != null) {
             return "The game is still loading. Try again in a second.";
         }
-        mc.schedule(() -> {
+        mc.tell(() -> {
             try {
                 if (canOpen(mc)) {
                     show(mc);
@@ -78,13 +78,13 @@ public final class GuiHotkey {
     }
 
     private static boolean canOpen(Minecraft mc) {
-        return mc.gui.screen() == null && mc.player != null && mc.level != null && mc.gui.overlay() == null;
+        return mc.screen == null && mc.player != null && mc.level != null && mc.getOverlay() == null;
     }
 
     private static void show(Minecraft mc) {
-        if (mc.gui.screen() instanceof GuiScreen) {
+        if (mc.screen instanceof GuiScreen) {
             return;
         }
-        mc.gui.setScreen(new GuiScreen());
+        mc.setScreen(new GuiScreen());
     }
 }

@@ -149,7 +149,7 @@ public final class InputOverrideHandler extends Behavior implements IInputOverri
             settle.tick(null, null, null, false, false, true);
             return;
         }
-        boolean shiftLastTick = player.input instanceof PlayerMovementInput p && p.keyPresses.shift();
+        boolean shiftLastTick = player.input instanceof PlayerMovementInput p && p.shiftKeyDown;
         boolean moveKey = false;
         for (Input input : new Input[]{Input.MOVE_FORWARD, Input.MOVE_BACK, Input.MOVE_LEFT, Input.MOVE_RIGHT, Input.JUMP}) {
             moveKey |= isInputForcedDown(input);

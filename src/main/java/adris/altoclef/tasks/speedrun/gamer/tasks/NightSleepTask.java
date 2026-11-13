@@ -35,7 +35,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.BedBlock;
@@ -324,12 +324,12 @@ public class NightSleepTask extends Task {
     }
 
     private static boolean inBed(LocalPlayer player) {
-        return player.isSleeping() || Minecraft.getInstance().gui.screen() instanceof InBedChatScreen;
+        return player.isSleeping() || Minecraft.getInstance().screen instanceof InBedChatScreen;
     }
 
     private void begin(AltoClef mod, long now) {
         stageSince = now;
-        nightAtStart = NightSleep.nightOf(mod.getWorld().getOverworldClockTime());
+        nightAtStart = NightSleep.nightOf(mod.getWorld().getDayTime());
         // (a container screen that sat open past the patience of the busy gate is stuck, and a bed click or a block break behind it
         // goes nowhere)
         StorageHelper.closeScreen();
@@ -882,7 +882,7 @@ public class NightSleepTask extends Task {
         ClientLevel world = mod.getWorld();
         if (inBed(player)) {
             if (!wasAsleep) {
-                asleepDayTime = world.getOverworldClockTime();
+                asleepDayTime = world.getDayTime();
             }
             wasAsleep = true;
             asleepTicks++;
@@ -903,7 +903,7 @@ public class NightSleepTask extends Task {
             if (upSince < 0) {
                 upSince = now;
             }
-            NightSleep.Wake wake = NightSleep.wake(asleepTicks, world.isBrightOutside(), asleepDayTime, world.getOverworldClockTime(), now - upSince,
+            NightSleep.Wake wake = NightSleep.wake(asleepTicks, world.isDay(), asleepDayTime, world.getDayTime(), now - upSince,
                     cfg.get().nightWakeGraceTicks);
             if (wake == NightSleep.Wake.WAIT) {
                 // (still reads night, the time packet may be on its way)
@@ -930,7 +930,7 @@ public class NightSleepTask extends Task {
         Refusal refusal = NightSleep.refusal(overlay);
         if (refusal != Refusal.NONE) {
             overlay = null;
-            if (NightSleep.nightIsOver(refusal, world.isBrightOutside(), nightAtStart, NightSleep.nightOf(world.getOverworldClockTime()))) {
+            if (NightSleep.nightIsOver(refusal, world.isDay(), nightAtStart, NightSleep.nightOf(world.getDayTime()))) {
                 nightOver(mod, now);
                 return null;
             }
@@ -1216,7 +1216,7 @@ public class NightSleepTask extends Task {
         boolean bed = bedsInBag(mod) > 0
                 || (source == BedSource.FOUND && found != null && mod.getWorld().getBlockState(found).getBlock() instanceof BedBlock);
         OverworldConfig c = cfg.get();
-        return canRetry(bed, !mod.getWorld().isBrightOutside(), budget.spent(c.nightAttempts, c.nightSeconds));
+        return canRetry(bed, !mod.getWorld().isDay(), budget.spent(c.nightAttempts, c.nightSeconds));
     }
 
     public static boolean canRetry(boolean haveBed, boolean night, boolean spent) {

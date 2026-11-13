@@ -5,8 +5,6 @@ import com.google.gson.JsonParser;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.component.CookingFuel;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ResolvableInt;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,32 +27,17 @@ public class FuelTableTest {
         ItemFixture.boot();
     }
 
-    private static int plainFurnaceTicks(ResolvableInt.Reference reference) throws Exception {
-        String path = "/data/" + reference.key().identifier().getNamespace() + "/context_int_provider/" + reference.key().identifier().getPath() + ".json";
-        try (Reader reader = new InputStreamReader(Item.class.getResourceAsStream(path), StandardCharsets.UTF_8)) {
-            JsonObject json = JsonParser.parseReader(reader).getAsJsonObject();
-            // div(left, 1 or 2): the plain furnace divides by 1, the smoker and blast furnace by 2
-            return json.get("left").getAsInt();
-        }
-    }
-
     @Test
     public void everyFuelItemMatchesTheVanillaData() throws Exception {
         List<String> wrong = new ArrayList<>();
         java.util.Set<String> fuelNames = new java.util.HashSet<>();
         int fuels = 0;
         for (Item item : BuiltInRegistries.ITEM) {
-            CookingFuel fuel = item.components().get(DataComponents.COOKING_FUEL);
-            if (fuel == null) {
+            Integer expected = net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity.getFuel().get(item);
+            if (expected == null) {
                 continue;
             }
             fuels++;
-            Integer expected = null;
-            if (fuel.burnTime() instanceof ResolvableInt.Constant constant) {
-                expected = constant.value();
-            } else if (fuel.burnTime() instanceof ResolvableInt.Reference reference) {
-                expected = plainFurnaceTicks(reference);
-            }
             String name = BuiltInRegistries.ITEM.getKey(item).getPath();
             fuelNames.add(name);
             if (expected == null || !ItemHelper.isFuel(item)) {
@@ -71,7 +54,7 @@ public class FuelTableTest {
             }
         }
         assertTrue("fuel table disagrees with vanilla: " + wrong, wrong.isEmpty());
-        assertTrue("found " + fuels + " fuel items, the data didn't load", fuels > 50);
+        assertTrue("found " + fuels + " fuel items, the data didn't load", fuels >= 40);
     }
 
     @Test

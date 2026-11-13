@@ -20,12 +20,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -132,8 +131,8 @@ public class NookHuntTask extends Task {
         }
         // (every branch below that wants a key holds it again this tick, a child task must not inherit a stuck sneak)
         mod.getInputControls().releaseOwnedBy(keys);
-        List<Enderman> men = mod.getEntityTracker().getTrackedEntities(Enderman.class);
-        Enderman angry = nearestAngry(men, player, now);
+        List<EnderMan> men = mod.getEntityTracker().getTrackedEntities(EnderMan.class);
+        EnderMan angry = nearestAngry(men, player, now);
         if (!built(level)) {
             if (now - startedAt > BUILD_TICKS) {
                 failed = true;
@@ -169,7 +168,7 @@ public class NookHuntTask extends Task {
             setDebugState("Stepping out for the pearl.");
             return pearl;
         }
-        Enderman bait = baitFor(men, player, now);
+        EnderMan bait = baitFor(men, player, now);
         boolean lava = lavaWithin(level, player.blockPosition(), EndermanNook.AGGRO_LAVA_GAP);
         if (bait != null && EndermanNook.mayAggro(player.isOnFire(), player.getHealth(), lava ? 1 : 99, countAngry(men), bait.distanceTo(player))) {
             idleSince = now;
@@ -283,7 +282,7 @@ public class NookHuntTask extends Task {
         }
         InteractionResult result = Minecraft.getInstance().gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhit);
         if (result.consumesAction()) {
-            player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            player.swing(InteractionHand.MAIN_HAND);
         }
     }
 
@@ -487,7 +486,7 @@ public class NookHuntTask extends Task {
         return null;
     }
 
-    private Task fight(AltoClef mod, LocalPlayer player, Enderman angry) {
+    private Task fight(AltoClef mod, LocalPlayer player, EnderMan angry) {
         // (a hair of slack: the creep stops a hair past the line and a knock can take it back)
         if (!EndermanNook.standDeepEnough(inFromMouth(player) + 0.05)) {
             // the gaze comes off its face on the very tick it turns angry (the walk back picks its own look once its path
@@ -511,7 +510,7 @@ public class NookHuntTask extends Task {
 
     // ---- the bait
 
-    private Task stare(AltoClef mod, LocalPlayer player, Enderman bait) {
+    private Task stare(AltoClef mod, LocalPlayer player, EnderMan bait) {
         if (!atMouth(player)) {
             mod.getInputControls().releaseOwnedBy(keys);
             setDebugState("To the mouth to get an enderman's attention.");
@@ -533,9 +532,9 @@ public class NookHuntTask extends Task {
         return null;
     }
 
-    private Enderman baitFor(List<Enderman> men, LocalPlayer player, long now) {
-        Enderman best = null;
-        for (Enderman man : men) {
+    private EnderMan baitFor(List<EnderMan> men, LocalPlayer player, long now) {
+        EnderMan best = null;
+        for (EnderMan man : men) {
             if (!man.isAlive() || man.isCreepy() || skipped.getOrDefault(man.getId(), 0L) > now) {
                 continue;
             }
@@ -550,9 +549,9 @@ public class NookHuntTask extends Task {
         return best;
     }
 
-    private int countAngry(List<Enderman> men) {
+    private int countAngry(List<EnderMan> men) {
         int n = 0;
-        for (Enderman man : men) {
+        for (EnderMan man : men) {
             if (man.isAlive() && man.isCreepy() && !fightClock.givenUp(man.getId())) {
                 n++;
             }
@@ -560,10 +559,10 @@ public class NookHuntTask extends Task {
         return n;
     }
 
-    private Enderman nearestAngry(List<Enderman> men, LocalPlayer player, long now) {
+    private EnderMan nearestAngry(List<EnderMan> men, LocalPlayer player, long now) {
         double[] d = new double[men.size()];
         for (int i = 0; i < d.length; i++) {
-            Enderman man = men.get(i);
+            EnderMan man = men.get(i);
             boolean skip = fightClock.givenUp(man.getId());
             d[i] = man.isAlive() && man.isCreepy() && !skip ? man.distanceTo(player) : Double.NaN;
         }

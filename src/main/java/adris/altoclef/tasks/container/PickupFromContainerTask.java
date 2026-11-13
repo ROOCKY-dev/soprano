@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.FurnaceMenu;
 import net.minecraft.world.inventory.SmokerMenu;
 import net.minecraft.world.item.ItemStack;
@@ -140,18 +140,18 @@ public class PickupFromContainerTask extends AbstractDoToStorageContainerTask {
                 if (!cursorStack.isEmpty()) {
                     Optional<Slot> fit = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorStack, false);
                     if (fit.isPresent() && target.matches(cursorStack.getItem())) {
-                        mod.getSlotHandler().clickSlot(fit.get(), 0, ContainerInput.PICKUP);
+                        mod.getSlotHandler().clickSlot(fit.get(), 0, ClickType.PICKUP);
                         return null;
                     }
                     // throw before the garbage click, same order as EnsureFreeCursorSlotTask. the other way round a cursor
                     // that is as much junk as the garbage pick (cobble on cobble) just trades places with it every tick
                     if (ItemHelper.canDropStack(mod, cursorStack)) {
-                        mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                        mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                         return null;
                     }
                     Optional<Slot> toPlace = fit.or(() -> StorageHelper.getGarbageSlot(mod));
                     if (toPlace.isPresent()) {
-                        mod.getSlotHandler().clickSlot(toPlace.get(), 0, ContainerInput.PICKUP);
+                        mod.getSlotHandler().clickSlot(toPlace.get(), 0, ClickType.PICKUP);
                         return null;
                     }
                     // a full bag and a held stack: grabbing from the chest now would just swap the cursor with it every tick
@@ -160,7 +160,7 @@ public class PickupFromContainerTask extends AbstractDoToStorageContainerTask {
                 }
                 if (bestPotential.isPresent()) {
                     // Just pick it up, it's now ours.
-                    mod.getSlotHandler().clickSlot(bestPotential.get(), 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(bestPotential.get(), 0, ClickType.PICKUP);
                     return null;
                 }
                 setDebugState("SHOULD NOT HAPPEN! No valid items detected.");
@@ -171,7 +171,7 @@ public class PickupFromContainerTask extends AbstractDoToStorageContainerTask {
         setDebugState("Done");
         if (mod.getPlayer().containerMenu instanceof SmokerMenu || mod.getPlayer().containerMenu
                 instanceof FurnaceMenu) {
-            mod.getSlotHandler().clickSlot(FurnaceSlot.INPUT_SLOT_MATERIALS, 0, ContainerInput.PICKUP);
+            mod.getSlotHandler().clickSlot(FurnaceSlot.INPUT_SLOT_MATERIALS, 0, ClickType.PICKUP);
             return null;
         }
         return null;

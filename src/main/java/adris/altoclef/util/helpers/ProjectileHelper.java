@@ -4,8 +4,8 @@ import adris.altoclef.Debug;
 import adris.altoclef.util.baritone.CachedProjectile;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.projectile.hurtingprojectile.AbstractHurtingProjectile;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
+import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
+import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.phys.Vec3;
 

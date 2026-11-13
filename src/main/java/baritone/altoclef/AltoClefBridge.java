@@ -40,7 +40,7 @@ import baritone.api.utils.SettingsUtil;
 import baritone.behavior.trip.TripGatherer;
 import baritone.event.GameEventHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.level.ChunkPos;
@@ -210,7 +210,7 @@ public final class AltoClefBridge implements AbstractGameEventListener {
     }
 
     // called from MixinAltoClefGui at the end of the hud extract, every frame
-    public static void renderHud(GuiGraphicsExtractor graphics) {
+    public static void renderHud(GuiGraphics graphics) {
         if (hudBroken || !isRunning()) {
             return;
         }
@@ -332,7 +332,7 @@ public final class AltoClefBridge implements AbstractGameEventListener {
     // then), or the first tick with a world for people who skip the title screen
     private void init() {
         Minecraft mc = Minecraft.getInstance();
-        if (!(mc.gui.screen() instanceof TitleScreen) && mc.level == null) {
+        if (!(mc.screen instanceof TitleScreen) && mc.level == null) {
             return;
         }
         initTried = true;

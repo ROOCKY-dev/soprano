@@ -335,7 +335,7 @@ public class RecoverItemsTask extends Task {
         Level level = mod.getWorld();
         // an unloaded chunk reads as air, so only judge it once we can see it
         boolean lava = level.isLoaded(_deathPos) && level.getFluidState(_deathPos).is(FluidTags.LAVA);
-        return RecoverRules.hopeless(lava, _deathPos.getY(), level.getMinY());
+        return RecoverRules.hopeless(lava, _deathPos.getY(), level.getMinBuildHeight());
     }
 
     // a wooden pick before going down for a deep pile, null when it is not the time. finishes the task when the trip ran out
@@ -392,7 +392,7 @@ public class RecoverItemsTask extends Task {
                 continue;
             }
             // a drop that slid into lava is a drop we are not going swimming for
-            boolean lost = RecoverRules.hopeless(level.getFluidState(e.blockPosition()).is(FluidTags.LAVA), e.blockPosition().getY(), level.getMinY());
+            boolean lost = RecoverRules.hopeless(level.getFluidState(e.blockPosition()).is(FluidTags.LAVA), e.blockPosition().getY(), level.getMinBuildHeight());
             // the bag question last, every drop in the world goes through this loop and most are not ours
             if (!lost && mod.getEntityTracker().isEntityReachable(e) && !full.skips(e.getItem())) {
                 bestDist = near;

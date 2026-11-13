@@ -43,7 +43,7 @@ import adris.altoclef.tasksystem.Task;
 import baritone.Baritone;
 import baritone.altoclef.SettingsOverrides;
 import baritone.api.Settings;
-import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.inventory.AbstractFurnaceMenu;
 import net.minecraft.world.item.Items;

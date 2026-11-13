@@ -51,8 +51,6 @@
     "MixinPalettedContainer$Data",
     "MixinPlayer",
     "MixinPlayerController",
-    "MixinRenderPipelines",
-    "MixinRenderType",
     "MixinScreen",
     "MixinScreenTripKeys",
     "MixinSopranoLanguage",

@@ -58,7 +58,7 @@ public final class PtShots {
             Minecraft mc = Minecraft.getInstance();
             // lands in <game dir>/screenshots/<file>, same spot as a real F2. the saved/failed message shows up on the io
             // thread, and the trace ring isn't something to poke from there
-            Screenshot.grab(mc.gameDirectory, file, mc.gameRenderer.mainRenderTarget(), 1,
+            Screenshot.grab(mc.gameDirectory, file, mc.getMainRenderTarget(),
                     msg -> mc.execute(() -> Debug.logInternal("pt shot " + file + ": " + msg.getString())));
         } catch (Throwable t) {
             Debug.logInternal("pt shot failed: " + t);

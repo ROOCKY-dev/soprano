@@ -28,9 +28,8 @@ import java.util.function.Predicate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -114,20 +113,20 @@ public class PlaceBlockNearbyTask extends Task {
         if (!cursorStack.isEmpty()) {
             Optional<Slot> moveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursorStack, false);
             if (moveTo.isPresent()) {
-                mod.getSlotHandler().clickSlot(moveTo.get(), 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(moveTo.get(), 0, ClickType.PICKUP);
                 return null;
             }
             if (ItemHelper.canDropStack(mod, cursorStack)) {
-                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
                 return null;
             }
             Optional<Slot> garbage = StorageHelper.getGarbageSlot(mod);
             // Try throwing away cursor slot if it's garbage
             if (garbage.isPresent()) {
-                mod.getSlotHandler().clickSlot(garbage.get(), 0, ContainerInput.PICKUP);
+                mod.getSlotHandler().clickSlot(garbage.get(), 0, ClickType.PICKUP);
                 return null;
             }
-            mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ContainerInput.PICKUP);
+            mod.getSlotHandler().clickSlot(Slot.UNDEFINED, 0, ClickType.PICKUP);
         } else {
             StorageHelper.closeScreen();
         }
@@ -254,7 +253,7 @@ public class PlaceBlockNearbyTask extends Task {
             //Debug.logMessage("TEMP: A: " + bpos);
             IPlayerContext ctx = mod.getClientBaritone().getPlayerContext();
             if (MovementHelper.canPlaceAgainst(ctx, bpos)) {
-                BlockPos placePos = bhit.getBlockPos().offset(bhit.getDirection().getUnitVec3i());
+                BlockPos placePos = bhit.getBlockPos().offset(bhit.getDirection().getNormal());
                 // Don't place inside the player.
                 if (WorldHelper.isInsidePlayer(mod, placePos)) {
                     return null;
@@ -288,10 +287,11 @@ public class PlaceBlockNearbyTask extends Task {
             assert Minecraft.getInstance().gameMode != null;
             // a place that went in is a fresh Success with the shrunk stack attached, never == SUCCESS. same check as
             // BlockPlaceHelper
-            if (Minecraft.getInstance().gameMode.useItemOn(mod.getPlayer(), hand, (BlockHitResult) mouseOver) instanceof InteractionResult.Success success &&
+            InteractionResult result = Minecraft.getInstance().gameMode.useItemOn(mod.getPlayer(), hand, (BlockHitResult) mouseOver);
+            if (result.consumesAction() &&
                     mod.getPlayer().isShiftKeyDown()) {
-                if (success.swingSource() == InteractionResult.SwingSource.PREDICTED) {
-                    mod.getPlayer().swing(hand, SwingAnimation.DEFAULT, false);
+                if (result.shouldSwing()) {
+                    mod.getPlayer().swing(hand);
                 }
                 _justPlaced = targetPlace;
                 return true;

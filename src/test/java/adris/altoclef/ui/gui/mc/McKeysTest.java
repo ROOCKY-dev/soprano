@@ -7,7 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-// the sdl scancodes the game sends against the glfw numbers the kit and the guiKey setting use
+// 1.21.1 and the kit use GLFW codes directly.
 public class McKeysTest {
 
     @Test
@@ -65,27 +65,13 @@ public class McKeysTest {
     }
 
     @Test
-    public void aKeyGlfwNeverNumberedRidesAboveItsRange() {
-        // media play: sdl has it, glfw does not
-        int kit = McKeys.toKit(262);
-        assertTrue(kit > 1000);
-        assertEquals(262, McKeys.toGame(kit));
-    }
-
-    @Test
-    public void nothingAndGarbageStayNothing() {
-        assertEquals(Keys.NONE, McKeys.toKit(0));
+    public void glfwCodesStayUnchanged() {
+        assertEquals(262, McKeys.toKit(262));
+        assertEquals(262, McKeys.toGame(262));
         assertEquals(Keys.NONE, McKeys.toKit(-1));
-        assertEquals(0, McKeys.toGame(-1));
-        assertEquals(0, McKeys.toGame(0));
-        // a glfw code with no key behind it
-        assertEquals(0, McKeys.toGame(314));
-    }
-
-    @Test
-    public void mouseButtonsDropByOne() {
+        assertEquals(Keys.NONE, McKeys.toGame(-1));
         assertEquals(0, McKeys.buttonToKit(InputConstants.MOUSE_BUTTON_LEFT));
-        assertEquals(1, McKeys.buttonToKit(InputConstants.MOUSE_BUTTON_MIDDLE));
-        assertEquals(2, McKeys.buttonToKit(InputConstants.MOUSE_BUTTON_RIGHT));
+        assertEquals(2, McKeys.buttonToKit(InputConstants.MOUSE_BUTTON_MIDDLE));
+        assertEquals(1, McKeys.buttonToKit(InputConstants.MOUSE_BUTTON_RIGHT));
     }
 }

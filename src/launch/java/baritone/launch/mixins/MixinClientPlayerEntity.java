@@ -23,12 +23,10 @@ import baritone.api.event.events.PlayerUpdateEvent;
 import baritone.api.event.events.SprintStateEvent;
 import baritone.api.event.events.type.EventState;
 import baritone.behavior.LookBehavior;
-import baritone.utils.InputOverrideHandler;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Abilities;
-import net.minecraft.world.entity.player.Input;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Group;
@@ -112,18 +110,13 @@ public class MixinClientPlayerEntity {
             method = "aiStep",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/player/Input;sprint()Z"
+                    target = "net/minecraft/client/KeyMapping.isDown()Z"
             )
     )
-    private boolean redirectSprintInput(final Input instance) {
+    private boolean isKeyDown(KeyMapping keyBinding) {
         IBaritone baritone = BaritoneAPI.getProvider().getBaritoneForPlayer((LocalPlayer) (Object) this);
         if (baritone == null) {
-            return instance.sprint();
-        }
-        // a crit hop in the air. checked before the event so nobody's opinion (a path, the toggle) can outvote it, the lock
-        // only lives while the hop keeps asking for it
-        if (((InputOverrideHandler) baritone.getInputOverrideHandler()).sprintLocked()) {
-            return false;
+            return keyBinding.isDown();
         }
         SprintStateEvent event = new SprintStateEvent();
         baritone.getGameEventHandler().onPlayerSprintState(event);
@@ -134,47 +127,7 @@ public class MixinClientPlayerEntity {
             // hitting control shouldn't make all bots sprint
             return false;
         }
-        return instance.sprint();
-    }
-
-    @Shadow
-    private boolean canStartSprinting() {
-        // mixin swaps this for the real one, it never runs
-        throw new AssertionError();
-    }
-
-    // viafabricplus redirects the canStartSprinting() call in aiStep on old (<= 1.21.4) servers, runs
-    // the old double tap logic and only listens to the real ctrl key, so redirectSprintInput never runs
-    // and the bot walks everywhere. so we start the sprint ourselves before that block gets a say.
-    // anchored on Tutorial.onInput instead of canStartSprinting because a redirect and an inject on the
-    // same call fight over who goes first, and that's not a fight i want to referee
-    @Inject(
-            method = "aiStep",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/tutorial/Tutorial;onInput(Lnet/minecraft/client/player/ClientInput;)V",
-                    shift = At.Shift.AFTER
-            )
-    )
-    private void startBaritoneSprint(CallbackInfo ci) {
-        LocalPlayer self = (LocalPlayer) (Object) this;
-        IBaritone baritone = BaritoneAPI.getProvider().getBaritoneForPlayer(self);
-        if (baritone == null || ((InputOverrideHandler) baritone.getInputOverrideHandler()).sprintLocked()) {
-            return;
-        }
-        SprintStateEvent event = new SprintStateEvent();
-        baritone.getGameEventHandler().onPlayerSprintState(event);
-        // only ever start, never stop. null and false leave it to vanilla (or vfp) exactly like before.
-        // once we're sprinting canStartSprinting is false, so vanilla's start block skips and its stop checks still run
-        if (!Boolean.TRUE.equals(event.getState()) || !this.canStartSprinting()) {
-            return;
-        }
-        // vanilla's canStartSprinting checks this too, but vfp's old rules read a move vector its own slowdown
-        // inject may not have shrunk yet (same anchor as us, no order), so a sneaking bot would sprint. 1.21.4 can't
-        if (self.isMovingSlowly() && !self.isUnderWater()) {
-            return;
-        }
-        self.setSprinting(true);
+        return keyBinding.isDown();
     }
 
     @Inject(

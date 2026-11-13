@@ -4,12 +4,12 @@ import adris.altoclef.ui.gui.kit.Theme;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
+import baritone.compat.input.InputWithModifiers;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -75,13 +75,12 @@ public final class MenuSwitchWidget extends AbstractButton {
         }
     }
 
-    @Override
     public void onPress(InputWithModifiers input) {
         SopranoMenus.flip();
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+    protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partial) {
         // reads the setting and not its own clicks, the click gui can flip it too. same as TitleMenu.syncMenuSwitch
         boolean on = SopranoMenus.enabled();
         if (on != shown) {
@@ -93,11 +92,11 @@ public final class MenuSwitchWidget extends AbstractButton {
         int y = getY();
         // the copyright line underlines on hover too, so this is what a vanilla player already expects
         if (!compact) {
-            g.text(font, lit ? UNDERLINED : PLAIN, x, y, Theme.fade(WHITE, alpha));
+            g.drawString(font, lit ? UNDERLINED : PLAIN, x, y, Theme.fade(WHITE, alpha));
         }
         int tx = getRight() - TRACK_W;
         g.fill(tx, y, tx + TRACK_W, y + TRACK_H, Theme.fade(on ? Theme.ACCENT : TRACK_OFF, alpha));
-        g.outline(tx, y, TRACK_W, TRACK_H, Theme.fade(lit ? WHITE : GREY, alpha));
+        g.renderOutline(tx, y, TRACK_W, TRACK_H, Theme.fade(lit ? WHITE : GREY, alpha));
         int kx = on ? tx + TRACK_W - 1 - KNOB : tx + 1;
         g.fill(kx, y + 1, kx + KNOB, y + 1 + KNOB, Theme.fade(WHITE, alpha));
     }
@@ -106,4 +105,8 @@ public final class MenuSwitchWidget extends AbstractButton {
     protected void updateWidgetNarration(NarrationElementOutput out) {
         defaultButtonNarrationText(out);
     }
+
+    // adapt the GLFW callbacks while retaining the shared GUI event handlers
+    @Override
+    public void onPress() { onPress(new baritone.compat.input.KeyEvent(0, 0, baritone.compat.input.InputWithModifiers.currentModifiers())); }
 }

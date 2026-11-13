@@ -29,7 +29,7 @@ public class PortalBedGuardTest {
     // a red bed with its foot at 10 64 10, head one block east
     private static Map<BlockPos, BlockState> world() {
         Map<BlockPos, BlockState> w = new HashMap<>();
-        BlockState foot = Block.byItem(Items.BED.red()).defaultBlockState().setValue(BedBlock.FACING, Direction.EAST).setValue(BedBlock.PART, BedPart.FOOT);
+        BlockState foot = Block.byItem(Items.RED_BED).defaultBlockState().setValue(BedBlock.FACING, Direction.EAST).setValue(BedBlock.PART, BedPart.FOOT);
         w.put(new BlockPos(10, 64, 10), foot);
         w.put(new BlockPos(11, 64, 10), foot.setValue(BedBlock.PART, BedPart.HEAD));
         w.put(new BlockPos(10, 64, 11), Blocks.DIRT.defaultBlockState());
@@ -77,7 +77,7 @@ public class PortalBedGuardTest {
         RunState s = withBed(10, 64, 10);
         Map<BlockPos, BlockState> w = world();
         // a second bed with its foot right next to the portal bed's foot, pointing north away from it
-        BlockState other = Block.byItem(Items.BED.white()).defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.FOOT);
+        BlockState other = Block.byItem(Items.WHITE_BED).defaultBlockState().setValue(BedBlock.FACING, Direction.NORTH).setValue(BedBlock.PART, BedPart.FOOT);
         w.put(new BlockPos(10, 64, 9), other);
         w.put(new BlockPos(10, 64, 8), other.setValue(BedBlock.PART, BedPart.HEAD));
         assertFalse(guarded(s, w, 10, 64, 9));

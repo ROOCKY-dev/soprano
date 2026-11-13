@@ -26,7 +26,7 @@ import baritone.behavior.look.CombatWants;
 import baritone.behavior.look.LegacyClicker;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
@@ -127,7 +127,7 @@ public final class CombatAim {
                 : new double[]{preferred.x + lx, preferred.y + ly, preferred.z + lz};
         // an enderman reads a look at its head as a challenge and teleports away, so every ask for one, even a caller who
         // knows better, gets its legs
-        boolean ender = entity instanceof Enderman;
+        boolean ender = entity instanceof EnderMan;
         double[] inner = ender ? CombatAimMath.innerBox(b, CombatAimMath.ENDERMAN_LOW, CombatAimMath.ENDERMAN_HIGH) : CombatAimMath.innerBox(b);
         if (ender) {
             pref = CombatAimMath.capHeight(pref, b, CombatAimMath.ENDERMAN_HIGH);

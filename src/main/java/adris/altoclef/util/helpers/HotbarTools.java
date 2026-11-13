@@ -6,7 +6,7 @@ import baritone.Baritone;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -78,7 +78,7 @@ public final class HotbarTools {
     // allowInventory, the move delay and standing still hold here too (2b2t does not love a swap mid sprint)
     private static void swapIn(AltoClef mod, int from, int to) {
         mod.getClientBaritone().getInventoryBehavior().inventoryMoveIfAllowed(
-                () -> mod.getSlotHandler().clickSlot(new PlayerSlot(from), to, ContainerInput.SWAP));
+                () -> mod.getSlotHandler().clickSlot(new PlayerSlot(from), to, ClickType.SWAP));
     }
 
     // the best one of this ItemHelper.toolKind from the bag into the hotbar, unless the hotbar has one already
@@ -120,7 +120,7 @@ public final class HotbarTools {
     // don't take turns kicking each other out), else a worn one of the same kind, the swap sends it up to the bag.
     // -1 when 2-6 are all good tools
     private static int slotFor(Inventory inv, String kind) {
-        int selected = inv.getSelectedSlot();
+        int selected = inv.selected;
         for (int h = 2; h <= 6; h++) {
             if (h != selected && inv.getItem(h).isEmpty()) return h;
         }

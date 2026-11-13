@@ -19,7 +19,7 @@ import baritone.utils.FallingColumn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.biome.Biomes;
@@ -92,7 +92,7 @@ public class BranchMiningTask extends ResourceTask {
         _count = count;
         _y = y;
         _facing = facing;
-        _blocks = ore.blocks().stream().map(id -> BuiltInRegistries.BLOCK.getValue(Identifier.withDefaultNamespace(id))).toArray(Block[]::new);
+        _blocks = ore.blocks().stream().map(id -> BuiltInRegistries.BLOCK.get(ResourceLocation.withDefaultNamespace(id))).toArray(Block[]::new);
         _tier = MiningRequirement.valueOf(ore.tier().name());
     }
 
@@ -100,9 +100,9 @@ public class BranchMiningTask extends ResourceTask {
     // the block and a count of diamonds alone would never be reached
     private static Item[] itemsOf(BranchOres.Ore ore) {
         List<Item> items = new ArrayList<>();
-        items.add(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(ore.drop())));
+        items.add(BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(ore.drop())));
         for (String block : ore.blocks()) {
-            items.add(BuiltInRegistries.ITEM.getValue(Identifier.withDefaultNamespace(block)));
+            items.add(BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(block)));
         }
         return items.toArray(Item[]::new);
     }
@@ -340,7 +340,7 @@ public class BranchMiningTask extends ResourceTask {
     // gravel over a hole counts as walkable, right up until digging the cell above it wakes it up and we go down with it
     private static boolean floorHolds(AltoClef mod, BlockPos floor) {
         BlockPos at = floor;
-        while (at.getY() > mod.getWorld().getMinY() && FallingColumn.isFalling(mod.getWorld().getBlockState(at))) {
+        while (at.getY() > mod.getWorld().getMinBuildHeight() && FallingColumn.isFalling(mod.getWorld().getBlockState(at))) {
             at = at.below();
             if (FallingBlock.isFree(mod.getWorld().getBlockState(at))) {
                 return false;
@@ -357,7 +357,7 @@ public class BranchMiningTask extends ResourceTask {
     // a gravel stack comes down the shaft we make, and the planner prices every block of it. one of them next to lava or under
     // water makes the whole cell infinite, so we find out now instead of staring at it for 10 s
     private static boolean stackAboveIsCalm(AltoClef mod, BlockStateInterface bsi, BlockPos head) {
-        for (BlockPos at = head.above(); at.getY() < mod.getWorld().getMaxY(); at = at.above()) {
+        for (BlockPos at = head.above(); at.getY() < mod.getWorld().getMaxBuildHeight(); at = at.above()) {
             BlockState state = mod.getWorld().getBlockState(at);
             if (!FallingColumn.isFalling(state)) {
                 return true;

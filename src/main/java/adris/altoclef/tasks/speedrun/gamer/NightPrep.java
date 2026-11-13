@@ -10,7 +10,7 @@ import adris.altoclef.tasksystem.Task;
 import adris.altoclef.util.helpers.ItemHelper;
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
-import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.item.DyeColor;
 
 // the evening before a night: a bed in the bag by the time the window opens, so the trip has something to put down. the rules
@@ -63,7 +63,7 @@ public final class NightPrep {
     // the task to run instead of the phase this tick, or null
     public Task tick(AltoClef mod, Gate gate, BooleanSupplier bedReady) {
         OverworldConfig c = cfg.get();
-        long dayTime = mod.getWorld().getOverworldClockTime();
+        long dayTime = mod.getWorld().getDayTime();
         long timeOfDay = Math.floorMod(dayTime, NightSleep.DAY_LENGTH);
         long dayId = NightSleep.nightOf(dayTime);
         woolClock.roll(dayId);

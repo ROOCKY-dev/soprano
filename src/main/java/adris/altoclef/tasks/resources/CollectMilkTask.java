@@ -9,7 +9,7 @@ import adris.altoclef.tasksystem.Task;
 import java.util.Optional;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.animal.cow.Cow;
+import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.EntityHitResult;
 
@@ -82,7 +82,7 @@ public class CollectMilkTask extends ResourceTask {
                 return null;
             }
             if (mod.getSlotHandler().forceEquipItem(Items.BUCKET)) {
-                mod.getController().interact(mod.getPlayer(), entity, new EntityHitResult(entity), InteractionHand.MAIN_HAND);
+                mod.getController().interactAt(mod.getPlayer(), entity, new EntityHitResult(entity), InteractionHand.MAIN_HAND);
             }
 
 

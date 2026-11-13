@@ -92,7 +92,7 @@ public class WoolHuntTest {
                 .cooking("iron_ingot", 40, 400);
         bag.foodUnits = 70;
         // the beds' wool is in hand, only the extra three beds' worth is left to ask for
-        bag.give(Items.WOOL.white(), 3 * BEDS);
+        bag.give(Items.WHITE_WOOL, 3 * BEDS);
         assertNotNull(findAny(SmeltFiller.schedule(bag, cfg, BEDS, true), "wool"));
         bag.woolHuntGaveUp = true;
         assertNull(findAny(SmeltFiller.schedule(bag, cfg, BEDS, true), "wool"));
@@ -122,7 +122,7 @@ public class WoolHuntTest {
 
     @Test
     public void theSpawnBedStillOwedAsksForItsWoolToo() {
-        FakeFacts bag = new FakeFacts().give(Items.WOOL.white(), 3 * BEDS);
+        FakeFacts bag = new FakeFacts().give(Items.WHITE_WOOL, 3 * BEDS);
         assertNull(find(KitPlanner.plan(bag, cfg, BEDS), "wool"));
         bag.spawnBedOwed = true;
         assertEquals(BEDS + 1, KitPlanner.bedGoal(bag, BEDS));

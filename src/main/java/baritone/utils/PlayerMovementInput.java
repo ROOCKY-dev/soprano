@@ -18,19 +18,19 @@
 package baritone.utils;
 
 import baritone.api.utils.input.Input;
-import net.minecraft.client.player.ClientInput;
+import baritone.api.utils.IInputOverrideHandler;
 import net.minecraft.world.phys.Vec2;
 
-public class PlayerMovementInput extends ClientInput {
+public class PlayerMovementInput extends net.minecraft.client.player.Input {
 
-    private final InputOverrideHandler handler;
+    private final IInputOverrideHandler handler;
 
-    PlayerMovementInput(InputOverrideHandler handler) {
+    PlayerMovementInput(IInputOverrideHandler handler) {
         this.handler = handler;
     }
 
     @Override
-    public void tick() {
+    public void tick(boolean slowDown, float slowDownFactor) {
         float leftImpulse = 0.0F;
         float forwardImpulse = 0.0F;
         boolean jumping = handler.isInputForcedDown(Input.JUMP); // oppa gangnam style
@@ -57,9 +57,9 @@ public class PlayerMovementInput extends ClientInput {
 
         boolean sneaking = handler.isInputForcedDown(Input.SNEAK);
         boolean sprinting = handler.isInputForcedDown(Input.SPRINT);
-        if (handler.settleActive()) {
+        if (handler instanceof InputOverrideHandler concrete && concrete.settleActive()) {
             // the edge settle owns this tick whatever got forced, here and not in the force map so no clearAllKeys eats it
-            EdgeSettle.Keys keys = handler.settleKeys();
+            EdgeSettle.Keys keys = concrete.settleKeys();
             up = keys.forward();
             down = keys.back();
             left = keys.left();
@@ -70,10 +70,18 @@ public class PlayerMovementInput extends ClientInput {
             sneaking = true;
             sprinting = false;
         }
-        // no sneak scaling here, LocalPlayer.modifyInput does the 0.98 and the sneaking speed attribute (scaling it here
-        // too made a sneak 0.09 instead of 0.294). and normalized like KeyboardInput, or a diagonal sneak is 1.4x too fast
-        this.moveVector = new Vec2(leftImpulse, forwardImpulse).normalized();
-
-        this.keyPresses = new net.minecraft.world.entity.player.Input(up, down, left, right, jumping, sneaking, sprinting);
+        this.up = up;
+        this.down = down;
+        this.left = left;
+        this.right = right;
+        this.jumping = jumping;
+        this.shiftKeyDown = sneaking;
+        this.leftImpulse = leftImpulse;
+        this.forwardImpulse = forwardImpulse;
+        // 1.21.1 scales in Input.tick; it does not have the newer LocalPlayer.modifyInput path
+        if (slowDown) {
+            this.leftImpulse *= slowDownFactor;
+            this.forwardImpulse *= slowDownFactor;
+        }
     }
 }

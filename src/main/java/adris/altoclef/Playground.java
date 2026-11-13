@@ -38,10 +38,10 @@ import java.util.Scanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
@@ -69,7 +69,7 @@ public class Playground {
 
         List<String> notCollected = new ArrayList<>();
 
-        for (Identifier id : Registry.ITEM.getIds()) {
+        for (ResourceLocation id : Registry.ITEM.getIds()) {
             Item item = Registry.ITEM.get(id);
             String name = ItemUtil.trimItemName(item.getTranslationKey());
             allItems.add(name);
@@ -276,8 +276,8 @@ public class Playground {
                     int total = 0;
                     File f = new File(fname);
                     FileWriter fw = new FileWriter(f);
-                    for (Identifier id : BuiltInRegistries.ITEM.keySet()) {
-                        Item item = BuiltInRegistries.ITEM.getValue(id);
+                    for (ResourceLocation id : BuiltInRegistries.ITEM.keySet()) {
+                        Item item = BuiltInRegistries.ITEM.get(id);
                         if (!TaskCatalogue.isObtainable(item)) {
                             ++unobtainable;
                             fw.write(item.getDescriptionId() + "\n");

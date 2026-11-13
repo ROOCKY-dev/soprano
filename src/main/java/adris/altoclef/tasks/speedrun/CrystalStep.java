@@ -23,7 +23,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.ServerExplosion;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -107,7 +107,7 @@ public class CrystalStep {
             return;
         }
         double distance = player.position().distanceTo(crystal.position());
-        double seen = ServerExplosion.getSeenPercent(crystal.position(), player);
+        double seen = Explosion.getSeenPercent(crystal.position(), player);
         double damage = blastDamage(mod, player, crystal);
         if (CrystalBlast.safeToSwing(damage)) {
             mod.getControllerExtras().attack(crystal, ReachRules.CRYSTAL_REACH);
@@ -121,7 +121,7 @@ public class CrystalStep {
     public static double blastDamage(AltoClef mod, LocalPlayer player, Entity crystal) {
         double distance = player.position().distanceTo(crystal.position());
         // vanilla's own seen check works client side, it only needs the level's blocks
-        double seen = ServerExplosion.getSeenPercent(crystal.position(), player);
+        double seen = Explosion.getSeenPercent(crystal.position(), player);
         return CrystalBlast.predicted(distance, seen, mod.getWorld().getDifficulty().getId(),
                 player.getArmorValue(), player.getAttributeValue(Attributes.ARMOR_TOUGHNESS));
     }

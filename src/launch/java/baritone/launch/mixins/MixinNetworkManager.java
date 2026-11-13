@@ -22,7 +22,7 @@ import baritone.api.IBaritone;
 import baritone.api.event.events.PacketEvent;
 import baritone.api.event.events.type.EventState;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFutureListener;
+import net.minecraft.network.PacketSendListener;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
@@ -52,7 +52,7 @@ public class MixinNetworkManager {
             method = "sendPacket",
             at = @At("HEAD")
     )
-    private void preDispatchPacket(final Packet<?> packet, final ChannelFutureListener channelFutureListener, final boolean flush, final CallbackInfo ci) {
+    private void preDispatchPacket(final Packet<?> packet, final PacketSendListener channelFutureListener, final boolean flush, final CallbackInfo ci) {
         if (this.receiving != PacketFlow.CLIENTBOUND) {
             return;
         }
@@ -68,7 +68,7 @@ public class MixinNetworkManager {
             method = "sendPacket",
             at = @At("RETURN")
     )
-    private void postDispatchPacket(Packet<?> packet, ChannelFutureListener packetSendListener, boolean flush, CallbackInfo ci) {
+    private void postDispatchPacket(Packet<?> packet, PacketSendListener packetSendListener, boolean flush, CallbackInfo ci) {
         if (this.receiving != PacketFlow.CLIENTBOUND) {
             return;
         }

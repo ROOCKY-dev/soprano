@@ -20,127 +20,25 @@ package baritone.utils;
 import baritone.api.BaritoneAPI;
 import baritone.api.Settings;
 import baritone.utils.accessor.IEntityRenderManager;
-import baritone.utils.accessor.IRenderPipelines;
-import baritone.utils.accessor.IRenderType;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexSorting;
-import com.mojang.renderpearl.api.pipeline.*;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BindGroupLayouts;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.StagedVertexBuffer;
-import net.minecraft.client.renderer.blockentity.BeaconRenderer;
-import net.minecraft.client.renderer.rendertype.RenderSetup;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.awt.*;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.function.BiFunction;
 
 public interface IRenderer {
 
-    StagedVertexBuffer stagedVertexBuffer = new StagedVertexBuffer(() -> "Baritone Render", 256);
+    Tesselator tessellator = Tesselator.getInstance();
     IEntityRenderManager renderManager = (IEntityRenderManager) Minecraft.getInstance().getEntityRenderDispatcher();
+    TextureManager textureManager = Minecraft.getInstance().getTextureManager();
     Settings settings = BaritoneAPI.getSettings();
-    // depth is reversed in 26.x (cleared to 0, nearer is bigger), so "in front of the terrain" is >= and not <=. the other way round is sky only
-    RenderPipeline.Snippet BARITONE_LINES_SNIPPET = RenderPipeline.builder(((IRenderPipelines) new RenderPipelines()).getLinesSnippet())
-        .withColorTargetState(new ColorTargetState(new BlendFunction(
-            BlendFactor.SRC_ALPHA,
-            BlendFactor.ONE_MINUS_SRC_ALPHA,
-            BlendFactor.ONE,
-            BlendFactor.ZERO
-        )))
-        .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
-        .withCull(false)
-        .buildSnippet();
 
-    // translucent quads for the ribbon and the box fills: the debug filled box pipeline with the same blending as the lines
-    RenderPipeline.Snippet BARITONE_QUADS_SNIPPET = RenderPipeline.builder(((IRenderPipelines) new RenderPipelines()).getDebugFilledSnippet())
-        .withColorTargetState(new ColorTargetState(new BlendFunction(
-            BlendFactor.SRC_ALPHA,
-            BlendFactor.ONE_MINUS_SRC_ALPHA,
-            BlendFactor.ONE,
-            BlendFactor.ZERO
-        )))
-        .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
-        .withCull(false)
-        .buildSnippet();
-
-    RenderPipeline.Snippet BARITONE_BEACON_BEAM_SNIPPET = RenderPipeline.builder(((IRenderPipelines) new RenderPipelines()).getMatricesFogSnippet())
-            .withVertexShader("core/rendertype_beacon_beam")
-            .withFragmentShader("core/rendertype_beacon_beam")
-            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
-            .withVertexBinding(0, DefaultVertexFormat.BLOCK)
-            .withPrimitiveTopology(PrimitiveTopology.QUADS)
-            .buildSnippet();
-
-    RenderPipeline BEACON_BEAM_OPAQUE = ((IRenderPipelines) new RenderPipelines()).baritone$registerPipeline(RenderPipeline.builder(BARITONE_BEACON_BEAM_SNIPPET)
-            .withLocation("pipeline/baritone_beacon_beam_opaque")
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
-            .withCull(true)
-            .build());
-
-    RenderPipeline BEACON_BEAM_TRANSLUCENT = ((IRenderPipelines) new RenderPipelines()).baritone$registerPipeline(RenderPipeline.builder(BARITONE_BEACON_BEAM_SNIPPET)
-            .withLocation("pipeline/baritone_beacon_beam_translucent")
-            .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))
-            .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
-            .withCull(true)
-            .build());
-
-    RenderType linesWithDepthRenderType = ((IRenderType) RenderTypes.lines()).createRenderType(
-        "renderType/baritone_lines_with_depth",
-        RenderSetup.builder(RenderPipeline.builder(BARITONE_LINES_SNIPPET)
-            .withLocation("pipelines/baritone_lines_with_depth")
-            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
-            .build())
-            .createRenderSetup()
-    );
-    RenderType linesNoDepthRenderType = ((IRenderType) RenderTypes.lines()).createRenderType(
-        "renderType/baritone_lines_no_depth",
-        RenderSetup.builder(RenderPipeline.builder(BARITONE_LINES_SNIPPET)
-                .withLocation("pipelines/baritone_lines_no_depth")
-                .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
-                .build())
-            .createRenderSetup()
-    );
-    RenderType quadsWithDepthRenderType = ((IRenderType) RenderTypes.lines()).createRenderType(
-        "renderType/baritone_quads_with_depth",
-        RenderSetup.builder(RenderPipeline.builder(BARITONE_QUADS_SNIPPET)
-            .withLocation("pipelines/baritone_quads_with_depth")
-            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
-            .build())
-            .createRenderSetup()
-    );
-    RenderType quadsNoDepthRenderType = ((IRenderType) RenderTypes.lines()).createRenderType(
-        "renderType/baritone_quads_no_depth",
-        RenderSetup.builder(RenderPipeline.builder(BARITONE_QUADS_SNIPPET)
-                .withLocation("pipelines/baritone_quads_no_depth")
-                .withDepthStencilState(new DepthStencilState(CompareOp.ALWAYS_PASS, false))
-                .build())
-            .createRenderSetup()
-    );
-
-    BiFunction<Identifier, Boolean, RenderType> BEACON_BEAM = Util.memoize(
-            (identifier, boolean_) -> ((IRenderType) RenderTypes.beaconBeam(BeaconRenderer.BEAM_LOCATION, boolean_)).createRenderType(
-                    boolean_ ? "renderType/baritone_beacon_beam_translucent" : "renderType/baritone_beacon_beam_opaque",
-            RenderSetup.builder(boolean_ ? BEACON_BEAM_TRANSLUCENT : BEACON_BEAM_OPAQUE)
-                    .withTexture("Sampler0", identifier)
-                    .sortOnUpload()
-                    .createRenderSetup())
-    );
-
-    StagedVertexBuffer.Draw[] draw = {null};
     float[] color = new float[]{1.0F, 1.0F, 1.0F, 255.0F};
 
     static void glColor(Color color, float alpha) {
@@ -151,61 +49,61 @@ public interface IRenderer {
         IRenderer.color[3] = alpha;
     }
 
-    static BufferBuilder startLines(Color color, float alpha) {
-        glColor(color, alpha);
-        draw[0] = stagedVertexBuffer.appendDraw(DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH, PrimitiveTopology.LINES);
-        return (BufferBuilder) stagedVertexBuffer.getVertexBuilder(draw[0]);
+    // see through, no depth writes, both sides. lines and quads want exactly the same things, and endLines undoes it for both
+    static void startTranslucent(boolean ignoreDepth) {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFuncSeparate(
+                GlStateManager.SourceFactor.SRC_ALPHA,
+                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA,
+                GlStateManager.SourceFactor.ONE,
+                GlStateManager.DestFactor.ZERO
+        );
+        RenderSystem.depthMask(false);
+        RenderSystem.disableCull();
+
+        if (ignoreDepth) {
+            RenderSystem.disableDepthTest();
+        }
     }
 
-    static BufferBuilder startLines(Color color) {
-        return startLines(color, .4f);
+    static BufferBuilder startLines(Color color, float alpha, float lineWidth, boolean ignoreDepth) {
+        startTranslucent(ignoreDepth);
+        glColor(color, alpha);
+        RenderSystem.lineWidth(lineWidth);
+        RenderSystem.setShader(GameRenderer::getRendertypeLinesShader);
+        return tessellator.begin(VertexFormat.Mode.LINES, DefaultVertexFormat.POSITION_COLOR_NORMAL);
+    }
+
+    static BufferBuilder startLines(Color color, float lineWidth, boolean ignoreDepth) {
+        return startLines(color, .4f, lineWidth, ignoreDepth);
     }
 
     static void endLines(BufferBuilder bufferBuilder, boolean ignoredDepth) {
-        endBuffer(bufferBuilder, ignoredDepth ? linesNoDepthRenderType : linesWithDepthRenderType);
+        if (ignoredDepth) RenderSystem.disableDepthTest();
+        MeshData meshData = bufferBuilder.build();
+        if (meshData != null) {
+            BufferUploader.drawWithShader(meshData);
+        }
+
+        if (ignoredDepth) {
+            RenderSystem.enableDepthTest();
+        }
+
+        RenderSystem.enableCull();
+        RenderSystem.depthMask(true);
+        RenderSystem.disableBlend();
     }
 
-    // lines and quads take turns, there's one draw open at a time. finish one before you start the other
-    static BufferBuilder startQuads() {
-        draw[0] = stagedVertexBuffer.appendDraw(DefaultVertexFormat.POSITION_COLOR, PrimitiveTopology.QUADS);
-        return (BufferBuilder) stagedVertexBuffer.getVertexBuilder(draw[0]);
+    // same tesselator as the lines, so finish your quads before you start your lines (or the other way around)
+    static BufferBuilder startQuads(boolean ignoreDepth) {
+        startTranslucent(ignoreDepth);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        return tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
     }
 
     static void endQuads(BufferBuilder bufferBuilder, boolean ignoredDepth) {
-        endBuffer(bufferBuilder, ignoredDepth ? quadsNoDepthRenderType : quadsWithDepthRenderType);
-    }
-
-    // the sorting has to be picked when the draw is appended, upload() is where the staged buffer sorts, so the render type
-    // comes in here and not just at endBuffer. vanilla skips this under improved transparency because oit sorts for it, but
-    // endBuffer always takes the plain drawFromBuffer path, so we always sort
-    static BufferBuilder startBlockQuads(RenderType renderType) {
-        VertexSorting quadSorting = renderType.sortOnUpload() ? RenderSystem.getProjectionType().vertexSorting() : null;
-        draw[0] = stagedVertexBuffer.appendDraw(DefaultVertexFormat.BLOCK, PrimitiveTopology.QUADS, quadSorting);
-        return (BufferBuilder) stagedVertexBuffer.getVertexBuilder(draw[0]);
-    }
-
-    static void endBuffer(BufferBuilder bufferBuilder, RenderType renderType) {
-        // endFrame has to happen even when the draw blows up, or the next one inherits this one's leftovers
-        try {
-            stagedVertexBuffer.upload();
-            StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(draw[0]);
-            if (info != null) {
-                var preparedRenderType = renderType.prepare();
-                var renderTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
-                try (var renderPass = RenderSystem.getDevice().createCommandEncoder().createRenderPass(
-                    () -> "Baritone Render Pass",
-                    renderTarget.getColorTextureView(),
-                    Optional.empty(),
-                    renderTarget.getDepthTextureView(),
-                    OptionalDouble.empty())
-                ) {
-                    preparedRenderType.drawFromBuffer(info, renderPass);
-                }
-            }
-        } finally {
-            draw[0] = null;
-            stagedVertexBuffer.endFrame();
-        }
+        // the cleanup is identical, the shader got picked in startQuads
+        endLines(bufferBuilder, ignoredDepth);
     }
 
     // uses the rgb from glColor but its own alpha, which is what makes gradients possible
@@ -244,7 +142,7 @@ public interface IRenderer {
         emitHorizontalQuad(bufferBuilder, stack, toDraw.minX, toDraw.minZ, toDraw.maxX, toDraw.maxZ, toDraw.maxY, alpha);
     }
 
-    static void emitLine(BufferBuilder bufferBuilder, PoseStack stack, double x1, double y1, double z1, double x2, double y2, double z2, float lineWidth) {
+    static void emitLine(BufferBuilder bufferBuilder, PoseStack stack, double x1, double y1, double z1, double x2, double y2, double z2) {
         final double dx = x2 - x1;
         final double dy = y2 - y1;
         final double dz = z2 - z1;
@@ -254,80 +152,86 @@ public interface IRenderer {
         final float ny = (float) (dy * invMag);
         final float nz = (float) (dz * invMag);
 
-        emitLine(bufferBuilder, stack, x1, y1, z1, x2, y2, z2, nx, ny, nz, lineWidth);
+        emitLine(bufferBuilder, stack, x1, y1, z1, x2, y2, z2, nx, ny, nz);
     }
 
     static void emitLine(BufferBuilder bufferBuilder, PoseStack stack,
                          double x1, double y1, double z1,
                          double x2, double y2, double z2,
-                         double nx, double ny, double nz,
-                         float lineWidth
-    ) {
+                         double nx, double ny, double nz) {
         emitLine(bufferBuilder, stack,
                 (float) x1, (float) y1, (float) z1,
                 (float) x2, (float) y2, (float) z2,
-                (float) nx, (float) ny, (float) nz,
-                lineWidth
+                (float) nx, (float) ny, (float) nz
         );
     }
 
     static void emitLine(BufferBuilder bufferBuilder, PoseStack stack,
                          float x1, float y1, float z1,
                          float x2, float y2, float z2,
-                         float nx, float ny, float nz,
-                         float lineWidth
-    ) {
+                         float nx, float ny, float nz) {
         PoseStack.Pose pose = stack.last();
 
-        bufferBuilder.addVertex(pose, x1, y1, z1).setColor(color[0], color[1], color[2], color[3]).setNormal(pose, nx, ny, nz).setLineWidth(lineWidth);
-        bufferBuilder.addVertex(pose, x2, y2, z2).setColor(color[0], color[1], color[2], color[3]).setNormal(pose, nx, ny, nz).setLineWidth(lineWidth);
+        bufferBuilder.addVertex(pose, x1, y1, z1).setColor(color[0], color[1], color[2], color[3]).setNormal(pose, nx, ny, nz);
+        bufferBuilder.addVertex(pose, x2, y2, z2).setColor(color[0], color[1], color[2], color[3]).setNormal(pose, nx, ny, nz);
     }
 
-    static void emitAABB(BufferBuilder bufferBuilder, PoseStack stack, AABB aabb, float lineWidth) {
+    static void emitAABB(BufferBuilder bufferBuilder, PoseStack stack, AABB aabb) {
         AABB toDraw = aabb.move(-renderManager.renderPosX(), -renderManager.renderPosY(), -renderManager.renderPosZ());
 
         // bottom
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.minY, toDraw.minZ, 1.0, 0.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.minY, toDraw.maxZ, 0.0, 0.0, 1.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.minY, toDraw.maxZ, -1.0, 0.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.minY, toDraw.minZ, 0.0, 0.0, -1.0, lineWidth);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.minY, toDraw.minZ, 1.0, 0.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.minY, toDraw.maxZ, 0.0, 0.0, 1.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.minY, toDraw.maxZ, -1.0, 0.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.minY, toDraw.minZ, 0.0, 0.0, -1.0);
         // top
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.maxY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.minZ, 1.0, 0.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.maxY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.maxZ, 0.0, 0.0, 1.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.maxY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.maxZ, -1.0, 0.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.maxY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.minZ, 0.0, 0.0, -1.0, lineWidth);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.maxY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.minZ, 1.0, 0.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.maxY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.maxZ, 0.0, 0.0, 1.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.maxY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.maxZ, -1.0, 0.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.maxY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.minZ, 0.0, 0.0, -1.0);
         // corners
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.minZ, toDraw.minX, toDraw.maxY, toDraw.minZ, 0.0, 1.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.minZ, 0.0, 1.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.maxZ, toDraw.maxX, toDraw.maxY, toDraw.maxZ, 0.0, 1.0, 0.0, lineWidth);
-        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.maxZ, 0.0, 1.0, 0.0, lineWidth);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.minZ, toDraw.minX, toDraw.maxY, toDraw.minZ, 0.0, 1.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.minZ, toDraw.maxX, toDraw.maxY, toDraw.minZ, 0.0, 1.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.maxX, toDraw.minY, toDraw.maxZ, toDraw.maxX, toDraw.maxY, toDraw.maxZ, 0.0, 1.0, 0.0);
+        emitLine(bufferBuilder, stack, toDraw.minX, toDraw.minY, toDraw.maxZ, toDraw.minX, toDraw.maxY, toDraw.maxZ, 0.0, 1.0, 0.0);
     }
 
-    static void emitAABB(BufferBuilder bufferBuilder, PoseStack stack, AABB aabb, double expand, float lineWidth) {
-        emitAABB(bufferBuilder, stack, aabb.inflate(expand, expand, expand), lineWidth);
+    static void emitAABB(BufferBuilder bufferBuilder, PoseStack stack, AABB aabb, double expand) {
+        emitAABB(bufferBuilder, stack, aabb.inflate(expand, expand, expand));
     }
 
-    static void emitLine(BufferBuilder bufferBuilder, PoseStack stack, Vec3 start, Vec3 end, float lineWidth) {
+    static void emitLine(BufferBuilder bufferBuilder, PoseStack stack, Vec3 start, Vec3 end) {
         double vpX = renderManager.renderPosX();
         double vpY = renderManager.renderPosY();
         double vpZ = renderManager.renderPosZ();
-        emitLine(bufferBuilder, stack, start.x - vpX, start.y - vpY, start.z - vpZ, end.x - vpX, end.y - vpY, end.z - vpZ, lineWidth);
+        emitLine(bufferBuilder, stack, start.x - vpX, start.y - vpY, start.z - vpZ, end.x - vpX, end.y - vpY, end.z - vpZ);
     }
 
-    static void emitTexturedVertex(BufferBuilder bufferBuilder, PoseStack.Pose pose, float x, float y, float z, int color, float u, float v, float nx, float ny, float nz) {
-        bufferBuilder.addVertex(pose, x, y, z)
-                .setColor(color)
-                .setUv(u, v)
-                .setOverlay(OverlayTexture.NO_OVERLAY)
-                .setLight(15728880)
-                .setNormal(pose, nx, ny, nz);
-    }
 
-    static RenderType beaconBeam(Identifier identifier, boolean bl) {
-        return BEACON_BEAM.apply(identifier, bl);
+    // bridge the current renderer's batching API to 1.21.1's immediate shader path
+    static BufferBuilder startLines(Color color) { return startLines(color, 0.4f); }
+    static BufferBuilder startLines(Color color, float alpha) {
+        return startLines(color, alpha, settings.pathRenderLineWidthPixels.value, false);
     }
-
-    static RenderType beaconBeam(Identifier identifier, boolean bl, boolean ignoreDepth) {
-        return ignoreDepth ? beaconBeam(identifier, bl) : RenderTypes.beaconBeam(identifier, bl);
+    static BufferBuilder startQuads() { return startQuads(false); }
+    static void emitLine(BufferBuilder b, PoseStack s, double x, double y, double z, double x2, double y2, double z2, float width) {
+        RenderSystem.lineWidth(width);
+        emitLine(b, s, x, y, z, x2, y2, z2);
+    }
+    static void emitLine(BufferBuilder b, PoseStack s, double x, double y, double z, double x2, double y2, double z2, double nx, double ny, double nz, float width) {
+        RenderSystem.lineWidth(width);
+        emitLine(b, s, x, y, z, x2, y2, z2, nx, ny, nz);
+    }
+    static void emitLine(BufferBuilder b, PoseStack s, Vec3 start, Vec3 end, float width) {
+        RenderSystem.lineWidth(width);
+        emitLine(b, s, start, end);
+    }
+    static void emitAABB(BufferBuilder b, PoseStack s, AABB box, float width) {
+        RenderSystem.lineWidth(width);
+        emitAABB(b, s, box);
+    }
+    static void emitAABB(BufferBuilder b, PoseStack s, AABB box, double expand, float width) {
+        RenderSystem.lineWidth(width);
+        emitAABB(b, s, box, expand);
     }
 }

@@ -42,7 +42,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.projectile.FireworkRocketEntity;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.Fireworks;
@@ -328,7 +328,7 @@ public final class ElytraBehavior implements Helper {
 
             int rangeStartIncl = playerNear;
             int rangeEndExcl = playerNear;
-            while (rangeEndExcl < path.size() && npfContext.hasChunk(ChunkPos.containing(path.get(rangeEndExcl)))) {
+            while (rangeEndExcl < path.size() && npfContext.hasChunk(new ChunkPos(path.get(rangeEndExcl)))) {
                 rangeEndExcl++;
             }
             // rangeEndExcl now represents an index either not in the path, or just outside render distance
@@ -522,7 +522,7 @@ public final class ElytraBehavior implements Helper {
         }
         final long now = System.currentTimeMillis();
         if ((now - this.timeLastCacheCull) / 1000 > Baritone.settings().elytraTimeBetweenCacheCullSecs.value) {
-            npfContext.queueCacheCulling(ctx.player().chunkPosition().x(), ctx.player().chunkPosition().z(), Baritone.settings().elytraCacheCullDistance.value);
+            npfContext.queueCacheCulling(ctx.player().chunkPosition().x, ctx.player().chunkPosition().z, Baritone.settings().elytraCacheCullDistance.value);
             this.timeLastCacheCull = now;
         }
     }
@@ -1318,12 +1318,12 @@ public final class ElytraBehavior implements Helper {
         if (invTickCountdown > 0) invTickCountdown--;
     }
 
-    private void queueWindowClick(int windowId, int slotId, int button, ContainerInput type) {
+    private void queueWindowClick(int windowId, int slotId, int button, ClickType type) {
         invTransactionQueue.add(() -> ctx.playerController().windowClick(windowId, slotId, button, type, ctx.player()));
     }
 
     private int findGoodElytra() {
-        NonNullList<ItemStack> invy = ctx.player().getInventory().getNonEquipmentItems();
+        NonNullList<ItemStack> invy = ctx.player().getInventory().items;
         for (int i = 0; i < invy.size(); i++) {
             ItemStack slot = invy.get(i);
             if (slot.getItem() == Items.ELYTRA && (slot.getMaxDamage() - slot.getDamageValue()) > Baritone.settings().elytraMinimumDurability.value) {
@@ -1348,9 +1348,9 @@ public final class ElytraBehavior implements Helper {
         if (goodElytraSlot != -1) {
             final int CHEST_SLOT = 6;
             final int slotId = goodElytraSlot < 9 ? goodElytraSlot + 36 : goodElytraSlot;
-            queueWindowClick(ctx.player().inventoryMenu.containerId, slotId, 0, ContainerInput.PICKUP);
-            queueWindowClick(ctx.player().inventoryMenu.containerId, CHEST_SLOT, 0, ContainerInput.PICKUP);
-            queueWindowClick(ctx.player().inventoryMenu.containerId, slotId, 0, ContainerInput.PICKUP);
+            queueWindowClick(ctx.player().inventoryMenu.containerId, slotId, 0, ClickType.PICKUP);
+            queueWindowClick(ctx.player().inventoryMenu.containerId, CHEST_SLOT, 0, ClickType.PICKUP);
+            queueWindowClick(ctx.player().inventoryMenu.containerId, slotId, 0, ClickType.PICKUP);
         }
     }
 
@@ -1378,8 +1378,8 @@ public final class ElytraBehavior implements Helper {
     }
 
     public boolean raytrace(double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinY();
-        final int minHeight = ctx.world().getMinY();
+        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinBuildHeight();
+        final int minHeight = ctx.world().getMinBuildHeight();
         final boolean isOOB = startY >= maxHeight || endY >= maxHeight || startY < minHeight || endY < minHeight;
         if (isOOB) {
             Vec3 start = new Vec3(startX, startY, startZ);
@@ -1391,8 +1391,8 @@ public final class ElytraBehavior implements Helper {
     }
 
     public boolean raytrace(Vec3 start, Vec3 end) {
-        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinY();
-        final int minHeight = ctx.world().getMinY();
+        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinBuildHeight();
+        final int minHeight = ctx.world().getMinBuildHeight();
         final boolean isOOB = start.y >= maxHeight || end.y >= maxHeight || start.y < minHeight || end.y < minHeight;
         if (isOOB) {
             return ctx.world().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, ctx.player())).getType() == HitResult.Type.MISS;
@@ -1404,12 +1404,12 @@ public final class ElytraBehavior implements Helper {
         if (src.length != count * 3 || src.length != dst.length) {
             throw new IllegalArgumentException("Expected source and dst to have length of " + (count * 3));
         }
-        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinY();
+        final int maxHeight = npfContext.getMaxHeight() + ctx.world().getMinBuildHeight();
 
         boolean isOOB = false;
         for(int i = 1; i < src.length; i += 3) {
-            if (src[i] >= maxHeight || src[i] < ctx.world().getMinY() ||
-                    dst[i] >= maxHeight || dst[i] < ctx.world().getMinY()) {
+            if (src[i] >= maxHeight || src[i] < ctx.world().getMinBuildHeight() ||
+                    dst[i] >= maxHeight || dst[i] < ctx.world().getMinBuildHeight()) {
                 isOOB = true;
                 break;
             }
@@ -1430,7 +1430,7 @@ public final class ElytraBehavior implements Helper {
     }
 
     public boolean passable(int x, int y, int z) {
-        if(y >= ctx.world().getMaxY() || y < ctx.world().getMinY()) {
+        if(y >= ctx.world().getMaxBuildHeight() || y < ctx.world().getMinBuildHeight()) {
             return true;
         }
         return npfContext.passable(x, y, z);

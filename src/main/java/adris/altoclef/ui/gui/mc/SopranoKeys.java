@@ -3,8 +3,8 @@ package adris.altoclef.ui.gui.mc;
 import adris.altoclef.ui.gui.kit.Safe;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.resources.Identifier;
+import baritone.compat.input.KeyEvent;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 
@@ -37,7 +37,7 @@ public final class SopranoKeys {
     public static synchronized KeyMapping[] all() {
         if (yes == null) {
             try {
-                KeyMapping.Category cat = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("soprano", "soprano"));
+                String cat = CATEGORY;
                 yes = new KeyMapping(YES, InputConstants.KEY_Y, cat);
                 no = new KeyMapping(NO, InputConstants.KEY_N, cat);
             } catch (Throwable t) {
@@ -53,11 +53,11 @@ public final class SopranoKeys {
     }
 
     static boolean isYes(KeyEvent event) {
-        return yes != null && yes.matches(event);
+        return yes != null && yes.matches(event.key(), event.scancode());
     }
 
     static boolean isNo(KeyEvent event) {
-        return no != null && no.matches(event);
+        return no != null && no.matches(event.key(), event.scancode());
     }
 
     // what the chip on the button says. "Y" until someone rebinds it, then whatever the controls screen calls the new

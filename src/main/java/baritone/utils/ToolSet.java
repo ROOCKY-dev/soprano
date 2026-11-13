@@ -132,7 +132,7 @@ public class ToolSet {
         possible, this lets us make pathing depend on the actual tool to be used (if auto tool is disabled)
         */
         if (!Baritone.settings().autoTool.value && pathingCalculation) {
-            return player.getInventory().getSelectedSlot();
+            return player.getInventory().selected;
         }
 
         int best = -1;
@@ -172,7 +172,7 @@ public class ToolSet {
         }
         if (best < 0) {
             // nothing but tools that do nothing here. a slot with no durability to burn if there is one, else wherever we are
-            best = player.getInventory().getSelectedSlot();
+            best = player.getInventory().selected;
             for (int i = 0; i < 9; i++) {
                 if (!player.getInventory().getItem(i).isDamageableItem()) {
                     return i;
@@ -282,13 +282,13 @@ public class ToolSet {
      */
     private double potionAmplifier() {
         double speed = 1;
-        if (player.hasEffect(MobEffects.HASTE)) {
-            speed *= 1 + (player.getEffect(MobEffects.HASTE).getAmplifier() + 1) * 0.2;
+        if (player.hasEffect(MobEffects.DIG_SPEED)) {
+            speed *= 1 + (player.getEffect(MobEffects.DIG_SPEED).getAmplifier() + 1) * 0.2;
         }
-        if (player.hasEffect(MobEffects.MINING_FATIGUE)) {
+        if (player.hasEffect(MobEffects.DIG_SLOWDOWN)) {
             // 1.21.4 had a switch with 0.3, 0.09, 0.0027, 0.00081 (the 0.0027 was a typo-looking truth). 26.3 made it a real power,
             // so fatigue 3 and 4 are 10x less crippling than that table says
-            speed *= fatigueFactor(player.getEffect(MobEffects.MINING_FATIGUE).getAmplifier());
+            speed *= fatigueFactor(player.getEffect(MobEffects.DIG_SLOWDOWN).getAmplifier());
         }
         return speed;
     }

@@ -138,7 +138,7 @@ public final class MinecraftFacts implements GamerFacts {
                 // only the sections inside the height box: the finder goes bottom up, so a chunk with deepslate gold at the
                 // bottom would hide the vein at our own height. sections[i] covers world y minY + i * 16
                 LevelChunkSection[] sections = chunk.getSections();
-                int minY = chunk.getMinY();
+                int minY = chunk.getMinBuildHeight();
                 int lo = Math.max(0, Math.floorDiv(y - r - minY, 16));
                 int hi = Math.min(sections.length - 1, Math.floorDiv(y + r - minY, 16));
                 if (lo > hi) {
@@ -201,7 +201,7 @@ public final class MinecraftFacts implements GamerFacts {
         // the same test IronPhase's food gate and the smelt site use, the nether's roof is not a sky
         nearSurface = dimension == Dimension.OVERWORLD && SmeltSurface.shallow(SmeltSurface.depthBelowSky(mod));
         armorPoints = player.getArmorValue();
-        if (Minecraft.getInstance().gui.screen() instanceof WinScreen) {
+        if (Minecraft.getInstance().screen instanceof WinScreen) {
             credits = true;
         }
         countItems(player);
@@ -444,7 +444,7 @@ public final class MinecraftFacts implements GamerFacts {
                 }
             }
         }
-        String screen = mc.gui.screen() == null ? "none" : mc.gui.screen().getClass().getSimpleName();
+        String screen = mc.screen == null ? "none" : mc.screen.getClass().getSimpleName();
         return PickDiag.scan(seen, open, screen, menuName);
     }
 

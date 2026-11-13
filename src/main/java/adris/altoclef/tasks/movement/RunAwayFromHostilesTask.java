@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.Skeleton;
 
 public class RunAwayFromHostilesTask extends CustomBaritoneGoalTask {
 

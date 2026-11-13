@@ -9,7 +9,7 @@ import adris.altoclef.ui.gui.mc.StatusPanelHud;
 import baritone.Baritone;
 import baritone.api.Settings;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ public class CommandStatusOverlay {
 
     // every frame, from AltoClef inside StatusPanelHud.guard. active is the task runner: off means no rows, and the
     // panel shows its idle pill for a moment if it had some
-    public void render(AltoClef mod, GuiGraphicsExtractor graphics, boolean active) {
+    public void render(AltoClef mod, GuiGraphics graphics, boolean active) {
         Minecraft mc = Minecraft.getInstance();
         // off is off: no task strings get built for a panel nobody sees
         if (mc.level == null || !Baritone.settings().altoShowTaskChains.value) {
@@ -50,7 +50,7 @@ public class CommandStatusOverlay {
             layout(mod, active, now);
         }
         // f1 hides the hud and f3 lives in the same corner, it was there first
-        boolean hidden = mc.gui.hud.isHidden() || mc.getDebugOverlay().showDebugScreen();
+        boolean hidden = mc.options.hideGui || mc.getDebugOverlay().showDebugScreen();
         StatusPanelHud.render(graphics, shownRows(), _keepTop, _timer, hidden);
     }
 

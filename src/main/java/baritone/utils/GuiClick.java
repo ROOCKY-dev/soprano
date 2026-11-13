@@ -26,9 +26,9 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.MouseButtonEvent;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.ClickEvent;
@@ -65,7 +65,7 @@ public class GuiClick extends Screen implements Helper {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor grapics, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics grapics, int mouseX, int mouseY, float partialTicks) {
         double mx = mc.mouseHandler.xpos();
         double my = mc.mouseHandler.ypos();
 
@@ -88,7 +88,7 @@ public class GuiClick extends Screen implements Helper {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor grapics, int mouseX, int mouseY, float partialTicks) {
+    public void renderBackground(GuiGraphics grapics, int mouseX, int mouseY, float partialTicks) {
         // Prevent default background rendering
     }
 
@@ -100,16 +100,16 @@ public class GuiClick extends Screen implements Helper {
     }
 
     @Override
-    public boolean mouseReleased(MouseButtonEvent event) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
         if (currentMouseOver != null) { //Catch this, or else a click into void will result in a crash
-            if (event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+            if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                 if (clickStart != null && !clickStart.equals(currentMouseOver)) {
                     BaritoneAPI.getProvider().getPrimaryBaritone().getSelectionManager().removeAllSelections();
                     BaritoneAPI.getProvider().getPrimaryBaritone().getSelectionManager().addSelection(BetterBlockPos.from(clickStart), BetterBlockPos.from(currentMouseOver));
                     MutableComponent component = Component.literal("Selection made! For usage: " + Baritone.settings().prefix.value + "help sel");
                     component.setStyle(component.getStyle()
                             .withColor(ChatFormatting.WHITE)
-                            .withClickEvent(new ClickEvent.RunCommand(
+                            .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,
                                     FORCE_COMMAND_PREFIX + "help sel"
                             )));
                     Helper.HELPER.logDirect(component);
@@ -117,18 +117,18 @@ public class GuiClick extends Screen implements Helper {
                 } else {
                     goTo(new GoalBlock(currentMouseOver));
                 }
-            } else if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
+            } else if (button == InputConstants.MOUSE_BUTTON_RIGHT) {
                 goTo(new GoalBlock(currentMouseOver.above()));
             }
         }
         clickStart = null;
-        return super.mouseReleased(event);
+        return super.mouseReleased(mouseX, mouseY, button);
     }
 
     @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
         clickStart = currentMouseOver;
-        return super.mouseClicked(event, doubleClick);
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     public void onRender(PoseStack modelViewStack, Matrix4f projectionMatrix) {

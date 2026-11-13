@@ -15,11 +15,10 @@ import adris.altoclef.util.helpers.CombatCommit;
 import baritone.Baritone;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.WinScreen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
@@ -76,37 +75,37 @@ public class GamerHudOverlay {
     private static final int STRIP_BG = 0xBFAA1414;
     private static final int RULE = 0x2EFFFFFF;
 
-    private static final Identifier HEART = Identifier.withDefaultNamespace("hud/heart/full");
-    private static final Identifier FOOD = Identifier.withDefaultNamespace("hud/food_full");
+    private static final ResourceLocation HEART = ResourceLocation.withDefaultNamespace("hud/heart/full");
+    private static final ResourceLocation FOOD = ResourceLocation.withDefaultNamespace("hud/food_full");
 
     private interface Op {
-        void draw(GuiGraphicsExtractor g, Font font);
+        void draw(GuiGraphics g, Font font);
     }
 
     private record Rect(int x, int y, int w, int h, int color) implements Op {
         @Override
-        public void draw(GuiGraphicsExtractor g, Font font) {
+        public void draw(GuiGraphics g, Font font) {
             g.fill(x, y, x + w, y + h, color);
         }
     }
 
     private record Text(String s, int x, int y, int color) implements Op {
         @Override
-        public void draw(GuiGraphicsExtractor g, Font font) {
-            g.text(font, s, x, y, color, true);
+        public void draw(GuiGraphics g, Font font) {
+            g.drawString(font, s, x, y, color, true);
         }
     }
 
     // the font at 2x, one glyph at a time with a unit between them: the plain scale-up has the letters touching
     private record BigText(String[] glyphs, int[] xs, int y, int color) implements Op {
         @Override
-        public void draw(GuiGraphicsExtractor g, Font font) {
+        public void draw(GuiGraphics g, Font font) {
             for (int i = 0; i < glyphs.length; i++) {
-                g.pose().pushMatrix();
-                g.pose().translate(xs[i], y);
-                g.pose().scale(2F, 2F);
-                g.text(font, glyphs[i], 0, 0, color, true);
-                g.pose().popMatrix();
+                g.pose().pushPose();
+                g.pose().translate(xs[i], y, 0);
+                g.pose().scale(2F, 2F, 1f);
+                g.drawString(font, glyphs[i], 0, 0, color, true);
+                g.pose().popPose();
             }
         }
     }
@@ -114,19 +113,19 @@ public class GamerHudOverlay {
     // an item at half size: 16 gui units is a hotbar slot, a list line is 8
     private record Icon(ItemStack stack, int x, int y) implements Op {
         @Override
-        public void draw(GuiGraphicsExtractor g, Font font) {
-            g.pose().pushMatrix();
-            g.pose().translate(x, y);
-            g.pose().scale(0.5F, 0.5F);
-            g.item(stack, 0, 0);
-            g.pose().popMatrix();
+        public void draw(GuiGraphics g, Font font) {
+            g.pose().pushPose();
+            g.pose().translate(x, y, 0);
+            g.pose().scale(0.5F, 0.5F, 1f);
+            g.renderItem(stack, 0, 0);
+            g.pose().popPose();
         }
     }
 
-    private record Sprite(Identifier id, int x, int y, int w, int h) implements Op {
+    private record Sprite(ResourceLocation id, int x, int y, int w, int h) implements Op {
         @Override
-        public void draw(GuiGraphicsExtractor g, Font font) {
-            g.blitSprite(RenderPipelines.GUI_TEXTURED, id, x, y, w, h);
+        public void draw(GuiGraphics g, Font font) {
+            g.blitSprite(id, x, y, w, h);
         }
     }
 
@@ -152,10 +151,10 @@ public class GamerHudOverlay {
         layoutTick = -1;
     }
 
-    public void render(AltoClef mod, GuiGraphicsExtractor graphics) {
+    public void render(AltoClef mod, GuiGraphics graphics) {
         Minecraft mc = Minecraft.getInstance();
         // f1 hides the hud, f3 is busy enough
-        if (mc.level == null || mc.player == null || mc.gui.hud.isHidden() || mc.getDebugOverlay().showDebugScreen()) {
+        if (mc.level == null || mc.player == null || mc.options.hideGui || mc.getDebugOverlay().showDebugScreen()) {
             return;
         }
         if (!Baritone.settings().altoGamerHud.value) {
@@ -187,17 +186,17 @@ public class GamerHudOverlay {
         int x0 = (int) (graphics.guiWidth() / scale) - MARGIN - WIDTH;
         int y0 = ((int) (graphics.guiHeight() / scale) - height) / 2;
         // the corner toast steps around this, in framebuffer px like it draws
-        float px = scale * mc.getWindow().getGuiScale();
+        float px = scale * (float) mc.getWindow().getGuiScale();
         HudObstacles.card(x0 * px, y0 * px, WIDTH * px, height * px);
-        graphics.pose().pushMatrix();
-        graphics.pose().scale(scale, scale);
-        graphics.pose().translate(x0, y0);
+        graphics.pose().pushPose();
+        graphics.pose().scale(scale, scale, 1f);
+        graphics.pose().translate(x0, y0, 0);
         // the chat's backdrop, so the accessibility text background option applies here too
         graphics.fill(0, 0, WIDTH, height, mc.options.getBackgroundColor(0.5F));
         for (Op op : ops) {
             op.draw(graphics, mc.font);
         }
-        graphics.pose().popMatrix();
+        graphics.pose().popPose();
     }
 
     // the win card while its thirty seconds last. they start with the first frame it can be seen: the credits cover the whole
@@ -211,7 +210,7 @@ public class GamerHudOverlay {
             return null;
         }
         long now = System.currentTimeMillis();
-        boolean show = linger.visible(now, mc.gui.screen() instanceof WinScreen);
+        boolean show = linger.visible(now, mc.screen instanceof WinScreen);
         if (linger.over(now)) {
             won = null;
             return null;

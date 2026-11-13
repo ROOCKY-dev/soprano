@@ -44,22 +44,21 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.arrow.Arrow;
-import net.minecraft.world.entity.projectile.hurtingprojectile.DragonFireball;
-import net.minecraft.world.entity.projectile.hurtingprojectile.LargeFireball;
+import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.DragonFireball;
+import net.minecraft.world.entity.projectile.LargeFireball;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.hurtingprojectile.SmallFireball;
-import net.minecraft.world.entity.projectile.arrow.SpectralArrow;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownLingeringPotion;
-import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownSplashPotion;
+import net.minecraft.world.entity.projectile.SmallFireball;
+import net.minecraft.world.entity.projectile.SpectralArrow;
+import net.minecraft.world.entity.projectile.ThrownPotion;
+import net.minecraft.world.entity.projectile.ThrownPotion;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.inventory.ContainerInput;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
@@ -215,7 +214,7 @@ public class MobDefenseChain extends SingleTaskChain {
                 if (!spaceSlots.isEmpty()) {
                     for (ItemStack spaceSlot : spaceSlots) {
                         if (spaceSlot.isEmpty()) {
-                            mod.getSlotHandler().clickSlot(PlayerSlot.getEquipSlot(), 0, ContainerInput.QUICK_MOVE);
+                            mod.getSlotHandler().clickSlot(PlayerSlot.getEquipSlot(), 0, ClickType.QUICK_MOVE);
                             return;
                         }
                     }
@@ -273,7 +272,7 @@ public class MobDefenseChain extends SingleTaskChain {
                 Optional<Slot> toMoveTo = mod.getItemStorage().getSlotThatCanFitInPlayerInventory(cursor, false).or(() -> StorageHelper.getGarbageSlot(mod));
                 if (toMoveTo.isPresent()) {
                     Slot garbageSlot = toMoveTo.get();
-                    mod.getSlotHandler().clickSlot(garbageSlot, 0, ContainerInput.PICKUP);
+                    mod.getSlotHandler().clickSlot(garbageSlot, 0, ClickType.PICKUP);
                 }
             }
             // (only ours: the aura's shield may be the one up)
@@ -433,8 +432,8 @@ public class MobDefenseChain extends SingleTaskChain {
         } else if (!_creeperStep.active() && mode != CombatCommit.Mode.RUN && !_brain.walkNoArrowShield() && Baritone.settings().altoDodgeProjectiles.value && hasShield(mod)
                 && isProjectileClose(mod) && !(_closeFireball && mod.getBehaviour().noFireballShield())
                 && (!mod.getFoodChain().biting() || _beatsBite)
-                && !mod.getEntityTracker().entityFound(ThrownSplashPotion.class, ThrownLingeringPotion.class)
-                && !player.getCooldowns().isOnCooldown(new ItemStack(offhandItem))
+                && !mod.getEntityTracker().entityFound(ThrownPotion.class, ThrownPotion.class)
+                && !player.getCooldowns().isOnCooldown(offhandItem)
                 && (fighting || mod.getClientBaritone().getPathingBehavior().isSafeToCancel())) {
             _dodgeTick = mod.getWorld().getGameTime();
             if (StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem() != Items.SHIELD) {
@@ -759,7 +758,7 @@ public class MobDefenseChain extends SingleTaskChain {
         }
         InteractionResult result = Minecraft.getInstance().gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhit);
         if (result.consumesAction()) {
-            player.swing(InteractionHand.MAIN_HAND, SwingAnimation.DEFAULT, false);
+            player.swing(InteractionHand.MAIN_HAND);
             // the block shows up next tick, and then the cell is not replaceable and we are done
             return true;
         }
@@ -829,8 +828,8 @@ public class MobDefenseChain extends SingleTaskChain {
             // same weirdness as getClosestFusingCreeper. a tick with no creepers ends a step, the next tick starts it again
             seen.clear();
         }
-        boolean shieldReady = hasShield(mod) && !mod.getEntityTracker().entityFound(ThrownSplashPotion.class, ThrownLingeringPotion.class)
-                && !player.getCooldowns().isOnCooldown(new ItemStack(StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem()));
+        boolean shieldReady = hasShield(mod) && !mod.getEntityTracker().entityFound(ThrownPotion.class, ThrownPotion.class)
+                && !player.getCooldowns().isOnCooldown(StorageHelper.getItemStackInSlot(PlayerSlot.OFFHAND_SLOT).getItem());
         boolean noHeading = noWayOut(mod, seen);
         CreeperStep.Event event = _creeperStep.step(now, seen, shieldReady, mode, enabled, noHeading);
         for (CreeperStep.Park park : _creeperStep.parkedNow()) Debug.logInternal(CombatLog.creeperParked(dimension, park));

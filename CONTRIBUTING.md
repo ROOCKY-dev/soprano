@@ -4,16 +4,16 @@ Bug reports, ideas and pull requests are all welcome.
 
 ## Branches
 
-Each branch is one Minecraft version, named after it (`1.21.4`, `1.21.11`, `26.3`). The newest version lives on `26.3`, which is the default branch. Open your pull request against the branch for the version you're targeting. Don't target `26.3` for a fix to an older version.
+Each branch is one Minecraft version, named after it (`1.21.1`, `1.21.4`, `1.21.11`, `26.3`). The newest version lives on `26.3`, which is the default branch. Open your pull request against the branch for the version you're targeting. Don't target `26.3` for a fix to an older version.
 
 ## Building and testing
 
-You need the JDK in `java_version` in `gradle.properties` (21 on `1.21.4`, 25 on `26.3`), same as [the CI workflow](.github/workflows/gradle_build.yml).
+You need the JDK in `java_version` in `gradle.properties` (21 on `1.21.1` and `1.21.4`, 25 on `26.3`), same as [the CI workflow](.github/workflows/gradle_build.yml).
 
 ```
 ./gradlew build            # everything, jars end up in dist/
 ./gradlew test             # unit tests
-./gradlew :fabric:runClient  # dev client with Soprano loaded
+./gradlew :neoforge:runClient  # dev client with Soprano loaded
 ```
 
 On Windows use `gradlew` instead of `./gradlew`.

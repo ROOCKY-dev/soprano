@@ -66,9 +66,6 @@ allprojects {
 
     repositories {
         maven {
-            url = "https://files.minecraftforge.net/maven/"
-        }
-        maven {
             name = 'spongepowered-repo'
             url = 'https://repo.spongepowered.org/repository/maven-public/'
         }
@@ -106,7 +103,10 @@ allprojects {
         version rootProject.minecraft_version
 
         mappings {
+            intermediary()
             mojmap()
+
+            devFallbackNamespace "official"
         }
     }
 

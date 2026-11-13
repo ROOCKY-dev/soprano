@@ -60,7 +60,7 @@ public final class PillarBed {
         return Vec3.atCenterOf(bed(portalTop).east());
     }
 
-    // ServerExplosion.getSeenPercent's own grid of rays, with the pillar as the only thing in the way. the real one can't be asked
+    // Explosion.getSeenPercent's own grid of rays, with the pillar as the only thing in the way. the real one can't be asked
     // while the bed stands: its rays all end inside the bed's own box, so it says 0 from anywhere. the server only asks once the
     // bed is gone. anything else in the way just makes us safer than this says
     public static double seen(BlockPos portalTop, double minX, double minY, double minZ, double maxX, double maxY, double maxZ) {

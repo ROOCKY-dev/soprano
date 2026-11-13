@@ -1,11 +1,11 @@
 package adris.altoclef.ui.gui.mc;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.input.InputWithModifiers;
-import net.minecraft.client.input.MouseButtonEvent;
+import baritone.compat.input.InputWithModifiers;
+import baritone.compat.input.MouseButtonEvent;
 import net.minecraft.client.sounds.SoundManager;
 
 // the clickable stand-in for one hidden vanilla title button (a dock tile, a corner button, the copyright line). it
@@ -52,10 +52,9 @@ public final class TitleTile extends AbstractButton {
         }
     }
 
-    @Override
     public void onPress(InputWithModifiers input) {
         if (target.active) {
-            target.onPress(input);
+            target.onPress();
         }
     }
 
@@ -70,16 +69,14 @@ public final class TitleTile extends AbstractButton {
         return x >= px && x < px + pw && y >= py && y < py + ph;
     }
 
-    @Override
     public void onClick(MouseButtonEvent event, boolean doubleClick) {
         held = true;
-        super.onClick(event, doubleClick);
+        super.onClick(event.x(), event.y());
     }
 
-    @Override
     public void onRelease(MouseButtonEvent event) {
         held = false;
-        super.onRelease(event);
+        super.onRelease(event.x(), event.y());
     }
 
     // vanilla calls this for both a click and enter/space, so one override swaps the whole button sound
@@ -89,7 +86,7 @@ public final class TitleTile extends AbstractButton {
     }
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor g, int mouseX, int mouseY, float partial) {
+    protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partial) {
         // TitleMenu already drew us
     }
 
@@ -97,4 +94,14 @@ public final class TitleTile extends AbstractButton {
     protected void updateWidgetNarration(NarrationElementOutput out) {
         defaultButtonNarrationText(out);
     }
+
+    // adapt the GLFW callbacks while retaining the shared GUI event handlers
+    @Override
+    public void onClick(double x, double y) { onClick(new MouseButtonEvent(x, y, 0, baritone.compat.input.InputWithModifiers.currentModifiers()), false); }
+
+    @Override
+    public void onRelease(double x, double y) { onRelease(new MouseButtonEvent(x, y, 0, baritone.compat.input.InputWithModifiers.currentModifiers())); }
+
+    @Override
+    public void onPress() { onPress(new baritone.compat.input.KeyEvent(0, 0, baritone.compat.input.InputWithModifiers.currentModifiers())); }
 }

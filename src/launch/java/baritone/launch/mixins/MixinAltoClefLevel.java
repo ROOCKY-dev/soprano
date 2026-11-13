@@ -35,7 +35,7 @@ public class MixinAltoClefLevel {
     // ClientLevel.setBlock goes through Level.setBlock which calls this, so Level is the right place
     // (26.3 renamed it to updatePOIOnBlockStateChange, still the empty hook at the very end of setBlock)
     @Inject(
-            method = "updatePOIOnBlockStateChange",
+            method = "onBlockStateChange",
             at = @At("HEAD")
     )
     private void altoclef$onBlockStateChange(final BlockPos pos, final BlockState oldState, final BlockState newState, final CallbackInfo ci) {

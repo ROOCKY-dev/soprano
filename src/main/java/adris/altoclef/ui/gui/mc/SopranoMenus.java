@@ -43,7 +43,7 @@ public final class SopranoMenus {
                 Safe.report("menus switch", new IllegalStateException(r.message()));
                 return;
             }
-            Minecraft.getInstance().gui.setScreen(new TitleScreen());
+            Minecraft.getInstance().setScreen(new TitleScreen());
         } catch (Throwable t) {
             Safe.report("menus switch", t);
         }

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 // RoutineLines' questions for the running game. a check that throws (no world yet, registries not up) counts as fine:
 // the run finds out for real, the editor shouldn't go red over something it can't know
@@ -117,7 +117,7 @@ public final class GameChecks implements GraphValidator.Checks {
     }
 
     private static boolean known(Registry<?> registry, String id) {
-        Identifier parsed = Identifier.tryParse(id);
+        ResourceLocation parsed = ResourceLocation.tryParse(id);
         return parsed != null && registry.containsKey(parsed);
     }
 

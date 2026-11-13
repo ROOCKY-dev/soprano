@@ -39,9 +39,6 @@ public abstract class MixinMusicManager {
     @Final
     private Minecraft minecraft;
 
-    @Shadow
-    private float currentGain;
-
     @Unique
     private boolean soprano$owned;
 
@@ -75,8 +72,6 @@ public abstract class MixinMusicManager {
     private void soprano$takeOver() {
         try {
             stopPlaying();
-            currentGain = 1f;
-            minecraft.getSoundManager().updateCategoryVolume(SoundSource.MUSIC, 1f);
         } catch (Throwable t) {
             Safe.report("menu music takeover", t);
         }

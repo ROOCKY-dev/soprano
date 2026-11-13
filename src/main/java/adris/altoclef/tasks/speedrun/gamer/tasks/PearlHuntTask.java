@@ -31,7 +31,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Enderman;
+import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.hoglin.Hoglin;
 import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.item.Items;
@@ -111,7 +111,7 @@ public class PearlHuntTask extends Task {
     // told when an enderman dies, and only then (a stare that goes nowhere is not progress, see NetherPhase.stallSeconds)
     private final Runnable onKill;
     // the angry ones seen last tick, so one that is dead now was one we killed
-    private final List<Enderman> watched = new ArrayList<>();
+    private final List<EnderMan> watched = new ArrayList<>();
     private final KillAndLootTask loot;
     private final ItemTarget pearlTarget;
     // one instance for the hunt: the bans live on the mod so a rebuild would be fine too, but this keeps its walk progress
@@ -207,7 +207,7 @@ public class PearlHuntTask extends Task {
         this.hotspot = hotspot;
         // an enderman on a lava shore is not worth the walk, the bot ends up standing at the lava with nowhere to go
         pearlTarget = new ItemTarget(Items.ENDER_PEARL, pearlsTotal);
-        loot = new KillAndLootTask(Enderman.class, man -> lootTarget(man, false), man -> lootTarget(man, true), pearlTarget);
+        loot = new KillAndLootTask(EnderMan.class, man -> lootTarget(man, false), man -> lootTarget(man, true), pearlTarget);
         loot.forceDimension(dimension);
         goToDimension = new DefaultGoToDimensionTask(dimension);
     }
@@ -318,13 +318,13 @@ public class PearlHuntTask extends Task {
 
     // the angry ones we watched last tick that are dead now: those are kills
     private void noteKills(AltoClef mod) {
-        for (Enderman man : watched) {
+        for (EnderMan man : watched) {
             if (man.isDeadOrDying()) {
                 onKill.run();
             }
         }
         watched.clear();
-        for (Enderman man : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+        for (EnderMan man : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
             if (man.isAlive() && man.isCreepy()) {
                 watched.add(man);
             }
@@ -405,7 +405,7 @@ public class PearlHuntTask extends Task {
         if (grab != null) {
             return say("Picking up an ender pearl", grab);
         }
-        Enderman pull = pullTarget(mod, gameTime);
+        EnderMan pull = pullTarget(mod, gameTime);
         if (pull != null) {
             if (pullStare.staringAt() != pull.getId()) {
                 Debug.logInternal("pearl: staring at enderman #" + pull.getId() + " at " + Math.round(pull.distanceTo(mod.getPlayer())));
@@ -426,7 +426,7 @@ public class PearlHuntTask extends Task {
         }
         // read before the back off below: it may be the tick that picks the target, and the back off clears it again
         int lootId = loot.pursuingId();
-        if (backsOffFrom(dimension == Dimension.NETHER && mod.getEntityTracker().entityFound(Enderman.class), anyLootable(mod, lootId))) {
+        if (backsOffFrom(dimension == Dimension.NETHER && mod.getEntityTracker().entityFound(EnderMan.class), anyLootable(mod, lootId))) {
             // no nook to do it from: lava or fire means step away, low hp means wait while it heals
             List<BlockPos> lava = exposedLava(mod.getWorld(), mod.getPlayer().blockPosition(), EndermanNook.AGGRO_LAVA_GAP);
             EndermanNook.Stance stance = EndermanNook.stance(!lava.isEmpty(), mod.getPlayer().isOnFire(), mod.getPlayer().getHealth(),
@@ -467,7 +467,7 @@ public class PearlHuntTask extends Task {
         // time spent as the loot target counts toward the same give up as the angry fight, an enderman the walk cannot reach
         // would otherwise bounce between this and the hotspot walk (the latch sees it, drops, sees it) for minutes
         // (not for one the kill task is about to drop for being far below, losing it is not a spent budget)
-        if (lootId >= 0 && !(mod.getWorld().getEntity(lootId) instanceof Enderman man && farBelow(man, true))) {
+        if (lootId >= 0 && !(mod.getWorld().getEntity(lootId) instanceof EnderMan man && farBelow(man, true))) {
             angrySpent.tick(lootId, ANGRY_SECONDS);
         }
         Task roaming = roamStep(mod, lootId);
@@ -476,7 +476,7 @@ public class PearlHuntTask extends Task {
             return say("Roaming the warped forest", roaming);
         }
         lootRanAt = tickNo;
-        return say(mod.getEntityTracker().entityFound(Enderman.class) ? "Collecting Ender Pearls" : "Looking for endermen", loot);
+        return say(mod.getEntityTracker().entityFound(EnderMan.class) ? "Collecting Ender Pearls" : "Looking for endermen", loot);
     }
 
     // the lava spot goes up when the back off gave up or the kill tasks have spent 20 s of the last minute standing by lava, and
@@ -539,7 +539,7 @@ public class PearlHuntTask extends Task {
         if (dryAt != now) {
             dryAt = now;
             dryAny = false;
-            for (Enderman other : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+            for (EnderMan other : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
                 if (other.isAlive() && baseLootTarget(other, false) && !byLava(other)) {
                     dryAny = true;
                     break;
@@ -580,7 +580,7 @@ public class PearlHuntTask extends Task {
     // the stare we were on turned angry: say so once (fightAngry takes it from here)
     private void noteStareAnswer(AltoClef mod, long gameTime) {
         int id = pullStare.staringAt();
-        if (id >= 0 && mod.getWorld().getEntity(id) instanceof Enderman man && man.isCreepy()) {
+        if (id >= 0 && mod.getWorld().getEntity(id) instanceof EnderMan man && man.isCreepy()) {
             int took = pullStare.answered(id, gameTime);
             if (took >= 0) {
                 Debug.logInternal("pearl: stare answered in " + took + " ticks");
@@ -590,7 +590,7 @@ public class PearlHuntTask extends Task {
 
     // the calm enderman to stare at, null for none. nether only: a calm one 12 to 48 blocks off, nothing angry, and the same
     // bait rules the nook uses (EndermanNook.stareWorthwhile: hp, fire, lava by us, lava between at close range)
-    private Enderman pullTarget(AltoClef mod, long gameTime) {
+    private EnderMan pullTarget(AltoClef mod, long gameTime) {
         var us = mod.getPlayer();
         var cells = CliffAvoidance.of(mod.getClientBaritone().bsi);
         if (!PullStare.allowed(dimension == Dimension.NETHER, LavaShore.edgeNear(cells, us.getX(), us.getY(), us.getZ()), pullStare.cooling(gameTime))) {
@@ -599,8 +599,8 @@ public class PearlHuntTask extends Task {
         if (!PullStare.witherClear(CollectBlazeRodsTask.witherSkeletonsNear(mod, us.position(), PullStare.WITHER_CLEAR))) {
             return null;
         }
-        List<Enderman> men = mod.getEntityTracker().getTrackedEntities(Enderman.class);
-        for (Enderman man : men) {
+        List<EnderMan> men = mod.getEntityTracker().getTrackedEntities(EnderMan.class);
+        for (EnderMan man : men) {
             // a given up one is not angry business anymore (countAngry in the nook does the same)
             if (man.isAlive() && man.isCreepy() && !angrySpent.givenUp(man.getId())) {
                 return null;
@@ -608,8 +608,8 @@ public class PearlHuntTask extends Task {
         }
         int lootId = loot.pursuingId();
         boolean ourLavaClear = exposedLava(mod.getWorld(), us.blockPosition(), EndermanNook.AGGRO_LAVA_GAP).isEmpty();
-        Enderman best = null;
-        for (Enderman man : men) {
+        EnderMan best = null;
+        for (EnderMan man : men) {
             double d = man.distanceTo(us);
             if (!man.isAlive() || man.isCreepy() || !lootTarget(man, false)) {
                 continue;
@@ -680,7 +680,7 @@ public class PearlHuntTask extends Task {
     // any angry one counts here, given up or not: given up means we stopped chasing it, not that it stopped hitting
     private static double nearestAngry(AltoClef mod) {
         double best = Double.POSITIVE_INFINITY;
-        for (Enderman man : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+        for (EnderMan man : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
             if (man.isAlive() && man.isCreepy()) {
                 best = Math.min(best, man.distanceTo(mod.getPlayer()));
             }
@@ -703,7 +703,7 @@ public class PearlHuntTask extends Task {
         boolean lootable = lootId >= 0 || anyLootable(mod, -1);
         // any enderman in the client world keeps the forest alive, chaseable or not: the ones by lava or given up on move
         // and new ones spawn, the walk around is what brings a good one in range
-        if (mod.getEntityTracker().entityFound(Enderman.class)) {
+        if (mod.getEntityTracker().entityFound(EnderMan.class)) {
             roam.sawEnderman();
         }
         // asking a loot task that is not running would arm its drop wait off any enderman that dies nearby, and the one
@@ -780,7 +780,7 @@ public class PearlHuntTask extends Task {
 
     // the one the kill walk is on (pursuingId) is judged on the keep line, same as the kill task does
     private boolean anyLootable(AltoClef mod, int pursuingId) {
-        for (Enderman man : mod.getEntityTracker().getTrackedEntities(Enderman.class)) {
+        for (EnderMan man : mod.getEntityTracker().getTrackedEntities(EnderMan.class)) {
             if (man.isAlive() && lootTarget(man, man.getId() == pursuingId)) {
                 return true;
             }
@@ -911,10 +911,10 @@ public class PearlHuntTask extends Task {
 
     // distance to the nearest tracked enderman we have line of sight to, infinity for none (see EndermanNook.nearestSeen)
     private static double nearestEnderman(AltoClef mod, AngryClock nookGaveUp, AngryClock angryGaveUp, boolean nether) {
-        List<Enderman> men = mod.getEntityTracker().getTrackedEntities(Enderman.class);
+        List<EnderMan> men = mod.getEntityTracker().getTrackedEntities(EnderMan.class);
         double[] dist = new double[men.size()];
         for (int i = 0; i < dist.length; i++) {
-            Enderman man = men.get(i);
+            EnderMan man = men.get(i);
             double d = man.distanceTo(mod.getPlayer());
             boolean farBelow = tooFarBelow(man.getY() - mod.getPlayer().getY(), false, nether);
             // (the cheap distance first, the ray is the dear part and the latch does not care past its range)
@@ -932,7 +932,7 @@ public class PearlHuntTask extends Task {
     private Task fightAngry(AltoClef mod) {
         // the one we are on stays the one until it is dead, gone, far or spent: isCreepy flickers when it looks away, and
         // every swap to the loot task restarts the kill task and its caps
-        if (angryTarget instanceof Enderman latched && angryTask != null) {
+        if (angryTarget instanceof EnderMan latched && angryTask != null) {
             if (stillLatched(latched.isAlive() && !latched.isRemoved(), latched.distanceTo(mod.getPlayer()), angrySpent.givenUp(latched.getId()), avoid(latched) || farBelow(latched, true))) {
                 return angrySpent.tick(latched.getId(), ANGRY_SECONDS) ? null : angryTask;
             }
@@ -940,17 +940,17 @@ public class PearlHuntTask extends Task {
             angryTarget = null;
             angryTask = null;
         }
-        List<Enderman> men = mod.getEntityTracker().getTrackedEntities(Enderman.class);
+        List<EnderMan> men = mod.getEntityTracker().getTrackedEntities(EnderMan.class);
         double[] dist = new double[men.size()];
         for (int i = 0; i < dist.length; i++) {
-            Enderman man = men.get(i);
+            EnderMan man = men.get(i);
             dist[i] = fightable(man.isAlive() && man.isCreepy(), angrySpent.givenUp(man.getId()), () -> avoid(man), farBelow(man, false)) ? man.distanceTo(mod.getPlayer()) : Double.NaN;
         }
         int at = EndermanNook.nearestAngry(dist);
         if (at < 0) {
             return null;
         }
-        Enderman man = men.get(at);
+        EnderMan man = men.get(at);
         if (angryTarget != man) {
             angryTarget = man;
             angryTask = new KillEntityTask(man);

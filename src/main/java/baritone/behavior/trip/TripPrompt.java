@@ -70,8 +70,8 @@ final class TripPrompt {
         MutableComponent c = Component.literal(text);
         c.setStyle(c.getStyle()
                 .withColor(color)
-                .withHoverEvent(new HoverEvent.ShowText(Component.literal(hover)))
-                .withClickEvent(new ClickEvent.RunCommand(FORCE_COMMAND_PREFIX + command)));
+                .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal(hover)))
+                .withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, FORCE_COMMAND_PREFIX + command)));
         return c;
     }
 

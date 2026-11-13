@@ -34,7 +34,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -338,7 +338,7 @@ public class PlaceBedAndSetSpawnTask extends Task {
             setDebugState("Going to the overworld first.", "Heading to the Overworld");
             return new DefaultGoToDimensionTask(Dimension.OVERWORLD);
         }
-        Screen screen = Minecraft.getInstance().gui.screen();
+        Screen screen = Minecraft.getInstance().screen;
         if (screen instanceof InBedChatScreen) {
             _progressChecker.reset();
             setDebugState("Sleeping...", "Sleeping");
@@ -411,7 +411,7 @@ public class PlaceBedAndSetSpawnTask extends Task {
                     /*
                     BlockPos targetMove = toSleepIn.offset(side).offset(side); // Twice, juust to make sure...
                      */
-                            return new GetToBlockTask(_bedForSpawnPoint.offset(side.getUnitVec3i()));
+                            return new GetToBlockTask(_bedForSpawnPoint.offset(side.getNormal()));
                         } catch (IllegalArgumentException e) {
                             // If bed is not loaded, this will happen. In that case just get to the bed first.
                         }
